@@ -12,15 +12,14 @@ struct Node{
     int offset;
     string type;
 public:
-    Node( string name, int offset, string type ) : name(name), offset(offset), type(type) {}
+    Node( string name, int offset, string type ) : name(name), offset(offset), type(type) {
+        cout << "heyyy!" << endl;
+    }
 };
 
 class Num: public Node{
 public:
     Num(const string& name, int offset, const string& type ) : Node(name, offset, type) {};
-    string prints(){
-        cout << "heyyy!" << endl;
-    };
 };
 
 

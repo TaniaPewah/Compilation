@@ -3,6 +3,7 @@
 	#include <iostream>
 	#include <stdlib.h>
     #include "hw3_output.hpp"
+    #include "parser.hpp"
 
 	using namespace std;
 	using namespace output;
@@ -50,7 +51,10 @@ Funcs : { printProductionRule(2); }
 	  | FuncDecl Funcs { printProductionRule(3); }
 	  ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE { printProductionRule(4); }
+FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE {
+        // add ID to symbolTable $2 is the name of function
+        // $$ = new FuncDefinition($2, offset, $1, $4 )
+        printProductionRule(4); }
 		;
 
 RetType : Type { printProductionRule(5); }
@@ -71,8 +75,11 @@ Statements : Statement { printProductionRule(12); }
 		   ;
 
 Statement : LBRACE Statements RBRACE { printProductionRule(14); }
-		  | Type ID SC { printProductionRule(15); }
-		  | Type ID ASSIGN Exp SC { printProductionRule(16); }
+		  | Type ID SC { // add ID to symbolTable $1 is the type
+		                    printProductionRule(15); }
+		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
+		                            // $$ = new VarDefinition($2, counter, $1)
+		                            printProductionRule(16); }
 		  | ID ASSIGN Exp SC { printProductionRule(17); }
 		  | Call SC { printProductionRule(18); }
 		  | RETURN SC { printProductionRule(19); }
