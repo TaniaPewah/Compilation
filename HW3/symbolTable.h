@@ -4,7 +4,17 @@
 
 #ifndef HW3_SYMBOLTABLE_H
 #define HW3_SYMBOLTABLE_H
+
+#include <iostream>
+#include <map>
+#include <string>
+
 using namespace std;
+
+class TableEntry
+{};
+
+
 
 class SymbolTable {
 public:
@@ -12,11 +22,11 @@ public:
 
     void newScope(){}
     void endScope(){}
-}
+};
 
 class Scope{
 
-    map <string, TableEntry> entries;
+    map<string, TableEntry> entries;
     Scope(){}
 }
 
