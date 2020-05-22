@@ -3,7 +3,8 @@
 	#include <iostream>
 	#include <stdlib.h>
     #include "hw3_output.hpp"
-    #define YYSTYPE double
+
+    #define YYSTYPE Node*
 	using namespace std;
 	using namespace output;
 
