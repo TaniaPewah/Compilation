@@ -5,21 +5,21 @@
 #ifndef HW3_PARSER_HPP
 #define HW3_PARSER_HPP
 #include "hw3_output.hpp"
+#include <iostream>
 using namespace std;
 
 struct Node{
     string name;
-    int offset;
     string type;
 public:
-    Node( string name, int offset, string type ) : name(name), offset(offset), type(type) {
-        cout << "heyyy!" << endl;
+    Node( string name, string type ) : name(name), type(type) {
+        cout << "node created ~~~~~~~~~~~~~~~~~~~~~" << name << endl;
     }
 };
 
 class Num: public Node{
 public:
-    Num(const string& name, int offset, const string& type ) : Node(name, offset, type) {};
+    Num(const string& name, const string& type ) : Node(name, type) {};
 };
 
 

@@ -1,9 +1,7 @@
 %{
-
+	#include "parser.hpp"
 	#include <iostream>
-	#include <stdlib.h>
-    #include "hw3_output.hpp"
-    #include "parser.hpp"
+	#include "symbolTable.h"
 
 	using namespace std;
 	using namespace output;
@@ -11,6 +9,7 @@
 	extern int yylex();
 	extern int yylineno;
 	int yyerror(const char * message);
+	SymbolTable symbolTable;
 %}
 
 
@@ -44,8 +43,10 @@
 
 %%
 
-Program : Funcs { printProductionRule(1); }
+Program : INIT Funcs { printProductionRule(1); }
 		;
+INIT : { symbolTable.newScope();
+		}
 
 Funcs : { printProductionRule(2); }
 	  | FuncDecl Funcs { printProductionRule(3); }
@@ -76,9 +77,13 @@ Statements : Statement { printProductionRule(12); }
 
 Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 		  | Type ID SC { // add ID to symbolTable $1 is the type
+		  					$$ = new Node("NUM_dec", "int"); 
+		  					symbolTable.addSymbolVar( $$ );
 		                    printProductionRule(15); }
 		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
 		                            // $$ = new VarDefinition($2, counter, $1)
+									$$ = new Node( "NUM_dec_val", "int"); 
+		  							symbolTable.addSymbolVar( $$ );
 		                            printProductionRule(16); }
 		  | ID ASSIGN Exp SC { printProductionRule(17); }
 		  | Call SC { printProductionRule(18); }
@@ -111,7 +116,7 @@ Exp : LPAREN Exp RPAREN { printProductionRule(34); }
 	| Exp MUL Exp { printProductionRule(35); }
 	| ID { printProductionRule(36); }
 	| Call { printProductionRule(37); }
-	| NUM { $$ = new Node( "NUM", 0, "int" );
+	| NUM { 
 	        printProductionRule(38); }
 	| NUM B { printProductionRule(39); }
 	| STRING { printProductionRule(40); }

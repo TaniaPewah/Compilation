@@ -14,6 +14,34 @@
 using namespace std;
 
 
+class TableEntry{
+public:
+
+    string name;
+    TableEntry( Node* newNode ){
+        name = newNode->name;
+        cout<<"--------new table entry added: "<<name<<endl;
+    }
+
+};
+
+class Scope{
+public:
+    map<string, TableEntry> entries;
+    int offset;
+
+    Scope(int offset) : offset(offset) {}
+
+    void addSymbolVar( Node* symbolToAdd ){
+        TableEntry* entryToAdd = new TableEntry( symbolToAdd );
+        entries.emplace ( symbolToAdd->name, entryToAdd );
+    }
+    void addSymbolFunc( Node* funcToAdd ){
+        TableEntry* entryToAdd = new TableEntry( funcToAdd );
+        entries.emplace ( funcToAdd->name, entryToAdd );
+    }
+};
+
 class SymbolTable {
 public:
     vector <Scope*> stack;
@@ -33,40 +61,12 @@ public:
     }
     void endScope(){}
 
-    void addSymbolVar( Node symbolToAdd ){
+    void addSymbolVar( Node* symbolToAdd ){
         stack.back()->addSymbolVar( symbolToAdd );
     }
-    void addSymbolFunc( Node symbolToAdd ){
+    void addSymbolFunc( Node* symbolToAdd ){
         stack.back()->addSymbolFunc( symbolToAdd );
     }
-};
-
-class Scope{
-public:
-    map<string, TableEntry> entries;
-    int offset;
-
-    Scope(int offset) : offset(offset) {}
-
-    void addSymbolVar( Node symbolToAdd ){
-        TableEntry* entryToAdd = new TableEntry( symbolToAdd );
-        entries.emplace ( symbolToAdd.name, entryToAdd );
-    }
-    void addSymbolFunc( Node funcToAdd ){
-        TableEntry* entryToAdd = new TableEntry( funcToAdd );
-        entries.emplace ( funcToAdd.name, entryToAdd );
-    }
-};
-
-class TableEntry{
-public:
-
-    string name;
-    TableEntry( Node newNode ){
-        name = newNode.name;
-        cout<<"new table entry added: "<<name<<endl;
-    }
-
 };
 
 #endif //HW3_SYMBOLTABLE_H
