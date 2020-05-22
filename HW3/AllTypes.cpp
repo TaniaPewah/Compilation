@@ -3,8 +3,11 @@
 //
 #include "AllTypes.h"
 
-void main() {
+int main() {
 
-    Num n = new Num("num", 1, "int");
-    n.prints()
+    Num* n = new Num("hi", 3, "by");
+    Node* node = new Node("jj", 8, "44");
+    n->prints();
+
+    return 0;
 }

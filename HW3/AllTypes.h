@@ -5,19 +5,21 @@
 #ifndef HW3_ALLTYPES_H
 #define HW3_ALLTYPES_H
 #include "hw3_output.hpp"
-#define
+
 struct Node{
-    const string& name;
+    string name;
     int offset;
-    const string& type;
+    string type;
 public:
     Node( const string& name, int offset, const string& type ) : name(name), offset(offset), type(type) {}
     virtual std::string prints();
 };
-class Num : public Node{
+
+class Num: public Node{
 public:
+    Num(const string& name, int offset, const string& type ) : Node(name, offset, type) {} {};
     string prints(){
-        output::printID(this.name, this.offset, this.type);
+        output::printID(this->name, this->offset, this->type);
     };
 };
 
