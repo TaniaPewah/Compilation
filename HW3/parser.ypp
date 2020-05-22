@@ -4,7 +4,6 @@
 	#include <stdlib.h>
     #include "hw3_output.hpp"
 
-    #define YYSTYPE Node*
 	using namespace std;
 	using namespace output;
 
@@ -105,7 +104,8 @@ Exp : LPAREN Exp RPAREN { printProductionRule(34); }
 	| Exp MUL Exp { printProductionRule(35); }
 	| ID { printProductionRule(36); }
 	| Call { printProductionRule(37); }
-	| NUM { printProductionRule(38); }
+	| NUM { $$ = new Node( "NUM", 0, "int" );
+	        printProductionRule(38); }
 	| NUM B { printProductionRule(39); }
 	| STRING { printProductionRule(40); }
 	| TRUE { printProductionRule(41); }
@@ -116,8 +116,6 @@ Exp : LPAREN Exp RPAREN { printProductionRule(34); }
 	| Exp RELOPLEFT Exp { printProductionRule(46); }
     | Exp RELOPNOTASS Exp { printProductionRule(46); }
 	;
-
-
 
 %%
 
