@@ -2,13 +2,13 @@
 
 	#include <iostream>
 	#include <stdlib.h>
-    #include "output.hpp"
+    #include "hw3_output.hpp"
+    #define YYSTYPE double
 	using namespace std;
 	using namespace output;
 
 	extern int yylex();
 	extern int yylineno;
-
 	int yyerror(const char * message);
 %}
 

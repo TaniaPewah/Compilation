@@ -2,7 +2,7 @@
 
 /* Declarations section */
 #include <stdio.h>
-#include "output.hpp"
+#include "hw3_output.hpp"
 #include "parser.tab.hpp"
 
 void handleGeneralError();
