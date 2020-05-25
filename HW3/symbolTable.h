@@ -6,6 +6,7 @@
 #define HW3_SYMBOLTABLE_H
 #include "parser.hpp"
 #include <map>
+#include <vector>
 
 using namespace std;
 
@@ -23,18 +24,18 @@ public:
 
 class Scope{
 public:
-    map<string, TableEntry> entries;
+    map<string, TableEntry*> entries;
     int offset;
 
     Scope(int offset) : offset(offset) {}
 
     void addSymbolVar( Node* symbolToAdd ){
         TableEntry* entryToAdd = new TableEntry( symbolToAdd );
-        entries.emplace ( symbolToAdd->name, entryToAdd );
+        entries.insert(make_pair(symbolToAdd->name, entryToAdd));
     }
     void addSymbolFunc( Node* funcToAdd ){
         TableEntry* entryToAdd = new TableEntry( funcToAdd );
-        entries.emplace ( funcToAdd->name, entryToAdd );
+        entries.insert(make_pair(funcToAdd->name, entryToAdd)); 
     }
 };
 

@@ -1,6 +1,7 @@
 #ifndef _236360_3_
 #define _236360_3_
 
+#include <vector>
 #include <string>
 using namespace std;
 
