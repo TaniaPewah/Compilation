@@ -1,8 +1,8 @@
 %{
 
 /* Declarations section */
-#include <stdio.h>
 #include "hw3_output.hpp"
+#include "parser.hpp"
 #include "parser.tab.hpp"
 
 void handleGeneralError();

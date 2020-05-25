@@ -5,11 +5,7 @@
 #ifndef HW3_SYMBOLTABLE_H
 #define HW3_SYMBOLTABLE_H
 #include "parser.hpp"
-
-#include <iostream>
 #include <map>
-#include <string>
-#include <vector>
 
 using namespace std;
 

@@ -1,6 +1,6 @@
 %{
+	#include "hw3_output.hpp"
 	#include "parser.hpp"
-	#include <iostream>
 	#include "symbolTable.h"
 
 	using namespace std;
