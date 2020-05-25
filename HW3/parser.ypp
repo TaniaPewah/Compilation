@@ -29,8 +29,6 @@
 %nonassoc RELOPNOTASS
 
 
-
-
 %left ADDITIVE 
 %left MUL
 
@@ -47,7 +45,8 @@ INIT : { symbolTable.newScope();
 		}
 
 Funcs : { printProductionRule(2); }
-	  | FuncDecl Funcs { printProductionRule(3); }
+	  | FuncDecl Funcs { 
+		  printProductionRule(3); }
 	  ;
 
 FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE {
@@ -72,7 +71,8 @@ FormalsList : FormalDecl { printProductionRule(9); }
 
 FormalDecl : Type ID { printProductionRule(11); };
 Statements : Statement { printProductionRule(12); }
-		   | Statements Statement { printProductionRule(13);}
+		   | Statements Statement { 
+			   printProductionRule(13);}
 		   ;
 
 Statement : LBRACE Statements RBRACE { printProductionRule(14); }
@@ -85,10 +85,11 @@ Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
 		                            
 									// TODO: take care of the type
-									$$ = ruleVarDeclAssign((IdNode*)$2);
+									$$ = ruleVarDeclAssign( (IdNode*)$2, 
+														   ((TypeNode*)$1)->type_name, 
+														   ((ExpNode*)$4)->type);
 
 		                            printProductionRule(16); }
-
 
 		  | ID ASSIGN Exp SC { printProductionRule(17); }
 		  | Call SC { printProductionRule(18); }
@@ -122,10 +123,12 @@ Exp : LPAREN Exp RPAREN { printProductionRule(34); }
 	| ID { printProductionRule(36); }
 	| Call { printProductionRule(37); }
 	| NUM { 
-	        printProductionRule(38); }
+		$$ = ruleExpNum((NumNode*)$1);
+		printProductionRule(38); }
 	| NUM B { printProductionRule(39); }
 	| STRING { printProductionRule(40); }
-	| TRUE { printProductionRule(41); }
+	| TRUE { $$ = (ExpNode*)$1;
+		printProductionRule(41); }
 	| FALSE { printProductionRule(42); }
 	| NOT Exp { printProductionRule(43); }
 	| Exp AND Exp { printProductionRule(44); }

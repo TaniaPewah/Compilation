@@ -12,16 +12,16 @@ void handleGeneralError();
 %option noyywrap
 
 %%
-void                        return VOID;
-int                         return INT;
-byte                        return BYTE;
-b 							return B;
-bool                        return BOOL;
+void                        { yylval =  new TypeNode( yylineno, string(yytext));  return VOID;}
+int                         { yylval =  new TypeNode( yylineno, string(yytext));  return INT;}
+byte                        { yylval =  new TypeNode( yylineno, string(yytext));  return BYTE;}
+b 							{ yylval =  new TypeNode( yylineno, string(yytext));  return B;}
+bool                        { yylval =  new TypeNode( yylineno, string(yytext));  return BOOL;}
 and                         return AND;
 or                          return OR;
 not                         return NOT;
-true                        return TRUE;
-false                       return FALSE;
+true                        { yylval =  new ExpNode( yylineno, string("bool"), string(yytext));  return TRUE; } 
+false                       { yylval =  new ExpNode( yylineno,  string("bool"), string(yytext)); return FALSE; }
 return                      return RETURN;
 if                          return IF;
 else                        return ELSE;
@@ -40,8 +40,8 @@ continue                    return CONTINUE;
 (\+|\-)                     return ADDITIVE;
 (\*|\/)                     return MUL;
 [a-zA-Z]([a-zA-Z0-9])* 		{ yylval =  new IdNode( yylineno, string(yytext)); return ID; }
-0|[1-9][0-9]*   			return NUM;
-\"([^\n\r\"\\]|\\[rnt\"\\])+\" return STRING;
+0|[1-9][0-9]*   			{ yylval = new NumNode( yylineno, string(yytext), string("int")); return NUM; }
+\"([^\n\r\"\\]|\\[rnt\"\\])+\" { yylval = new StringNode( yylineno, string(yytext)); return STRING; }
 [\t\n\r ]|\n				;
 \/\/[^\r\n]*[\r|\n|\r\n]?   ;
 .							handleGeneralError();
