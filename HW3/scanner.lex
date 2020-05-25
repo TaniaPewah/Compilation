@@ -39,7 +39,7 @@ continue                    return CONTINUE;
 (<|>|(<=)|(>=))             return RELOPNOTASS;
 (\+|\-)                     return ADDITIVE;
 (\*|\/)                     return MUL;
-[a-zA-Z]([a-zA-Z0-9])* 		return ID;
+[a-zA-Z]([a-zA-Z0-9])* 		{ yylval =  new IdNode( yylineno, string(yytext)); return ID; }
 0|[1-9][0-9]*   			return NUM;
 \"([^\n\r\"\\]|\\[rnt\"\\])+\" return STRING;
 [\t\n\r ]|\n				;

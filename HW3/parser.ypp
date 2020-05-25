@@ -55,6 +55,11 @@ Funcs : { printProductionRule(2); }
 FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE {
         // add ID to symbolTable $2 is the name of function
         // $$ = new FuncDefinition($2, offset, $1, $4 )
+
+		string name = ((IdNode*)$2)->name;
+		$$ = new IdNode( $2->lineno, name ); 
+		symbolTable.addSymbolFunc( (IdNode*)$$ );
+
         printProductionRule(4); }
 		;
 
@@ -77,15 +82,20 @@ Statements : Statement { printProductionRule(12); }
 
 Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 		  | Type ID SC { // add ID to symbolTable $1 is the type
-		  					$$ = new Node("NUM_dec", "int"); 
-		  					symbolTable.addSymbolVar( $$ );
+		  					string name = ((IdNode*)$2)->name;
+		  					$$ = new IdNode($2->lineno, name); 
+		  					symbolTable.addSymbolVar( (IdNode*)$$ );
 		                    printProductionRule(15); }
+
 		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
 		                            // $$ = new VarDefinition($2, counter, $1)
-									string name = ((Node*)$2)->name;
-									$$ = new Node( "NUM_dec_Assign", "int"); 
-		  							symbolTable.addSymbolVar( $$ );
+									string name = ($2)->name;
+
+									$$ = new IdNode( $2->lineno, name ); 
+		  							symbolTable.addSymbolVar( (IdNode*)$$ );
 		                            printProductionRule(16); }
+
+
 		  | ID ASSIGN Exp SC { printProductionRule(17); }
 		  | Call SC { printProductionRule(18); }
 		  | RETURN SC { printProductionRule(19); }

@@ -7,18 +7,24 @@
 #include <iostream>
 using namespace std;
 
-struct Node{
-    string name;
-    string type;
-public:
-    Node( string name, string type ) : name(name), type(type) {
-        cout << "node created ~~~~~~~~~~~~~~~~~~~~~" << name << endl;
-    }
+class Node{
+    public:
+    int lineno;
+    Node(int lineno) : lineno(lineno) {};
 };
 
-class Num: public Node{
+class IdNode: public Node{
+    public:
+    string name;
+    IdNode( int lineno, string name ) : Node(lineno), name(name) {
+        cout << "node created ~~~~~~~~~~~~~~~~~~~~~" << name << endl;
+    };
+};
+
+//remake num
+class Num: public IdNode{
 public:
-    Num(const string& name, const string& type ) : Node(name, type) {};
+    Num(int lineno, const string name, const string type ) : IdNode(lineno, name) {};
 };
 
 
