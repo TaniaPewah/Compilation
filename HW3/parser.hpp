@@ -19,6 +19,7 @@ class IdNode: public Node{
     IdNode( int lineno, string name ) : Node(lineno), name(name) {
         cout << "node created ~~~~~~~~~~~~~~~~~~~~~" << name << endl;
     };
+
 };
 
 //remake num

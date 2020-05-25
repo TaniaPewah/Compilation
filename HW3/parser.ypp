@@ -89,9 +89,10 @@ Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 
 		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
 		                            // $$ = new VarDefinition($2, counter, $1)
-									string name = ($2)->name;
+									string name = ((IdNode*)$2)->name;
 
-									$$ = new IdNode( $2->lineno, name ); 
+									$$ = new IdNode( $2->lineno, name );
+									delete((IdNode*)$2); 
 		  							symbolTable.addSymbolVar( (IdNode*)$$ );
 		                            printProductionRule(16); }
 
