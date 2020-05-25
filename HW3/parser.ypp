@@ -54,10 +54,7 @@ FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE {
         // add ID to symbolTable $2 is the name of function
         // $$ = new FuncDefinition($2, offset, $1, $4 )
 
-		string name = ((IdNode*)$2)->name;
-		$$ = new IdNode( $2->lineno, name ); 
-		symbolTable.addSymbolFunc( (IdNode*)$$ );
-
+		$$ = ruleFuncDecl((IdNode*)$2);
         printProductionRule(4); }
 		;
 
@@ -86,12 +83,10 @@ Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 		                    printProductionRule(15); }
 
 		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
-		                            // $$ = new VarDefinition($2, counter, $1)
-									string name = ((IdNode*)$2)->name;
+		                            
+									// TODO: take care of the type
+									$$ = ruleVarDeclAssign((IdNode*)$2);
 
-									$$ = new IdNode( $2->lineno, name );
-									delete((IdNode*)$2); 
-		  							symbolTable.addSymbolVar( (IdNode*)$$ );
 		                            printProductionRule(16); }
 
 
