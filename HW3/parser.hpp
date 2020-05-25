@@ -17,7 +17,6 @@ class IdNode: public Node{
     public:
     string name;
     IdNode( int lineno, string name ) : Node(lineno), name(name) {
-        cout << "node created ~~~~~~~~~~~~~~~~~~~~~" << name << endl;
     };
 
 };

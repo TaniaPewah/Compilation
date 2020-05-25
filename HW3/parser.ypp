@@ -1,7 +1,6 @@
 %{
 	#include "hw3_output.hpp"
-	#include "parser.hpp"
-	#include "symbolTable.h"
+	#include "parserAdapter.hpp"
 
 	using namespace std;
 	using namespace output;
@@ -9,7 +8,6 @@
 	extern int yylex();
 	extern int yylineno;
 	int yyerror(const char * message);
-	SymbolTable symbolTable;
 %}
 
 
@@ -82,9 +80,9 @@ Statements : Statement { printProductionRule(12); }
 
 Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 		  | Type ID SC { // add ID to symbolTable $1 is the type
-		  					string name = ((IdNode*)$2)->name;
-		  					$$ = new IdNode($2->lineno, name); 
-		  					symbolTable.addSymbolVar( (IdNode*)$$ );
+		  
+		  					$$ = ruleVarDecl((IdNode*)$2);
+
 		                    printProductionRule(15); }
 
 		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
