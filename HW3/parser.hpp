@@ -22,6 +22,5 @@ public:
 };
 
 
-
 #define YYSTYPE Node*
 #endif //HW3_PARSER_HPP

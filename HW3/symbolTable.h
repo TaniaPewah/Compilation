@@ -60,9 +60,11 @@ public:
 
     void addSymbolVar( Node* symbolToAdd ){
         stack.back()->addSymbolVar( symbolToAdd );
+        cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
     }
     void addSymbolFunc( Node* symbolToAdd ){
         stack.back()->addSymbolFunc( symbolToAdd );
+        cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << symbolToAdd->name << endl;
     }
 };
 
