@@ -9,12 +9,14 @@ using namespace std;
 
 
 class Node{
+    /* This class is the basic node with line num. which all other types inherite from */
     public:
     int lineno;
     Node(int lineno) : lineno(lineno) {};
 };
 
 class IdNode: public Node{
+    /* This class gives basic support all ID's (variable name) */
     public:
     string name;
     IdNode( int lineno, string name ) : Node(lineno), name(name) {
@@ -22,20 +24,23 @@ class IdNode: public Node{
 };
 
 class TypeNode : public Node{
+    /* This class gives basic support all types */
     public:
     string type_name;
-    TypeNode( int lineno, string name ) : Node(lineno), type_name(name) {
+    TypeNode( int lineno, string type ) : Node(lineno), type_name(type) {
     };
 };
 
 class NumNode: public TypeNode{
+    /* This class will support int variable without a name*/
     public:
-    string int_value;
-    NumNode( int lineno, string value, string type ) : TypeNode(lineno, type), int_value(value) {
+    string value;
+    NumNode( int lineno, string value, string type ) : TypeNode(lineno, type), value(value) {
     };
 };
 
 class StringNode: public Node{
+    /* This class will support string variable without a name*/
     public:
     string string_value;
     StringNode( int lineno, string value ) : Node(lineno), string_value(value) {
@@ -43,18 +48,26 @@ class StringNode: public Node{
 };
 
 class ExpNode: public Node{
+    /* This class supports the rule expressions, need further checks on CALL methods*/
     public:
     string type;
-    string value;
-    ExpNode( int lineno,  string type, string value ) : Node(lineno), type(type), value(value) {
+    ExpNode( int lineno, string type ) : Node(lineno), type(type) {
     };
 };
 
 class VarNode: public IdNode{
+    /* This class supports variable types, such as int, bool... */
     public:
     string type;
-    string value;
-    VarNode( int lineno, string name, string type, string value ) : IdNode(lineno, name), type(type), value(value) {
+    VarNode( int lineno, string name, string type ) : IdNode(lineno, name), type(type) {
+    };
+};
+
+class BinopNode: public Node{
+    /* This class supports Binop operataros , such as +, - ... */
+    public:
+    string binop;
+    BinopNode( int lineno, string binop ) : Node(lineno), binop(binop){
     };
 };
 

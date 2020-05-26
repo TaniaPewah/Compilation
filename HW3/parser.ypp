@@ -79,7 +79,6 @@ Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 		  | Type ID SC { // add ID to symbolTable $1 is the type
 		  
 		  					$$ = ruleVarDecl((IdNode*)$2);
-
 		                    printProductionRule(15); }
 
 		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
@@ -88,7 +87,6 @@ Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 									$$ = ruleVarDeclAssign( (IdNode*)$2, 
 														   ((TypeNode*)$1)->type_name, 
 														   ((ExpNode*)$4)->type);
-
 		                            printProductionRule(16); }
 
 		  | ID ASSIGN Exp SC { printProductionRule(17); }
@@ -117,15 +115,24 @@ Type	: INT { printProductionRule(31); }
 		| BOOL { printProductionRule(33); }
 		;
 
-Exp : LPAREN Exp RPAREN { printProductionRule(34); }
-	| Exp ADDITIVE Exp { printProductionRule(35); }
-	| Exp MUL Exp { printProductionRule(35); }
-	| ID { printProductionRule(36); }
+Exp : LPAREN Exp RPAREN { 
+		$$ = (ExpNode*)$2;
+		printProductionRule(34); }
+	| Exp ADDITIVE Exp { 
+		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
+		printProductionRule(35); }
+	| Exp MUL Exp { 
+		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
+		printProductionRule(35); }
+	| ID { 
+		printProductionRule(36); }
 	| Call { printProductionRule(37); }
 	| NUM { 
 		$$ = ruleExpNum((NumNode*)$1);
 		printProductionRule(38); }
-	| NUM B { printProductionRule(39); }
+	| NUM B { 
+		$$ = (ruleExpNumB((NumNode*)$1));
+		printProductionRule(39); }
 	| STRING { printProductionRule(40); }
 	| TRUE { $$ = (ExpNode*)$1;
 		printProductionRule(41); }

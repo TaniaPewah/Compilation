@@ -20,8 +20,8 @@ bool                        { yylval =  new TypeNode( yylineno, string(yytext));
 and                         return AND;
 or                          return OR;
 not                         return NOT;
-true                        { yylval =  new ExpNode( yylineno, string("bool"), string(yytext));  return TRUE; } 
-false                       { yylval =  new ExpNode( yylineno,  string("bool"), string(yytext)); return FALSE; }
+true                        { yylval =  new ExpNode( yylineno, string("bool"));  return TRUE; } 
+false                       { yylval =  new ExpNode( yylineno,  string("bool")); return FALSE; }
 return                      return RETURN;
 if                          return IF;
 else                        return ELSE;
@@ -37,8 +37,8 @@ continue                    return CONTINUE;
 =                           return ASSIGN;
 (==)|(!=)                   return RELOPLEFT;
 (<|>|(<=)|(>=))             return RELOPNOTASS;
-(\+|\-)                     return ADDITIVE;
-(\*|\/)                     return MUL;
+(\+|\-)                     { yylval =  new BinopNode( yylineno, string(yytext)); return ADDITIVE; }
+(\*|\/)                     { yylval =  new BinopNode( yylineno, string(yytext)); return MUL; }
 [a-zA-Z]([a-zA-Z0-9])* 		{ yylval =  new IdNode( yylineno, string(yytext)); return ID; }
 0|[1-9][0-9]*   			{ yylval = new NumNode( yylineno, string(yytext), string("int")); return NUM; }
 \"([^\n\r\"\\]|\\[rnt\"\\])+\" { yylval = new StringNode( yylineno, string(yytext)); return STRING; }
