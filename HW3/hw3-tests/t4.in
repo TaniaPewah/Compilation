@@ -1,6 +1,11 @@
 
+int max() {
+ return 2;
+} 
+
 void main()
 {
-    int x = 4;
+    int x = 1b + 1;
+    int y = max();
 
 }
