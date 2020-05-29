@@ -6,7 +6,7 @@
 #define HW3_PARSER_HPP
 #include <iostream>
 using namespace std;
-
+#define NA -1
 
 class Node{
     /* This class is the basic node with line num. which all other types inherite from */
@@ -55,6 +55,14 @@ class VarNode: public IdNode{
     };
 };
 
+class FuncNode: public VarNode{
+    /* This class supports variable types, such as int, bool... */
+    public:
+    vector<VarNode*> params;
+    FuncNode( int lineno, string name, string type, vector<VarNode*> params ) : VarNode(lineno, name, type), params(params) {
+    };
+};
+
 class BinopNode: public Node{
     /* This class supports Binop operataros , such as +, - ... */
     public:
@@ -63,12 +71,24 @@ class BinopNode: public Node{
     };
 };
 
-class ExpList: public Node {
+class FormalsList: public Node {
     /* this class saves the function givven variables for every function */
     public:
-    vector<VarNode> functionParams;
+    vector<VarNode*> functionParams;
 
-    //TODO add the params
+    FormalsList() : Node(NA){ }
+
+    void addParam( VarNode* param_to_add){
+        functionParams.push_back(param_to_add);
+    }
+};
+
+class Formals: public Node {
+    public:
+    FormalsList* params;
+
+    Formals(): Node(NA), params(NULL){ }
+    Formals( FormalsList* params): Node(NA), params(params){ }
 };
 
 

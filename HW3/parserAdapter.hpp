@@ -8,11 +8,16 @@
 
 SymbolTable symbolTable;
 
-VarNode* ruleFuncDecl(IdNode* id_node) {
+VarNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
     string name = id_node->name;
 
-    // TODO add function type
-	VarNode* current_node = new VarNode(id_node->lineno, name, "func"); 
+    if( symbolTable.ifExists(id_node->lineno, name) ){
+        output::errorDef(id_node->lineno, name);
+        exit(0);
+    }
+
+    // TODO params show be of type vector<VarNode*> in the calling function
+	FuncNode* current_node = new FuncNode(id_node->lineno, name, type, params); 
 	symbolTable.addSymbolFunc( current_node );
     delete(id_node);
     return current_node;
@@ -20,8 +25,14 @@ VarNode* ruleFuncDecl(IdNode* id_node) {
 
 VarNode* ruleVarDecl( string type_name, IdNode* id_node) {
     string name = id_node->name;
+
+    if( symbolTable.ifExists(id_node->lineno, name) ){
+        output::errorDef(id_node->lineno, name);
+        exit(0);
+    }
 	VarNode* current_node = new VarNode(id_node->lineno, name, type_name); 
 	symbolTable.addSymbolVar( current_node );
+    
     delete(id_node);
     return current_node;
 }
@@ -80,6 +91,16 @@ TypeNode* ruleCallFunc(IdNode* id_node) {
     // check whether the Exp list types are correct for this func else raise exception
     
     return (new TypeNode(id_node->lineno, returned_type )); 
+}
+
+FormalsList* ruleCreateFormals(int lineno){
+
+    return new FormalsList();
+}
+
+FormalsList* ruleAddFormals( FormalsList* params_list ,VarNode* param_to_add){
+    params_list->addParam(param_to_add);
+    return params_list;
 }
 
 

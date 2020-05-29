@@ -50,38 +50,60 @@ INIT : NEWSCOPECREATION {
 	// 
 }
 
-Funcs : { printProductionRule(2); }
+Funcs :  %empty { printProductionRule(2); }
 	  | FuncDecl Funcs { 
 		  printProductionRule(3); }
 	  ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE {
-		//TODO: funcDecl scope- the function givven parameters should be in the same block as the function itself (after statments),
-		// Whith a negative sign
+FuncDecl : RetType ID {
 
-        // add ID to symbolTable $2 is the name of function
-        // $$ = new FuncDefinition($2, offset, $1, $4 )
+		// check if ID exist if so- thow error
 
-		// TODO: newFunctioScope($4, $7);
+        } LPAREN Formals RPAREN {
+	
+			//TODO: funcDecl scope - the function given parameters should be in the same block as the function itself (after statments),
+			// open new scope?
+			
+			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((Formals*)$5)->params->functionParams );
+			printProductionRule(4);
+
+		} LBRACE Statements RBRACE {
+
 		//TODO: CloseFunctionScope
-
-		$$ = ruleFuncDecl((IdNode*)$2);
-        printProductionRule(4); }
+		}
 		;
 
-RetType : Type { printProductionRule(5); }
+RetType : Type { 
+		$$ = (TypeNode*)$1;
+		printProductionRule(5); }
 		| VOID { printProductionRule(6); }
 		;
 
-Formals :  { printProductionRule(7); }
-    | FormalsList { printProductionRule(8); }
+Formals :  %empty { 
+	$$ = new Formals();
+	printProductionRule(7); }
+    | FormalsList { 
+		$$ = new Formals((FormalsList*)$1);
+
+		// create params empty vector
+		
+		printProductionRule(8); }
     ;
 
-FormalsList : FormalDecl { printProductionRule(9); }
-			| FormalDecl COMMA FormalsList { printProductionRule(10); }
+FormalsList : FormalDecl { 
+	// varNode $1 addParam
+	$$ = ruleAddFormals( (FormalsList*)ruleCreateFormals( ((VarNode*)$1)->lineno ), (VarNode*)$1); 
+	
+	printProductionRule(9); }
+			| FormalDecl COMMA FormalsList { 
+				
+				$$ = ruleAddFormals((FormalsList*)$3, (VarNode*)$1);
+				printProductionRule(10); }
 			;
 
-FormalDecl : Type ID { printProductionRule(11); };
+FormalDecl : Type ID { 
+	$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2); 
+	printProductionRule(11); };
 Statements : Statement {
 				printProductionRule(12); }
 		   | Statements Statement { 
@@ -188,7 +210,7 @@ Exp : LPAREN Exp RPAREN {
     | Exp RELOPNOTASS Exp { printProductionRule(46); }
 	;
 
-NEWSCOPECREATION : { symbolTable.newScope(); };
+NEWSCOPECREATION :  %empty { symbolTable.newScope(); };
 
 %%
 

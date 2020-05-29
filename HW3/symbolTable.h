@@ -15,10 +15,10 @@ using namespace std;
 class TableEntry{
 public:
 
-    IdNode* node;
+    VarNode* node;
     bool is_var;
 
-    TableEntry( IdNode* newNode, bool is_var ) : node(newNode), is_var(is_var) {
+    TableEntry( VarNode* newNode, bool is_var ) : node(newNode), is_var(is_var) {
 
         if(is_var){
             cout<<"--------new table Var added: "<< node->name <<endl;
@@ -43,13 +43,13 @@ public:
         entries.insert(make_pair(symbolToAdd->name, entryToAdd));
         offset++;
     }
-    void addSymbolFunc( VarNode* funcToAdd ){
+    void addSymbolFunc( FuncNode* funcToAdd ){
         TableEntry* entryToAdd = new TableEntry( funcToAdd, false );
         entries.insert(make_pair(funcToAdd->name, entryToAdd)); 
         offset++;
     }
 
-    IdNode* findSymbolInScope(string key) {
+    VarNode* findSymbolInScope(string key) {
 
         cout << "The entries in this scope are: "<< endl;
         for(auto key = entries.begin(); key != entries.end(); key++) {
@@ -94,28 +94,36 @@ public:
         stack.back()->addSymbolVar( symbolToAdd );
         cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
     }
-    void addSymbolFunc( VarNode* symbolToAdd ){
-        stack.back()->addSymbolFunc( symbolToAdd );
-        cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << symbolToAdd->name << endl;
+    void addSymbolFunc( FuncNode* func_to_add ){
+        stack.back()->addSymbolFunc( func_to_add );
+        cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << func_to_add->name << endl;
     }
 
-    IdNode* findSymbolInStack(int lineno, string symbol_name){
+    VarNode* findSymbolInStack(int lineno, string symbol_name){
          cout << "searching all stack"<<endl;
 
         for(int i = 0; i < stack.size(); i++){
-            IdNode* entry = stack[i]->findSymbolInScope(symbol_name);
+            VarNode* entry = stack[i]->findSymbolInScope(symbol_name);
             if(entry != NULL) {
                 return entry;
             }
         }
-
-        output::errorUndef(lineno, symbol_name);
-        exit(0);
+        return NULL;
     }
 
     string getIdType(int lineno, string id){
         cout << "finding type in getIdType"<<endl;
-       return ((VarNode*)findSymbolInStack(lineno, id))->type;
+
+        VarNode* wanted_entry = findSymbolInStack(lineno, id);
+        if(!wanted_entry) {
+            output::errorUndef(lineno, id);
+            exit(0);
+       }
+       return wanted_entry->type;
+    }
+
+    bool ifExists(int line, string name){
+        return findSymbolInStack(line, name) ? true : false;
     }
 };
 
