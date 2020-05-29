@@ -61,7 +61,7 @@ ExpNode* ruleExpNum(NumNode* num_node){
 }
 
 ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
-    // Check exp_a & exp_b are num types. If not- raise exaption. Else, do binop and return higher num type
+    // Check exp_a & exp_b are num types. If not- raise exeption. Else, do binop and return higher num type
 
     if((exp_a->type != "int" && exp_a->type != "byte") || (exp_b->type != "int" && exp_b->type != "byte")){
         cout<< " ERROR in line num: "<< binop->lineno << " not numaric type using binop!"<< endl;
@@ -109,8 +109,18 @@ void ruleIdAssign( IdNode* id_node, ExpNode* exp){
         output::errorMismatch(id_node->lineno);
         exit(0);
     }
-
     // TODO update value in symbol table
+}
+
+ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
+
+    if((exp1->type != "int" && exp1->type != "byte") || (exp2->type != "int" && exp2->type != "byte")){
+
+        output::errorMismatch(exp1->lineno);
+        exit(0);
+    }
+      
+    return new ExpNode(exp1->lineno, "bool");
 }
 
 
