@@ -50,14 +50,16 @@ public:
     SymbolTable() {}
 
     void newScope(){
+         
 
         Scope* scopeToAdd;
         if (stack.empty()){
             scopeToAdd = new Scope(0);
+            cout << "--First scope was created--" << endl;
         }
         else{
             scopeToAdd = new Scope(stack.back()->offset);
-            cout << "New scope was created" << endl;
+            cout << "--New scope was created--" << endl;
         }
         stack.push_back(scopeToAdd);
     }

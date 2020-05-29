@@ -102,19 +102,33 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 		  | Call SC { printProductionRule(18); }
 		  | RETURN SC { printProductionRule(19); }
 		  | RETURN Exp SC { printProductionRule(20); }
-		  | IF NEWSCOPECREATION LPAREN Exp RPAREN Statement %prec NO_ELSE { 
-			  symbolTable.closeScope();
+		  | IfScope %prec NO_ELSE { 
 			  printProductionRule(21); }
-          | IF NEWSCOPECREATION LPAREN Exp RPAREN Statement CLOSESCOPE ELSE Statement { 
-			  
-			  printProductionRule(22); }
-		  | WHILE NEWSCOPECREATION LPAREN Exp RPAREN Statement %prec NO_ELSE { 
+
+          | IfScope ELSE NEWSCOPECREATION Statement { 
 			  symbolTable.closeScope();
+			  printProductionRule(22); }
+
+		  |  whileScope %prec NO_ELSE { 
 			  printProductionRule(23); }
-		  | WHILE NEWSCOPECREATION LPAREN Exp RPAREN Statement CLOSESCOPE ELSE Statement { printProductionRule(24); }
+
+		  | whileScope ELSE NEWSCOPECREATION Statement { 
+			  symbolTable.closeScope();
+			  printProductionRule(24); }
+
 		  | BREAK SC { printProductionRule(25); }
 		  | CONTINUE SC { printProductionRule(26); }
 		  ;
+
+IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
+	symbolTable.closeScope();
+}
+;
+
+whileScope : WHILE LPAREN NEWSCOPECREATION Exp RPAREN Statement {
+	symbolTable.closeScope();
+}
+;
 
 Call : ID LPAREN ExpList RPAREN { printProductionRule(27); }
 	 | ID LPAREN RPAREN { printProductionRule(28); }
@@ -159,8 +173,7 @@ Exp : LPAREN Exp RPAREN {
     | Exp RELOPNOTASS Exp { printProductionRule(46); }
 	;
 
-NEWSCOPECREATION : { symbolTable.newScope(); }
-CLOSESCOPE : {symbolTable.closeScope(); }
+NEWSCOPECREATION : { symbolTable.newScope(); };
 
 %%
 
