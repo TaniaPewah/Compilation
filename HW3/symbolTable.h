@@ -15,10 +15,17 @@ using namespace std;
 class TableEntry{
 public:
 
-    string name;
-    TableEntry( VarNode* newNode ){
-        name = newNode->name;
-        cout<<"--------new table entry added: "<<name<<endl;
+    IdNode* node;
+    bool is_var;
+
+    TableEntry( IdNode* newNode, bool is_var ) : node(newNode), is_var(is_var) {
+
+        if(is_var){
+            cout<<"--------new table Var added: "<< node->name <<endl;
+        }
+        else{
+            cout<<"--------new Function Var added: "<< node->name <<endl;
+        }
     }
     //TODO: add FunctionTableEntry
 
@@ -32,14 +39,22 @@ public:
     Scope(int offset) : offset(offset) {}
 
     void addSymbolVar( VarNode* symbolToAdd ){
-        TableEntry* entryToAdd = new TableEntry( symbolToAdd );
+        TableEntry* entryToAdd = new TableEntry( symbolToAdd, true );
         entries.insert(make_pair(symbolToAdd->name, entryToAdd));
         offset++;
     }
     void addSymbolFunc( VarNode* funcToAdd ){
-        TableEntry* entryToAdd = new TableEntry( funcToAdd );
+        TableEntry* entryToAdd = new TableEntry( funcToAdd, false );
         entries.insert(make_pair(funcToAdd->name, entryToAdd)); 
         offset++;
+    }
+
+    IdNode* findSymbolInScope(string key) {
+        map<string, TableEntry*>::iterator wanted_entry = entries.find(key);
+        if (wanted_entry != entries.end()){
+            return wanted_entry->second->node;
+        }
+        return NULL;
     }
 };
 
@@ -75,6 +90,17 @@ public:
     void addSymbolFunc( VarNode* symbolToAdd ){
         stack.back()->addSymbolFunc( symbolToAdd );
         cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << symbolToAdd->name << endl;
+    }
+
+    IdNode* findSymbolInStack(string symbol_name){
+
+        for(int i; i<stack.size(); i++){
+            IdNode* entry = stack[i]->findSymbolInScope(symbol_name);
+        }
+    }
+
+    string getIdType(string id){
+        return ((VarNode*)findSymbolInStack(id))->type;
     }
 };
 

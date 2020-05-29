@@ -136,7 +136,9 @@ whileScope : WHILE LPAREN NEWSCOPECREATION Exp RPAREN Statement {
 }
 ;
 
-Call : ID LPAREN ExpList RPAREN { printProductionRule(27); }
+Call : ID LPAREN ExpList RPAREN { 
+		// $$ = ruleCallFunc((IdNode*)$1, (ExpList*)$3)
+	printProductionRule(27); }
 	 | ID LPAREN RPAREN { printProductionRule(28); }
 	 ;
 

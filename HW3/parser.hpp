@@ -63,6 +63,14 @@ class BinopNode: public Node{
     };
 };
 
+class ExpList: public Node {
+    /* this class saves the function givven variables for every function */
+    public:
+    vector<VarNode> functionParams;
+
+    //TODO add the params
+}
+
 
 
 #define YYSTYPE Node*

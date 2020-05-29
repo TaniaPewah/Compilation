@@ -69,6 +69,17 @@ ExpNode* ruleExpNumB(NumNode* num) {
     return new ExpNode(num->lineno, "byte");
 }
 
+TypeNode* ruleCallFunc(IdNode* id_node) {
+
+    // search ID in symboltable, and get it's type
+    string returned_type = symbolTable.getIdType(id_node->name);
+
+    // TODO: get function arg types from symbol table
+    // check whether the Exp list types are correct for this func else raise exception
+    
+    return (new TypeNode(id_node->lineno, returned_type )); 
+}
+
 
 
 // int stringToBinop(ExpNode* var_a, ExpNode* var_b, string op )
