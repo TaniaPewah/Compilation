@@ -39,10 +39,10 @@
 
 %%
 
-Program : INIT Funcs { printProductionRule(1); }
+Program : NEWSCOPECREATION Funcs { 
+	symbolTable.closeScope();
+	printProductionRule(1); }
 		;
-INIT : { symbolTable.newScope();
-		}
 
 Funcs : { printProductionRule(2); }
 	  | FuncDecl Funcs { 
@@ -50,8 +50,14 @@ Funcs : { printProductionRule(2); }
 	  ;
 
 FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE {
+		//TODO: funcDecl scope- the function givven parameters should be in the same block as the function itself (after statments),
+		// Whith a negative sign
+
         // add ID to symbolTable $2 is the name of function
         // $$ = new FuncDefinition($2, offset, $1, $4 )
+
+		// TODO: newFunctioScope($4, $7);
+		//TODO: CloseFunctionScope
 
 		$$ = ruleFuncDecl((IdNode*)$2);
         printProductionRule(4); }
@@ -70,12 +76,15 @@ FormalsList : FormalDecl { printProductionRule(9); }
 			;
 
 FormalDecl : Type ID { printProductionRule(11); };
-Statements : Statement { printProductionRule(12); }
+Statements : Statement {
+				printProductionRule(12); }
 		   | Statements Statement { 
-			   printProductionRule(13);}
+				printProductionRule(13);}
 		   ;
 
-Statement : LBRACE Statements RBRACE { printProductionRule(14); }
+Statement : LBRACE NEWSCOPECREATION Statements RBRACE { 
+			symbolTable.closeScope();
+			printProductionRule(14); }
 		  | Type ID SC { // add ID to symbolTable $1 is the type
 		  
 		  					$$ = ruleVarDecl((IdNode*)$2);
@@ -93,10 +102,16 @@ Statement : LBRACE Statements RBRACE { printProductionRule(14); }
 		  | Call SC { printProductionRule(18); }
 		  | RETURN SC { printProductionRule(19); }
 		  | RETURN Exp SC { printProductionRule(20); }
-		  | IF LPAREN Exp RPAREN Statement %prec NO_ELSE { printProductionRule(21); }
-          | IF LPAREN Exp RPAREN Statement ELSE Statement { printProductionRule(22); }
-		  | WHILE LPAREN Exp RPAREN Statement %prec NO_ELSE { printProductionRule(23); }
-		  | WHILE LPAREN Exp RPAREN Statement ELSE Statement { printProductionRule(24); }
+		  | IF NEWSCOPECREATION LPAREN Exp RPAREN Statement %prec NO_ELSE { 
+			  symbolTable.closeScope();
+			  printProductionRule(21); }
+          | IF NEWSCOPECREATION LPAREN Exp RPAREN Statement CLOSESCOPE ELSE Statement { 
+			  
+			  printProductionRule(22); }
+		  | WHILE NEWSCOPECREATION LPAREN Exp RPAREN Statement %prec NO_ELSE { 
+			  symbolTable.closeScope();
+			  printProductionRule(23); }
+		  | WHILE NEWSCOPECREATION LPAREN Exp RPAREN Statement CLOSESCOPE ELSE Statement { printProductionRule(24); }
 		  | BREAK SC { printProductionRule(25); }
 		  | CONTINUE SC { printProductionRule(26); }
 		  ;
@@ -143,6 +158,9 @@ Exp : LPAREN Exp RPAREN {
 	| Exp RELOPLEFT Exp { printProductionRule(46); }
     | Exp RELOPNOTASS Exp { printProductionRule(46); }
 	;
+
+NEWSCOPECREATION : { symbolTable.newScope(); }
+CLOSESCOPE : {symbolTable.closeScope(); }
 
 %%
 

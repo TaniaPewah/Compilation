@@ -5,6 +5,7 @@
 #ifndef HW3_SYMBOLTABLE_H
 #define HW3_SYMBOLTABLE_H
 #include "parser.hpp"
+#include "hw3_output.hpp"
 #include <map>
 #include <vector>
 
@@ -19,6 +20,7 @@ public:
         name = newNode->name;
         cout<<"--------new table entry added: "<<name<<endl;
     }
+    //TODO: add FunctionTableEntry
 
 };
 
@@ -32,10 +34,12 @@ public:
     void addSymbolVar( IdNode* symbolToAdd ){
         TableEntry* entryToAdd = new TableEntry( symbolToAdd );
         entries.insert(make_pair(symbolToAdd->name, entryToAdd));
+        offset++;
     }
     void addSymbolFunc( IdNode* funcToAdd ){
         TableEntry* entryToAdd = new TableEntry( funcToAdd );
         entries.insert(make_pair(funcToAdd->name, entryToAdd)); 
+        offset++;
     }
 };
 
@@ -53,10 +57,14 @@ public:
         }
         else{
             scopeToAdd = new Scope(stack.back()->offset);
+            cout << "New scope was created" << endl;
         }
         stack.push_back(scopeToAdd);
     }
-    void endScope(){}
+    void closeScope(){
+        stack.pop_back();
+        output::endScope();
+    }
 
     void addSymbolVar( IdNode* symbolToAdd ){
         stack.back()->addSymbolVar( symbolToAdd );
