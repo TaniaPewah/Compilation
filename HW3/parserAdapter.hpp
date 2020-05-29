@@ -8,6 +8,19 @@
 
 SymbolTable symbolTable;
 
+ExpNode* ruleNotExp(ExpNode* node) {
+    cout<< "node type is: "<< node->type <<endl;
+    if(node->type != "bool") {
+        output::errorMismatch(node->lineno);
+        exit(0);
+    }
+    cout<< "is boll!!!"<<endl;
+
+    ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
+    delete(node);
+    return new_exp_node;
+}
+
 VarNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
 
     string name = id_node->name;

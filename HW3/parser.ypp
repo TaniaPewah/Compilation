@@ -45,7 +45,6 @@ Program : INIT Funcs {
 		;
 INIT : NEWSCOPECREATION {
 	// TODO create funcNode print, printi
-	addPrintandPrinti();
 
 	// symbolTable.addSymbolFunc( print );
 	// 
@@ -191,6 +190,7 @@ Type	: INT { printProductionRule(31); }
 
 Exp : LPAREN Exp RPAREN { 
 		$$ = (ExpNode*)$2;
+		cout<<"current node type is :" <<((ExpNode*)$$)->type << endl;
 		printProductionRule(34); }
 	| Exp ADDITIVE Exp { 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
@@ -214,7 +214,9 @@ Exp : LPAREN Exp RPAREN {
 		printProductionRule(41); }
 	| FALSE { $$ = (ExpNode*)$1;
 		printProductionRule(42); }
-	| NOT Exp { printProductionRule(43); }
+	| NOT Exp { 
+		$$ = ruleNotExp((ExpNode*)$2);
+		printProductionRule(43); }
 	| Exp AND Exp { printProductionRule(44); }
 	| Exp OR Exp { printProductionRule(45); }
 	| Exp RELOPLEFT Exp { 
