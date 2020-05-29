@@ -55,7 +55,10 @@ Funcs :  %empty { printProductionRule(2); }
 		  printProductionRule(3); }
 	  ;
 
-FuncDecl : RetType ID 
+FuncDecl : RetType ID {
+			// add function to global scope
+			// open new scope
+		}
 		// check if ID exist if so- thow error
         LPAREN Formals RPAREN {
 
@@ -65,11 +68,10 @@ FuncDecl : RetType ID
 			// open new scope?
 
 			cout << "in func decl Formals - type name " << ((TypeNode*)$1)->type_name <<endl;
-
 			cout << "in func decl Formals - id node id " << ((IdNode*)$2) -> name << endl;
-			cout << "in func decl Formals - params " << ((((FormalsList*)((Formals*)$4)->params)->functionParams).empty())<< endl;
+			cout << "in func decl Formals - params " << ((((FormalsList*)((Formals*)$5)->params)->functionParams).empty())<< endl;
 			
-			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
+			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$5)->params)->functionParams );
 			printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
@@ -87,12 +89,11 @@ RetType : Type {
 		;
 
 Formals :  %empty { 
-	cout << "created empty formals, with empty vector" << endl;
+
 	$$ = new Formals();
 	printProductionRule(7); }
     | FormalsList { 
 
-		cout << " formals list" << endl;
 		$$ = new Formals((FormalsList*)$1);
 
 		// create params empty vector
@@ -128,15 +129,15 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 		  					$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
 		                    printProductionRule(15); }
 
-		  | Type ID ASSIGN Exp SC { // add ID to symbolTable $1 is the type
-		                            
-									// TODO: take care of the type
+		  | Type ID ASSIGN Exp SC { 
 									$$ = ruleVarDeclAssign( (IdNode*)$2, 
 														   ((TypeNode*)$1)->type_name, 
 														   ((ExpNode*)$4)->type);
 		                            printProductionRule(16); }
 
-		  | ID ASSIGN Exp SC { printProductionRule(17); }
+		  | ID ASSIGN Exp SC { 
+			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
+			  printProductionRule(17); }
 		  | Call SC { printProductionRule(18); }
 		  | RETURN SC { printProductionRule(19); }
 		  | RETURN Exp SC { printProductionRule(20); }
@@ -199,7 +200,6 @@ Exp : LPAREN Exp RPAREN {
 	| ID { 
 		printProductionRule(36); }
 	| Call {
-		cout << "!!!!!!!!!!!!!!!!!!!!!Exp - >call here " << endl;
 		printProductionRule(37); }
 	| NUM { 
 		$$ = ruleExpNum((NumNode*)$1);

@@ -10,8 +10,6 @@ SymbolTable symbolTable;
 
 VarNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
 
-
-    cout << "ruleFuncDecl" << endl;
     string name = id_node->name;
 
     if( symbolTable.ifExists(id_node->lineno, name) ){
@@ -23,8 +21,6 @@ VarNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
 	FuncNode* current_node = new FuncNode(id_node->lineno, name, type, params); 
 	symbolTable.addSymbolFunc( current_node );
     delete(id_node);
-
-     cout << "ruleFuncDecl END----------------------------------------------" << endl;
     return current_node;
 }
 
@@ -64,7 +60,6 @@ ExpNode* ruleExpNum(NumNode* num_node){
     return (new ExpNode(num_node->lineno, num_node->type_name));
 }
 
-
 ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     // Check exp_a & exp_b are num types. If not- raise exaption. Else, do binop and return higher num type
 
@@ -87,8 +82,6 @@ ExpNode* ruleExpNumB(NumNode* num) {
 
 TypeNode* ruleCallFunc(IdNode* id_node) {
 
-    cout << "ruleCallFunc" << endl;
-
     // search ID in symboltable, and get it's type
     string returned_type = symbolTable.getIdType(id_node->lineno, id_node->name);
 
@@ -108,36 +101,18 @@ FormalsList* ruleAddFormals( FormalsList* params_list ,VarNode* param_to_add){
     return params_list;
 }
 
+void ruleIdAssign( IdNode* id_node, ExpNode* exp){
 
+    string id_type = symbolTable.getIdType(id_node->lineno, id_node->name);
 
-// int stringToBinop(ExpNode* var_a, ExpNode* var_b, string op )
-// {
-//     int result = 0;
-//     int a,b = 0;
-//     if (var_a->type == "int" ){
-//         a = stoi(var_a->value);
-//     } else {
-//         cout<< var_a->value << "  " << (var_a->value)[0] << endl;
-//         a = var_a->value[0];
-//         cout<<"secound variable is of type byte and value is: " << b << endl;
-//     }
-//      if (var_b->type == "int" ){
-//         b = stoi(var_b->value);
-//     } else {
-//         b = var_b->value[0];
-//         cout<<"secound variable is of type byte and value is: " << b << endl;
-//     }
+    if( id_type != exp->type ){
+        output::errorMismatch(id_node->lineno);
+        exit(0);
+    }
 
-//     if(op == "+") result = a + b;
-//     else if(op == "-") result = a - b;
-//     else if(op == "*") result = a * b;
-//     else if(op == "/") result = a / b;
+    // TODO update value in symbol table
+}
 
-//     return result;
-// }
-
-
-// TODO: take care of type conversions
 
 
 #endif //PARSER_ADAPTER_HPP
