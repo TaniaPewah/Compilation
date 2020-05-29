@@ -55,6 +55,35 @@ class VarNode: public IdNode{
     };
 };
 
+class ExpList: public Node{
+    public:
+    vector<ExpNode*> params;
+    ExpList() : Node(NA){ }
+
+    // TODO use it
+    void addParam( ExpNode* param_to_add){
+        params.push_back(param_to_add);
+    }
+
+    // for every param of the func check whether the param in params list is same.
+    bool compareParams( vector<VarNode*> func_params){
+        if (params.size() != func_params.size()) {
+            cout << " ~~~~~~~~~ruleCallFunc params: WRONG NUMBER OF PARAMS" << params.size() << " " << func_params.size()<< endl;
+            return false;
+        }
+
+        auto it_my = params.begin();
+        for (auto it_func = func_params.begin(); 
+            it_func != func_params.end(); ++it_func, ++it_my) {
+            if ((*it_func)->type != (*it_my)->type && !((*it_func)->type == "int" && (*it_my)->type == "byte")) {
+                cout << " ~~~~~~~~~ruleCallFunc params: WRONG TYPE OF PARAM" << endl;
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
 class FuncNode: public VarNode{
     /* This class supports variable types, such as int, bool... */
     public:
