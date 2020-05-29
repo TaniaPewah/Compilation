@@ -16,7 +16,7 @@ class TableEntry{
 public:
 
     string name;
-    TableEntry( IdNode* newNode ){
+    TableEntry( VarNode* newNode ){
         name = newNode->name;
         cout<<"--------new table entry added: "<<name<<endl;
     }
@@ -31,12 +31,12 @@ public:
 
     Scope(int offset) : offset(offset) {}
 
-    void addSymbolVar( IdNode* symbolToAdd ){
+    void addSymbolVar( VarNode* symbolToAdd ){
         TableEntry* entryToAdd = new TableEntry( symbolToAdd );
         entries.insert(make_pair(symbolToAdd->name, entryToAdd));
         offset++;
     }
-    void addSymbolFunc( IdNode* funcToAdd ){
+    void addSymbolFunc( VarNode* funcToAdd ){
         TableEntry* entryToAdd = new TableEntry( funcToAdd );
         entries.insert(make_pair(funcToAdd->name, entryToAdd)); 
         offset++;
@@ -68,11 +68,11 @@ public:
         output::endScope();
     }
 
-    void addSymbolVar( IdNode* symbolToAdd ){
+    void addSymbolVar( VarNode* symbolToAdd ){
         stack.back()->addSymbolVar( symbolToAdd );
         cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
     }
-    void addSymbolFunc( IdNode* symbolToAdd ){
+    void addSymbolFunc( VarNode* symbolToAdd ){
         stack.back()->addSymbolFunc( symbolToAdd );
         cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << symbolToAdd->name << endl;
     }

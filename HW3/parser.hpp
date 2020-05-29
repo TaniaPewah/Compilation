@@ -39,14 +39,6 @@ class NumNode: public TypeNode{
     };
 };
 
-class StringNode: public Node{
-    /* This class will support string variable without a name*/
-    public:
-    string string_value;
-    StringNode( int lineno, string value ) : Node(lineno), string_value(value) {
-    };
-};
-
 class ExpNode: public Node{
     /* This class supports the rule expressions, need further checks on CALL methods*/
     public:
