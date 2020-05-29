@@ -9,6 +9,9 @@
 SymbolTable symbolTable;
 
 VarNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
+
+
+    cout << "ruleFuncDecl" << endl;
     string name = id_node->name;
 
     if( symbolTable.ifExists(id_node->lineno, name) ){
@@ -20,6 +23,8 @@ VarNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
 	FuncNode* current_node = new FuncNode(id_node->lineno, name, type, params); 
 	symbolTable.addSymbolFunc( current_node );
     delete(id_node);
+
+     cout << "ruleFuncDecl END----------------------------------------------" << endl;
     return current_node;
 }
 

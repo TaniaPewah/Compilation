@@ -103,6 +103,7 @@ public:
          cout << "searching all stack"<<endl;
 
         for(int i = 0; i < stack.size(); i++){
+            cout << "####### scope: " << i << endl;
             VarNode* entry = stack[i]->findSymbolInScope(symbol_name);
             if(entry != NULL) {
                 return entry;

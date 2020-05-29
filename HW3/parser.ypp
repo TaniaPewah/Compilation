@@ -55,16 +55,21 @@ Funcs :  %empty { printProductionRule(2); }
 		  printProductionRule(3); }
 	  ;
 
-FuncDecl : RetType ID {
-
+FuncDecl : RetType ID 
 		// check if ID exist if so- thow error
+        LPAREN Formals RPAREN {
 
-        } LPAREN Formals RPAREN {
+			cout << "in func decl Formals" << endl;
 	
 			//TODO: funcDecl scope - the function given parameters should be in the same block as the function itself (after statments),
 			// open new scope?
+
+			cout << "in func decl Formals - type name " << ((TypeNode*)$1)->type_name <<endl;
+
+			cout << "in func decl Formals - id node id " << ((IdNode*)$2) -> name << endl;
+			cout << "in func decl Formals - params " << ((((FormalsList*)((Formals*)$4)->params)->functionParams).empty())<< endl;
 			
-			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((Formals*)$5)->params->functionParams );
+			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
 			printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
@@ -76,13 +81,18 @@ FuncDecl : RetType ID {
 RetType : Type { 
 		$$ = (TypeNode*)$1;
 		printProductionRule(5); }
-		| VOID { printProductionRule(6); }
+		| VOID { 
+			$$ = (TypeNode*)$1;	
+			printProductionRule(6); }
 		;
 
 Formals :  %empty { 
+	cout << "created empty formals, with empty vector" << endl;
 	$$ = new Formals();
 	printProductionRule(7); }
     | FormalsList { 
+
+		cout << " formals list" << endl;
 		$$ = new Formals((FormalsList*)$1);
 
 		// create params empty vector

@@ -87,7 +87,9 @@ class Formals: public Node {
     public:
     FormalsList* params;
 
-    Formals(): Node(NA), params(NULL){ }
+    Formals(): Node(NA){ 
+        params = new FormalsList();
+    }
     Formals( FormalsList* params): Node(NA), params(params){ }
 };
 
