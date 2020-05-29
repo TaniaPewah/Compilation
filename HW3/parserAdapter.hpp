@@ -123,6 +123,22 @@ ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
     return new ExpNode(exp1->lineno, "bool");
 }
 
+void addPrintandPrinti(){
+
+    // print
+    vector<VarNode*> params_print;
+    params_print.push_back(new VarNode(NA, "string_to_print", "string"));
+
+    FuncNode* print = new FuncNode(NA, "print", "void", params_print); 
+
+    vector<VarNode*> params_printi;
+    params_printi.push_back(new VarNode(NA, "int_to_print", "int"));
+
+    FuncNode* printi = new FuncNode(NA, "printi", "void", params_printi); 
+
+	symbolTable.addSymbolFunc( print );
+    symbolTable.addSymbolFunc( printi );
+}
 
 
 #endif //PARSER_ADAPTER_HPP

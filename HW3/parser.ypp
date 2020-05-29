@@ -45,6 +45,7 @@ Program : INIT Funcs {
 		;
 INIT : NEWSCOPECREATION {
 	// TODO create funcNode print, printi
+	addPrintandPrinti();
 
 	// symbolTable.addSymbolFunc( print );
 	// 
