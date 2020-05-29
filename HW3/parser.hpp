@@ -69,7 +69,7 @@ class ExpList: public Node {
     vector<VarNode> functionParams;
 
     //TODO add the params
-}
+};
 
 
 

@@ -32,7 +32,7 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, string assign_type)
 
     if(var_type != assign_type ){
 
-        cout << " bad type !! in line: "<< id_node->lineno << endl;
+        cout << " bad type !! in line: "<< id_node->lineno << "type is: " << var_type << " and assign type is: "<< assign_type << endl;
 
     } else {
 	    current_node = new VarNode(id_node->lineno, name, var_type); 
@@ -71,8 +71,10 @@ ExpNode* ruleExpNumB(NumNode* num) {
 
 TypeNode* ruleCallFunc(IdNode* id_node) {
 
+    cout << "ruleCallFunc" << endl;
+
     // search ID in symboltable, and get it's type
-    string returned_type = symbolTable.getIdType(id_node->name);
+    string returned_type = symbolTable.getIdType(id_node->lineno, id_node->name);
 
     // TODO: get function arg types from symbol table
     // check whether the Exp list types are correct for this func else raise exception

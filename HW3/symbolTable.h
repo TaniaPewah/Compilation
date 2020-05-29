@@ -50,6 +50,13 @@ public:
     }
 
     IdNode* findSymbolInScope(string key) {
+
+        cout << "The entries in this scope are: "<< endl;
+        for(auto key = entries.begin(); key != entries.end(); key++) {
+            cout << key->first << " : " << key->second->node->lineno << "        ";
+        }
+        cout<<endl<<endl;
+
         map<string, TableEntry*>::iterator wanted_entry = entries.find(key);
         if (wanted_entry != entries.end()){
             return wanted_entry->second->node;
@@ -92,15 +99,23 @@ public:
         cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << symbolToAdd->name << endl;
     }
 
-    IdNode* findSymbolInStack(string symbol_name){
+    IdNode* findSymbolInStack(int lineno, string symbol_name){
+         cout << "searching all stack"<<endl;
 
-        for(int i; i<stack.size(); i++){
+        for(int i = 0; i < stack.size(); i++){
             IdNode* entry = stack[i]->findSymbolInScope(symbol_name);
+            if(entry != NULL) {
+                return entry;
+            }
         }
+
+        output::errorUndef(lineno, symbol_name);
+        exit(0);
     }
 
-    string getIdType(string id){
-        return ((VarNode*)findSymbolInStack(id))->type;
+    string getIdType(int lineno, string id){
+        cout << "finding type in getIdType"<<endl;
+       return ((VarNode*)findSymbolInStack(lineno, id))->type;
     }
 };
 

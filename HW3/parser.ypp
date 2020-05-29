@@ -137,9 +137,12 @@ whileScope : WHILE LPAREN NEWSCOPECREATION Exp RPAREN Statement {
 ;
 
 Call : ID LPAREN ExpList RPAREN { 
-		// $$ = ruleCallFunc((IdNode*)$1, (ExpList*)$3)
+		 $$ = ruleCallFunc((IdNode*)$1);
 	printProductionRule(27); }
-	 | ID LPAREN RPAREN { printProductionRule(28); }
+	
+	 | ID LPAREN RPAREN { 
+		$$ = ruleCallFunc((IdNode*)$1);
+	 	printProductionRule(28); }
 	 ;
 
 ExpList : Exp { printProductionRule(29); }
@@ -163,7 +166,9 @@ Exp : LPAREN Exp RPAREN {
 		printProductionRule(35); }
 	| ID { 
 		printProductionRule(36); }
-	| Call { printProductionRule(37); }
+	| Call {
+		cout << "!!!!!!!!!!!!!!!!!!!!!Exp - >call here " << endl;
+		printProductionRule(37); }
 	| NUM { 
 		$$ = ruleExpNum((NumNode*)$1);
 		printProductionRule(38); }
