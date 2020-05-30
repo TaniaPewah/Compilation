@@ -22,12 +22,12 @@ or                          return OR;
 not                         return NOT;
 true                        { yylval =  new ExpNode( yylineno, string("bool"));  return TRUE; } 
 false                       { yylval =  new ExpNode( yylineno,  string("bool")); return FALSE; }
-return                      return RETURN;
+return                      { yylval =  new Node( yylineno); return RETURN; }
 if                          return IF;
 else                        return ELSE;
 while                       return WHILE;
-break                       return BREAK;
-continue                    return CONTINUE;
+break                       { yylval =  new Node( yylineno); return BREAK; }
+continue                    { yylval =  new Node( yylineno); return CONTINUE; }
 ;                           return SC;
 ,                           return COMMA;
 \(                          return LPAREN;
@@ -40,7 +40,7 @@ continue                    return CONTINUE;
 (\+|\-)                     { yylval =  new BinopNode( yylineno, string(yytext)); return ADDITIVE; }
 (\*|\/)                     { yylval =  new BinopNode( yylineno, string(yytext)); return MUL; }
 [a-zA-Z]([a-zA-Z0-9])* 		{ yylval =  new IdNode( yylineno, string(yytext)); return ID; }
-0|[1-9][0-9]*   			{ yylval = new NumNode( yylineno, string(yytext), string("int")); return NUM; }
+0|[1-9][0-9]*   			{ yylval = new NumNode( yylineno, stoi(yytext), string("int")); return NUM; }
 \"([^\n\r\"\\]|\\[rnt\"\\])+\" { yylval = new ExpNode( yylineno, string("string")); return STRING; }
 [\t\n\r ]|\n				;
 \/\/[^\r\n]*[\r|\n|\r\n]?   ;
