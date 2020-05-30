@@ -170,16 +170,21 @@ whileScope : WHILE LPAREN NEWSCOPECREATION Exp RPAREN Statement {
 ;
 
 Call : ID LPAREN ExpList RPAREN { 
-		 $$ = ruleCallFunc((IdNode*)$1);
+		 $$ = ruleCallFunc((IdNode*)$1, (ExpList*)$3);
 	printProductionRule(27); }
 	
 	 | ID LPAREN RPAREN { 
-		$$ = ruleCallFunc((IdNode*)$1);
+		$$ = ruleCallEmptyFunc((IdNode*)$1 );
 	 	printProductionRule(28); }
 	 ;
 
-ExpList : Exp { printProductionRule(29); }
-		| Exp COMMA ExpList { printProductionRule(30); }
+ExpList : Exp { 
+		$$ = new ExpList();
+		$$ = ruleAddExp( (ExpList*)$$, (ExpNode*)$1); 
+		printProductionRule(29); }
+		| Exp COMMA ExpList { 
+			$$ = ruleAddExp((ExpList*)$3, (ExpNode*)$1);
+			printProductionRule(30); }
 		;
 
 

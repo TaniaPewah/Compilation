@@ -76,6 +76,7 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, string assign_type)
 
     if((var_type != assign_type) && !(var_type == "int" && assign_type == "byte")){
 
+        // TODO raise proper error
         cout << " bad type !! in line: "<< id_node->lineno << "type is: " << var_type << " and assign type is: "<< assign_type << endl;
 
     } else {
@@ -112,16 +113,32 @@ ExpNode* ruleExpNumB(NumNode* num) {
     return new ExpNode(num->lineno, "byte");
 }
 
-TypeNode* ruleCallFunc(IdNode* id_node) {
+TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
     // search ID in symboltable, and get it's type
     string returned_type = symbolTable.getIdType(id_node->lineno, id_node->name);
 
     // TODO: get function arg types from symbol table
     // check whether the Exp list types are correct for this func else raise exception
-    
+    FuncNode* func = (FuncNode*)symbolTable.findSymbolInStack(id_node->lineno, id_node->name);
+
+    cout << " ~~~~~~~~~ruleCallFunc params: " << func->params.front()->name << endl;
+
+    if(!params_list->compareParams(func->params)){
+
+        // TODO add error
+        cout << " ~~~~~~~~~ruleCallFunc params: WRONG TYPE" << endl;
+    }
+
     return (new TypeNode(id_node->lineno, returned_type )); 
 }
+
+TypeNode* ruleCallEmptyFunc(IdNode* id_node) {
+     // search ID in symboltable, and get it's type
+    string returned_type = symbolTable.getIdType(id_node->lineno, id_node->name);
+    return (new TypeNode(id_node->lineno, returned_type )); 
+}
+
 
 FormalsList* ruleCreateFormals(int lineno){
 
@@ -131,6 +148,12 @@ FormalsList* ruleCreateFormals(int lineno){
 FormalsList* ruleAddFormals( FormalsList* params_list ,VarNode* param_to_add){
     params_list->addParam(param_to_add);
     return params_list;
+}
+
+ExpList* ruleAddExp(ExpList* exp_list, ExpNode* exp){
+
+    exp_list->addParam(exp);
+    return exp_list;
 }
 
 void ruleIdAssign( IdNode* id_node, ExpNode* exp){
