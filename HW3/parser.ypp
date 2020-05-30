@@ -217,8 +217,12 @@ Exp : LPAREN Exp RPAREN {
 	| NOT Exp { 
 		$$ = ruleNotExp((ExpNode*)$2);
 		printProductionRule(43); }
-	| Exp AND Exp { printProductionRule(44); }
-	| Exp OR Exp { printProductionRule(45); }
+	| Exp AND Exp { 
+		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$3);
+		printProductionRule(44); }
+	| Exp OR Exp { 
+		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$3);
+		printProductionRule(45); }
 	| Exp RELOPLEFT Exp { 
 		
 		// check both Exp are numerical

@@ -8,8 +8,27 @@
 
 SymbolTable symbolTable;
 
+ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b){
+    cout<< "node a atype is: "<< node_a->type <<endl;
+    cout<< "node b atype is: "<< node_a->type <<endl;
+
+    if(node_a->type != "bool" || node_b->type != "bool") {
+        output::errorMismatch(node_a->lineno);
+        exit(0);
+    }
+    cout<< "is boll!!!"<<endl;
+
+    ExpNode* new_exp_node = new ExpNode(node_a->lineno, "bool");
+    delete(node_a);
+    delete(node_b);
+    return new_exp_node;
+}
+
+ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b){
+    return ruleAndExp(node_a, node_b);
+}
+
 ExpNode* ruleNotExp(ExpNode* node) {
-    cout<< "node type is: "<< node->type <<endl;
     if(node->type != "bool") {
         output::errorMismatch(node->lineno);
         exit(0);
