@@ -137,8 +137,12 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
 			  printProductionRule(17); }
 		  | Call SC { printProductionRule(18); }
-		  | RETURN SC { printProductionRule(19); }
-		  | RETURN Exp SC { printProductionRule(20); }
+		  | RETURN SC { 
+			  returnFromVoidFunction($1);
+			  printProductionRule(19); }
+		  | RETURN Exp SC { 
+			  ruleReturnFromNonVoidFunc($1, (ExpNode*)$2);
+			  printProductionRule(20); }
 		  | IfScope %prec NO_ELSE { 
 			  printProductionRule(21); }
 
@@ -153,8 +157,12 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  symbolTable.closeScope();
 			  printProductionRule(24); }
 
-		  | BREAK SC { printProductionRule(25); }
-		  | CONTINUE SC { printProductionRule(26); }
+		  | BREAK SC { 
+			  ruleBreakCheck($1);
+			  printProductionRule(25); }
+		  | CONTINUE SC { 
+			  ruleContinueCheck($1);
+			  printProductionRule(26); }
 		  ;
 
 IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
@@ -163,15 +171,15 @@ IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
 }
 ;
 
-whileScope : WHILE LPAREN NEWSCOPECREATION Exp RPAREN Statement {
-
+whileScope : WHILE LPAREN {in_while = true;} NEWSCOPECREATION Exp RPAREN Statement {
+	in_while = false;
 	symbolTable.closeScope();
 }
 ;
 
-Call : ID LPAREN ExpList RPAREN { 
-		 $$ = ruleCallFunc((IdNode*)$1, (ExpList*)$3);
-	printProductionRule(27); }
+Call : ID LPAREN {ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
+		$$ = ruleCallFunc((IdNode*)$1, (ExpList*)$4);
+		printProductionRule(27); }
 	
 	 | ID LPAREN RPAREN { 
 		$$ = ruleCallEmptyFunc((IdNode*)$1 );
@@ -213,7 +221,8 @@ Exp : LPAREN Exp RPAREN {
 	| NUM B { 
 		$$ = (ruleExpNumB((NumNode*)$1));
 		printProductionRule(39); }
-	| STRING { $$ = (ExpNode*)$1;
+	| STRING { 
+		$$ = ruleHandleString((ExpNode*)$1);
 		printProductionRule(40); }
 	| TRUE { $$ = (ExpNode*)$1;
 		printProductionRule(41); }

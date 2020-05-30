@@ -34,8 +34,8 @@ class TypeNode : public Node{
 class NumNode: public TypeNode{
     /* This class will support int variable without a name*/
     public:
-    string value;
-    NumNode( int lineno, string value, string type ) : TypeNode(lineno, type), value(value) {
+    int value;
+    NumNode( int lineno, int value, string type ) : TypeNode(lineno, type), value(value) {
     };
 };
 

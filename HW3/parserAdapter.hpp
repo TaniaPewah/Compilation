@@ -8,6 +8,58 @@
 
 SymbolTable symbolTable;
 string current_func = "";
+bool in_while = false, call_print = false;
+
+
+void ruleAllowString(IdNode* id){
+    if(id->name == "print") {
+        call_print = true;
+    }
+}
+
+
+ExpNode* ruleHandleString(ExpNode* string_value){
+    if(!call_print){
+        output::errorMismatch(string_value->lineno);
+        exit(0);
+    }
+    return string_value;
+}
+
+void ruleContinueCheck(Node* continue_sign) {
+    if(!in_while){
+        output::errorUnexpectedContinue(continue_sign->lineno);
+        exit(0);
+    }
+    delete(continue_sign);
+}
+
+
+void ruleBreakCheck(Node* break_sign){
+    if(!in_while){
+        output::errorUnexpectedBreak(break_sign->lineno);
+        exit(0);
+    }
+    delete(break_sign);
+}
+
+
+void ruleReturnFromNonVoidFunc(Node* return_sign, ExpNode* return_value) {
+    string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
+    if((func_type != return_value->type) && !(return_value->type == "byte" && func_type == "int")){
+        output::errorMismatch(return_sign->lineno);
+        exit(0);
+    }
+}
+
+
+void returnFromVoidFunction(Node* return_sign){
+    string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
+    if(func_type != "void"){
+        output::errorMismatch(return_sign->lineno);
+        exit(0);
+    }
+}
 
 void addPrintAndPrinti(){
 
@@ -136,11 +188,16 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 }
 
 ExpNode* ruleExpNumB(NumNode* num) {
+    if(num->value > 255) {
+        output::errorByteTooLarge(num->lineno, to_string(num->value));
+        exit(0);
+    }
     return new ExpNode(num->lineno, "byte");
 }
 
 TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
+    call_print = false;
     // search ID in symboltable, and get it's type
     string returned_type = symbolTable.getIdType(id_node->lineno, id_node->name);
 
