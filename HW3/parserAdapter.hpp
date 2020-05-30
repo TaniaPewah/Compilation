@@ -279,7 +279,7 @@ ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
 //     symbolTable.addSymbolFunc( printi );
 // }
 
-void checkIfScopeBoolExp( ExpNode* if_cond_exp ){
+void checkBoolExp( ExpNode* if_cond_exp ){
 
     if(if_cond_exp->type != "bool"){
        output::errorMismatch(if_cond_exp->lineno);
