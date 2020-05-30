@@ -7,6 +7,22 @@
 #include <string>
 
 SymbolTable symbolTable;
+string current_func = "";
+
+void addPrintAndPrinti(){
+    VarNode* var_for_print_func = new VarNode(0, "", "string");
+    vector<VarNode*> vector_for_print_func;
+    vector_for_print_func.push_back(var_for_print_func);
+    FuncNode* print_function = new FuncNode(0, "print", "void", vector_for_print_func);
+    symbolTable.addSymbolFunc(print_function);
+
+    VarNode* var_for_printi_func = new VarNode(0, "", "int");
+    vector<VarNode*> vector_for_printi_func;
+    vector_for_printi_func.push_back(var_for_printi_func);
+    FuncNode* printi_function = new FuncNode(0, "printi", "void", vector_for_printi_func);
+    symbolTable.addSymbolFunc(printi_function);
+
+}
 
 ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b){
     cout<< "node a atype is: "<< node_a->type <<endl;
@@ -40,11 +56,16 @@ ExpNode* ruleNotExp(ExpNode* node) {
     return new_exp_node;
 }
 
-VarNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
+void ruleFuncDeclEndFunc(){
+    current_func = "";
+    symbolTable.closeScope();
+}
+
+VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> params) {
 
     string name = id_node->name;
 
-    if( symbolTable.ifExists(id_node->lineno, name) ){
+    if( symbolTable.ifExists(name) ){
         output::errorDef(id_node->lineno, name);
         exit(0);
     }
@@ -52,14 +73,20 @@ VarNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
     // TODO params show be of type vector<VarNode*> in the calling function
 	FuncNode* current_node = new FuncNode(id_node->lineno, name, type, params); 
 	symbolTable.addSymbolFunc( current_node );
+    symbolTable.newScope();
+    current_func = name;
     delete(id_node);
+
+    for(int i=0; i< params.size(); i++) {
+        symbolTable.addSymbolVar(params[i]);
+    }
     return current_node;
 }
 
 VarNode* ruleVarDecl( string type_name, IdNode* id_node) {
     string name = id_node->name;
 
-    if( symbolTable.ifExists(id_node->lineno, name) ){
+    if( symbolTable.ifExists(name) ){
         output::errorDef(id_node->lineno, name);
         exit(0);
     }
@@ -120,7 +147,7 @@ TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
     // TODO: get function arg types from symbol table
     // check whether the Exp list types are correct for this func else raise exception
-    FuncNode* func = (FuncNode*)symbolTable.findSymbolInStack(id_node->lineno, id_node->name);
+    FuncNode* func = (FuncNode*)symbolTable.findSymbolInStack(id_node->name);
 
     cout << " ~~~~~~~~~ruleCallFunc params: " << func->params.front()->name << endl;
 
@@ -178,22 +205,23 @@ ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
     return new ExpNode(exp1->lineno, "bool");
 }
 
-void addPrintandPrinti(){
+//TODO: didn't saw it. done another one
+// void addPrintandPrinti(){
 
-    // print
-    vector<VarNode*> params_print;
-    params_print.push_back(new VarNode(NA, "string_to_print", "string"));
+//     // print
+//     vector<VarNode*> params_print;
+//     params_print.push_back(new VarNode(NA, "string_to_print", "string"));
 
-    FuncNode* print = new FuncNode(NA, "print", "void", params_print); 
+//     FuncNode* print = new FuncNode(NA, "print", "void", params_print); 
 
-    vector<VarNode*> params_printi;
-    params_printi.push_back(new VarNode(NA, "int_to_print", "int"));
+//     vector<VarNode*> params_printi;
+//     params_printi.push_back(new VarNode(NA, "int_to_print", "int"));
 
-    FuncNode* printi = new FuncNode(NA, "printi", "void", params_printi); 
+//     FuncNode* printi = new FuncNode(NA, "printi", "void", params_printi); 
 
-	symbolTable.addSymbolFunc( print );
-    symbolTable.addSymbolFunc( printi );
-}
+// 	symbolTable.addSymbolFunc( print );
+//     symbolTable.addSymbolFunc( printi );
+// }
 
 
 #endif //PARSER_ADAPTER_HPP

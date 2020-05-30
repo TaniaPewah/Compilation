@@ -44,10 +44,7 @@ Program : INIT Funcs {
 	printProductionRule(1); }
 		;
 INIT : NEWSCOPECREATION {
-	// TODO create funcNode print, printi
-
-	// symbolTable.addSymbolFunc( print );
-	// 
+	addPrintAndPrinti();
 }
 
 Funcs :  %empty { printProductionRule(2); }
@@ -71,10 +68,11 @@ FuncDecl : RetType ID {
 			cout << "in func decl Formals - id node id " << ((IdNode*)$2) -> name << endl;
 			cout << "in func decl Formals - params " << ((((FormalsList*)((Formals*)$5)->params)->functionParams).empty())<< endl;
 			
-			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$5)->params)->functionParams );
+			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$5)->params)->functionParams );
 			printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
+			ruleFuncDeclEndFunc();
 
 		//TODO: CloseFunctionScope
 		}

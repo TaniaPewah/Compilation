@@ -50,10 +50,12 @@ public:
     }
 
     VarNode* findSymbolInScope(string key) {
+        cout << "entries in current scope are: " << endl;
 
         for(auto key = entries.begin(); key != entries.end(); key++) {
-           // cout << key->first << " : " << key->second->node->lineno << "        ";
+           cout << key->first << " : " << key->second->node->name << ", " << key->second->node->type << "        ";
         }
+        cout << endl;
 
         map<string, TableEntry*>::iterator wanted_entry = entries.find(key);
         if (wanted_entry != entries.end()){
@@ -89,15 +91,27 @@ public:
     }
 
     void addSymbolVar( VarNode* symbolToAdd ){
-        stack.back()->addSymbolVar( symbolToAdd );
-        cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
+        if(!ifExists(symbolToAdd->name)){
+            stack.back()->addSymbolVar( symbolToAdd );
+            cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
+        }
+        else{
+            output::errorUndef(symbolToAdd->lineno, symbolToAdd->name);
+            exit(0);
+        }
     }
     void addSymbolFunc( FuncNode* func_to_add ){
-        stack.front()->addSymbolFunc( func_to_add );
-        cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << func_to_add->name << endl;
+        if(!ifExists(func_to_add->name)){
+            stack.front()->addSymbolFunc( func_to_add );
+            cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << func_to_add->name << endl;
+        }
+        else{
+            output::errorUndefFunc(func_to_add->lineno, func_to_add->name);
+            exit(0);
+        }
     }
 
-    VarNode* findSymbolInStack(int lineno, string symbol_name){
+    VarNode* findSymbolInStack(string symbol_name){
        
         for(int i = 0; i < stack.size(); i++){
             VarNode* entry = stack[i]->findSymbolInScope(symbol_name);
@@ -110,7 +124,7 @@ public:
 
     string getIdType(int lineno, string id){
 
-        VarNode* wanted_entry = findSymbolInStack(lineno, id);
+        VarNode* wanted_entry = findSymbolInStack(id);
         if(!wanted_entry) {
             output::errorUndef(lineno, id);
             exit(0);
@@ -118,8 +132,8 @@ public:
        return wanted_entry->type;
     }
 
-    bool ifExists(int line, string name){
-        return findSymbolInStack(line, name) ? true : false;
+    bool ifExists(string name){
+        return findSymbolInStack(name) ? true : false;
     }
 };
 
