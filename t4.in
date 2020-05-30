@@ -1,0 +1,11 @@
+
+int max(int s) {
+ return 2;
+} 
+
+void main()
+{
+      int x = 1b + 1;
+    print(4);
+    
+}

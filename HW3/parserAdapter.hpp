@@ -127,10 +127,10 @@ VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> pa
     symbolTable.newScope();
     current_func = name;
     delete(id_node);
-
-    for(int i=0; i< params.size(); i++) {
-        symbolTable.addSymbolVar(params[i]);
-    }
+    // for(int i=0; i< params.size(); i++) {
+    //     cout<< "try to insert !!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << params[i] << endl;
+    //     symbolTable.addSymbolVar(params[i]);
+    // }
     return current_node;
 }
 

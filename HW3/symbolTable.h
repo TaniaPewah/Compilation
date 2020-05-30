@@ -96,7 +96,7 @@ public:
             cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
         }
         else{
-            output::errorUndef(symbolToAdd->lineno, symbolToAdd->name);
+            output::errorDef(symbolToAdd->lineno, symbolToAdd->name);
             exit(0);
         }
     }
