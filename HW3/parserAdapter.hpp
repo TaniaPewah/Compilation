@@ -10,16 +10,15 @@ SymbolTable symbolTable;
 string current_func = "";
 
 void addPrintAndPrinti(){
-    VarNode* var_for_print_func = new VarNode(0, "", "string");
+
     vector<VarNode*> vector_for_print_func;
-    vector_for_print_func.push_back(var_for_print_func);
-    FuncNode* print_function = new FuncNode(0, "print", "void", vector_for_print_func);
+    vector_for_print_func.push_back(new VarNode(NA, "", "string"));
+    FuncNode* print_function = new FuncNode(NA, "print", "void", vector_for_print_func);
     symbolTable.addSymbolFunc(print_function);
 
-    VarNode* var_for_printi_func = new VarNode(0, "", "int");
     vector<VarNode*> vector_for_printi_func;
-    vector_for_printi_func.push_back(var_for_printi_func);
-    FuncNode* printi_function = new FuncNode(0, "printi", "void", vector_for_printi_func);
+    vector_for_printi_func.push_back(new VarNode(NA, "", "int"));
+    FuncNode* printi_function = new FuncNode(NA, "printi", "void", vector_for_printi_func);
     symbolTable.addSymbolFunc(printi_function);
 
 }
@@ -219,9 +218,17 @@ ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
 
 //     FuncNode* printi = new FuncNode(NA, "printi", "void", params_printi); 
 
-// 	symbolTable.addSymbolFunc( print );
+// 	  symbolTable.addSymbolFunc( print );
 //     symbolTable.addSymbolFunc( printi );
 // }
+
+void checkIfScopeBoolExp( ExpNode* if_cond_exp ){
+
+    if(if_cond_exp->type != "bool"){
+       output::errorMismatch(if_cond_exp->lineno);
+       exit(0); 
+    }
+}
 
 
 #endif //PARSER_ADAPTER_HPP

@@ -158,11 +158,13 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 		  ;
 
 IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
+	checkIfScopeBoolExp( (ExpNode*)$4 );
 	symbolTable.closeScope();
 }
 ;
 
 whileScope : WHILE LPAREN NEWSCOPECREATION Exp RPAREN Statement {
+
 	symbolTable.closeScope();
 }
 ;
