@@ -78,6 +78,14 @@ public:
         return returned;
     }
 
+    vector <string> varNodeToVectString(vector<VarNode*> func_params){
+        vector<string> params;
+        for( auto it_param = func_params.begin(); it_param != func_params.end(); ++it_param){
+            params.push_back(toUpper((*it_param)->type));
+        }
+        return params;
+    }
+
     void endScope(){
         output::endScope();
         //cout << "++++++ Trying to end scope: "<< func_name << "++++++" << endl;
@@ -87,7 +95,14 @@ public:
             string id = entry.first;
             TableEntry* entry_value = entry.second;
 
-            output::printID( id, entry_value->offset, toUpper(entry_value->node->type));
+            if(entry_value->is_var){
+                output::printID( id, entry_value->offset, toUpper(entry_value->node->type));
+            }
+            else{
+                vector<string> params_type = varNodeToVectString(((FuncNode*)(entry_value->node))->params);
+                string print_types = output::makeFunctionType(toUpper(entry_value->node->type), params_type);
+                output::printID( id, entry_value->offset, print_types);
+            }
 
             // TODO is its a func print name, type, params, offset
             // if its a var print name type offset
