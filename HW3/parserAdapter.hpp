@@ -136,8 +136,8 @@ VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> pa
 	FuncNode* current_node = new FuncNode(id_node->lineno, name, type, params); 
 	symbolTable.addSymbolFunc( current_node );
     symbolTable.newScope();
-    for( int i = 0 ; i < params.size(); i++){
-        symbolTable.addSymbolVarForFunction(params[i], 0 - i - 1);
+    for( int i = params.size() -1 ; i >= 0; i--){
+        symbolTable.addSymbolVarForFunction(params[i], i - params.size() );
     }
     current_func = name;
     delete(id_node);

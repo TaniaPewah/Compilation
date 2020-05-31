@@ -8,6 +8,17 @@
 using namespace std;
 #define NA -1
 
+static string toUpper(string lower_type){
+
+    string returned;
+    
+    // convert string to upper case
+    for(char lower_char : lower_type){
+        returned.push_back(toupper(lower_char));
+    }
+    return returned;
+}
+
 class Node{
     /* This class is the basic node with line num. which all other types inherite from */
     public:
@@ -85,7 +96,7 @@ class ExpList: public Node{
             it_func != func_params.end(); ++it_func, ++it_my) {
             if ((*it_func)->type != (*it_my)->type && !((*it_func)->type == "int" && (*it_my)->type == "byte")) {
                 vector<string> types = varNodeToVectString(func_params);
-                output::errorPrototypeMismatch( (*it_func)->lineno, func->name, types);
+                output::errorPrototypeMismatch( (*it_my)->lineno, func->name, types);
                 exit(0);
             }
         }
@@ -95,7 +106,7 @@ class ExpList: public Node{
     vector <string> varNodeToVectString(vector<VarNode*> func_params){
         vector<string> params;
         for( auto it_param = func_params.begin(); it_param != func_params.end(); ++it_param){
-            params.push_back((*it_param)->type);
+            params.push_back(toUpper((*it_param)->type));
         }
         return params;
     }
