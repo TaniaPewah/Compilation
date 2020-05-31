@@ -5,6 +5,7 @@
 #ifndef HW3_PARSER_HPP
 #define HW3_PARSER_HPP
 #include <iostream>
+#include <algorithm>
 using namespace std;
 #define NA -1
 
@@ -91,6 +92,8 @@ class ExpList: public Node{
             return false;
         }
 
+        reverse(params.begin(), params.end());
+
         auto it_my = params.begin();
         for (auto it_func = func_params.begin(); 
             it_func != func_params.end(); ++it_func, ++it_my) {
@@ -100,6 +103,7 @@ class ExpList: public Node{
                 exit(0);
             }
         }
+        reverse(params.begin(), params.end());
         return true;
     }
 

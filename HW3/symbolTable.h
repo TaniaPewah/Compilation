@@ -64,7 +64,7 @@ public:
 
     vector <string> varNodeToVectString(vector<VarNode*> func_params){
         vector<string> params;
-        for( auto it_param = func_params.end(); it_param != func_params.begin(); --it_param){
+        for( auto it_param = func_params.begin(); it_param != func_params.end(); ++it_param){
             params.push_back(toUpper((*it_param)->type));
         }
         return params;
