@@ -287,5 +287,12 @@ void checkBoolExp( ExpNode* if_cond_exp ){
     }
 }
 
+void checkMain(){
+    if (!symbolTable.hasMain) {
+		output::errorMainMissing();
+		exit(0);
+	}
+}
+
 
 #endif //PARSER_ADAPTER_HPP

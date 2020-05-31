@@ -68,6 +68,7 @@ public:
 class SymbolTable {
 public:
     vector <Scope*> stack;
+    bool has_main = false;
 
     SymbolTable() {}
 
@@ -103,9 +104,18 @@ public:
     void addSymbolFunc( FuncNode* func_to_add ){
         if(!ifExists(func_to_add->name)){
             stack.front()->addSymbolFunc( func_to_add );
+            
+            if (func_to_add->name == "main" && 
+                func_to_add->type == "void" && 
+                func_to_add->params.size() == 0) {
+
+                this->has_main = true;
+            }  
             cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << func_to_add->name << endl;
         }
         else{
+
+            // TODO - check if should be errorDef
             output::errorUndefFunc(func_to_add->lineno, func_to_add->name);
             exit(0);
         }
@@ -134,6 +144,11 @@ public:
 
     bool ifExists(string name){
         return findSymbolInStack(name) ? true : false;
+    }
+
+
+    bool hasMain(){
+        return has_main;
     }
 };
 

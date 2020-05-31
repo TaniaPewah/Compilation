@@ -40,6 +40,8 @@
 %%
 
 Program : INIT Funcs { 
+
+	checkMain();
 	symbolTable.closeScope();
 	printProductionRule(1); }
 		;
