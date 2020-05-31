@@ -18,8 +18,9 @@ public:
     VarNode* node;
     string type="";
     bool is_var;
+    int offset;
 
-    TableEntry( VarNode* newNode, bool is_var ) : node(newNode), is_var(is_var) {
+    TableEntry( VarNode* newNode, bool is_var, int offset=0 ) : node(newNode), is_var(is_var), offset(offset) {
     }
 };
 
@@ -34,10 +35,18 @@ public:
     Scope(int offset, string func_name) : offset(offset), func_name(func_name), is_func_scope(true) {}
 
     void addSymbolVar( VarNode* symbolToAdd ){
-        TableEntry* entryToAdd = new TableEntry( symbolToAdd, true );
-        entries.insert(make_pair(symbolToAdd->name, entryToAdd));
+        
+        TableEntry* entryToAdd = new TableEntry( symbolToAdd, true, offset );
         offset++;
+        
+        entries.insert(make_pair(symbolToAdd->name, entryToAdd));
     }
+
+    void addSymbolVarForFunction( VarNode* symbolToAdd , int wanted_offset){
+        TableEntry* entryToAdd = new TableEntry( symbolToAdd, true, wanted_offset );
+        entries.insert(make_pair(symbolToAdd->name, entryToAdd));
+    }
+
     void addSymbolFunc( FuncNode* funcToAdd ){
         TableEntry* entryToAdd = new TableEntry( funcToAdd, false );
         entries.insert(make_pair(funcToAdd->name, entryToAdd)); 
@@ -102,9 +111,9 @@ public:
         stack.pop_back();
     }
 
-    void addSymbolVar( VarNode* symbolToAdd ){
+    void addSymbolVar( VarNode* symbolToAdd){
         if(!ifExists(symbolToAdd->name)){
-            stack.back()->addSymbolVar( symbolToAdd );
+            stack.back()->addSymbolVar( symbolToAdd);
             //cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
         }
         else{
@@ -112,6 +121,18 @@ public:
             exit(0);
         }
     }
+
+    void addSymbolVarForFunction( VarNode* symbolToAdd , int wanted_offset) {
+        if(!ifExists(symbolToAdd->name)){
+            stack.back()->addSymbolVarForFunction( symbolToAdd, wanted_offset );
+            //cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
+        }
+        else{
+            output::errorDef(symbolToAdd->lineno, symbolToAdd->name);
+            exit(0);
+        }
+    }
+    
     void addSymbolFunc( FuncNode* func_to_add ){
         if(!ifExists(func_to_add->name)){
             stack.front()->addSymbolFunc( func_to_add );
