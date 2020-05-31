@@ -11,6 +11,14 @@ string current_func = "";
 bool in_while = false, call_print = false;
 
 
+VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
+    VarNode* new_var = new VarNode(type->lineno, id->name, type->type_name);
+    delete(type);
+    delete(id);
+    return new_var;
+}
+
+
 void ruleAllowString(IdNode* id){
     if(id->name == "print") {
         call_print = true;
@@ -128,6 +136,9 @@ VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> pa
 	FuncNode* current_node = new FuncNode(id_node->lineno, name, type, params); 
 	symbolTable.addSymbolFunc( current_node );
     symbolTable.newScope();
+    for( int i = 0 ; i < params.size(); i++){
+        symbolTable.addSymbolVar(params[i]);
+    }
     current_func = name;
     delete(id_node);
     return current_node;
@@ -141,6 +152,7 @@ VarNode* ruleVarDecl( string type_name, IdNode* id_node) {
         exit(0);
     }
 	VarNode* current_node = new VarNode(id_node->lineno, name, type_name); 
+    // cout << "tring to add " << current_node->name <<" in ruleVarDecl" <<endl;
 	symbolTable.addSymbolVar( current_node );
     
     delete(id_node);
@@ -158,6 +170,7 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, string assign_type)
 
     } else {
 	    current_node = new VarNode(id_node->lineno, name, var_type); 
+        // cout << "tring to add " << current_node->name <<" in ruleVarDeclAssign" <<endl;
 	    symbolTable.addSymbolVar( current_node );
     }
 

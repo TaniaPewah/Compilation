@@ -114,7 +114,7 @@ FormalsList : FormalDecl {
 			;
 
 FormalDecl : Type ID { 
-	$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2); 
+	$$ = ruleFormalDecl((TypeNode*)$1, (IdNode*)$2); 
 	//printProductionRule(11); 
 	};
 Statements : Statement {
