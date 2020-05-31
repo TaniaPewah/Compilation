@@ -196,7 +196,8 @@ whileScope : WHILE LPAREN {in_while = true;} NEWSCOPECREATION Exp RPAREN Stateme
 }
 ;
 
-Call : ID LPAREN {ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
+Call : ID LPAREN {
+	 ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
 		$$ = ruleCallFunc((IdNode*)$1, (ExpList*)$4);
 		//printProductionRule(27); 
 		}
@@ -241,6 +242,7 @@ Exp : LPAREN Exp RPAREN {
 		//printProductionRule(35); 
 		}
 	| ID { 
+			$$ = ruleIDToExp((IdNode*)$1);
 		//printProductionRule(36); 
 		}
 	| Call {
@@ -283,7 +285,9 @@ Exp : LPAREN Exp RPAREN {
 			
 		//printProductionRule(46); 
 		}
-    | Exp RELOPNOTASS Exp { //printProductionRule(46); 
+    | Exp RELOPNOTASS Exp { 
+		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
+		//printProductionRule(46); 
 	}
 	;
 

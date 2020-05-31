@@ -19,17 +19,8 @@ public:
     string type="";
     bool is_var;
 
-    // TODO - save type for every node
     TableEntry( VarNode* newNode, bool is_var ) : node(newNode), is_var(is_var) {
-
-        if(is_var){
-            cout<<"--------new table Var added: "<< node->name <<endl;
-        }
-        else{
-            cout<<"--------new Function Var added: "<< node->name <<endl;
-        }
     }
-    //TODO: add FunctionTableEntry
 };
 
 class Scope{
@@ -54,12 +45,12 @@ public:
     }
 
     VarNode* findSymbolInScope(string key) {
-        cout << "entries in current scope are: " << endl;
+        //cout << "entries in current scope are: " << endl;
 
         for(auto key = entries.begin(); key != entries.end(); key++) {
-           cout << key->first << " : " << key->second->node->name << ", " << key->second->node->type << "        ";
+           //cout << key->first << " : " << key->second->node->name << ", " << key->second->node->type << "        ";
         }
-        cout << endl;
+        //cout << endl;
 
         map<string, TableEntry*>::iterator wanted_entry = entries.find(key);
         if (wanted_entry != entries.end()){
@@ -70,7 +61,7 @@ public:
 
     void endScope(){
         output::endScope();
-        cout << "++++++ Trying to end scope: "<< func_name << "++++++" << endl;
+        //cout << "++++++ Trying to end scope: "<< func_name << "++++++" << endl;
 
       
         for (pair<string, TableEntry*> entry : entries) {
@@ -98,11 +89,11 @@ public:
         Scope* scopeToAdd;
         if (stack.empty()){
             scopeToAdd = new Scope(0);
-            cout << "--First scope was created--" << endl;
+            //cout << "--First scope was created--" << endl;
         }
         else{
             scopeToAdd = new Scope(stack.back()->offset);
-            cout << "--New scope was created--" << endl;
+            //cout << "--New scope was created--" << endl;
         }
         stack.push_back(scopeToAdd);
     }
@@ -114,7 +105,7 @@ public:
     void addSymbolVar( VarNode* symbolToAdd ){
         if(!ifExists(symbolToAdd->name)){
             stack.back()->addSymbolVar( symbolToAdd );
-            cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
+            //cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
         }
         else{
             output::errorDef(symbolToAdd->lineno, symbolToAdd->name);
@@ -131,12 +122,11 @@ public:
 
                 this->has_main = true;
             }  
-            cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << func_to_add->name << endl;
+            //cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << func_to_add->name << endl;
         }
         else{
 
-            // TODO - check if should be errorDef
-            output::errorUndefFunc(func_to_add->lineno, func_to_add->name);
+            output::errorDef(func_to_add->lineno, func_to_add->name);
             exit(0);
         }
     }

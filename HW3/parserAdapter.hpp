@@ -20,6 +20,7 @@ void ruleAllowString(IdNode* id){
 
 ExpNode* ruleHandleString(ExpNode* string_value){
     if(!call_print){
+        //cout << "ruleHandleString" << endl;
         output::errorMismatch(string_value->lineno);
         exit(0);
     }
@@ -48,6 +49,7 @@ void ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
 
     string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
     if((func_type != return_value->type) && !(return_value->type == "byte" && func_type == "int")){
+        //cout << "ruleReturnNonVoid" << endl;
         output::errorMismatch(return_sign->lineno);
         exit(0);
     }
@@ -58,6 +60,7 @@ void ruleReturnVoid(Node* return_sign){
     // check what is the return type of the current function
     string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
     if(func_type != "void"){
+        //cout << "ruleReturnVoid" << endl;
         output::errorMismatch(return_sign->lineno);
         exit(0);
     }
@@ -80,6 +83,7 @@ void addPrintAndPrinti(){
 ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b){
    
     if(node_a->type != "bool" || node_b->type != "bool") {
+        //cout << "ruleAndExp" << endl;
         output::errorMismatch(node_a->lineno);
         exit(0);
     }
@@ -96,6 +100,7 @@ ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b){
 
 ExpNode* ruleNotExp(ExpNode* node) {
     if(node->type != "bool") {
+         //cout << "ruleNotExp" << endl;
         output::errorMismatch(node->lineno);
         exit(0);
     }
@@ -199,9 +204,9 @@ TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
     // check whether the Exp list types are correct for this func else raise exception
     FuncNode* func = (FuncNode*)symbolTable.findSymbolInStack(id_node->name);
 
-    cout << " ~~~~~~~~~ruleCallFunc params: " << func->params.front()->name << endl;
+    //cout << " ~~~~~~~~~ruleCallFunc params: " << func->params.front()->name << endl;
 
-    if(!params_list->compareParams(func->params)){
+    if(!params_list->compareParams(func, func->params)){
 
         // TODO add error
         cout << " ~~~~~~~~~ruleCallFunc params: WRONG TYPE" << endl;
@@ -238,6 +243,7 @@ void ruleIdAssign( IdNode* id_node, ExpNode* exp){
     string id_type = symbolTable.getIdType(id_node->lineno, id_node->name);
 
     if( id_type != exp->type ){
+        
         output::errorMismatch(id_node->lineno);
         exit(0);
     }
@@ -274,7 +280,6 @@ ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
 // }
 
 void checkBoolExp( ExpNode* if_cond_exp ){
-
     if(if_cond_exp->type != "bool"){
        output::errorMismatch(if_cond_exp->lineno);
        exit(0); 
@@ -286,6 +291,13 @@ void checkMain(){
 		output::errorMainMissing();
 		exit(0);
 	}
+}
+
+ExpNode* ruleIDToExp (IdNode* id_node){
+    string type = symbolTable.getIdType(id_node->lineno, id_node->name);
+    int line = id_node->lineno;
+    delete id_node;
+    return new ExpNode(line, type);
 }
 
 

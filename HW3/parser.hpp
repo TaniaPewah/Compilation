@@ -55,6 +55,14 @@ class VarNode: public IdNode{
     };
 };
 
+class FuncNode: public VarNode{
+    /* This class supports variable types, such as int, bool... */
+    public:
+    vector<VarNode*> params;
+    FuncNode( int lineno, string name, string type, vector<VarNode*> params ) : VarNode(lineno, name, type), params(params) {
+    };
+};
+
 class ExpList: public Node{
     public:
     vector<ExpNode*> params;
@@ -66,7 +74,7 @@ class ExpList: public Node{
     }
 
     // for every param of the func check whether the param in params list is same.
-    bool compareParams( vector<VarNode*> func_params){
+    bool compareParams(FuncNode* func, vector<VarNode*> func_params){
         if (params.size() != func_params.size()) {
             cout << " ~~~~~~~~~ruleCallFunc params: WRONG NUMBER OF PARAMS" << params.size() << " " << func_params.size()<< endl;
             return false;
@@ -76,21 +84,23 @@ class ExpList: public Node{
         for (auto it_func = func_params.begin(); 
             it_func != func_params.end(); ++it_func, ++it_my) {
             if ((*it_func)->type != (*it_my)->type && !((*it_func)->type == "int" && (*it_my)->type == "byte")) {
-                cout << " ~~~~~~~~~ruleCallFunc params: WRONG TYPE OF PARAM" << endl;
-                return false;
+                vector<string> types = varNodeToVectString(func_params);
+                output::errorPrototypeMismatch( (*it_func)->lineno, func->name, types);
+                exit(0);
             }
         }
         return true;
     }
+
+    vector <string> varNodeToVectString(vector<VarNode*> func_params){
+        vector<string> params;
+        for( auto it_param = func_params.begin(); it_param != func_params.end(); ++it_param){
+            params.push_back((*it_param)->type);
+        }
+        return params;
+    }
 };
 
-class FuncNode: public VarNode{
-    /* This class supports variable types, such as int, bool... */
-    public:
-    vector<VarNode*> params;
-    FuncNode( int lineno, string name, string type, vector<VarNode*> params ) : VarNode(lineno, name, type), params(params) {
-    };
-};
 
 class BinopNode: public Node{
     /* This class supports Binop operataros , such as +, - ... */
