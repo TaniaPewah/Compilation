@@ -8,6 +8,7 @@
 #include "hw3_output.hpp"
 #include <map>
 #include <vector>
+#include <cctype> 
 
 using namespace std;
 
@@ -16,7 +17,6 @@ class TableEntry{
 public:
 
     VarNode* node;
-    string type="";
     bool is_var;
     int offset;
 
@@ -68,16 +68,27 @@ public:
         return NULL;
     }
 
+    string toUpper(string lower_type){
+
+        string returned;
+        
+        // convert string to upper case
+        for(char lower_char : lower_type){
+            returned.push_back(toupper(lower_char));
+        }
+        return returned;
+    }
+
     void endScope(){
         output::endScope();
         //cout << "++++++ Trying to end scope: "<< func_name << "++++++" << endl;
-
       
         for (pair<string, TableEntry*> entry : entries) {
  
             string id = entry.first;
             TableEntry* entry_value = entry.second;
-            cout <<" entry name: " << id << " :: " << entry_value->type << std::endl;
+
+            output::printID( id, 0, toUpper(entry_value->node->type));
 
             // TODO is its a func print name, type, params, offset
             // if its a var print name type offset
