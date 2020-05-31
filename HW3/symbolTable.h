@@ -26,7 +26,7 @@ public:
 
 class Scope{
 public:
-    map<string, TableEntry*> entries;
+    vector<TableEntry*> entries;
     int offset;
     string func_name;
     bool is_func_scope;
@@ -39,30 +39,26 @@ public:
         TableEntry* entryToAdd = new TableEntry( symbolToAdd, true, offset );
         offset++;
         
-        entries.insert(make_pair(symbolToAdd->name, entryToAdd));
+        entries.push_back(entryToAdd); 
     }
 
     void addSymbolVarForFunction( VarNode* symbolToAdd , int wanted_offset){
         TableEntry* entryToAdd = new TableEntry( symbolToAdd, true, wanted_offset );
-        entries.insert(make_pair(symbolToAdd->name, entryToAdd));
+        entries.push_back(entryToAdd); 
     }
 
     void addSymbolFunc( FuncNode* funcToAdd ){
         TableEntry* entryToAdd = new TableEntry( funcToAdd, false );
-        entries.insert(make_pair(funcToAdd->name, entryToAdd)); 
+        entries.push_back(entryToAdd); 
     }
 
     VarNode* findSymbolInScope(string key) {
-        //cout << "entries in current scope are: " << endl;
 
-        for(auto key = entries.begin(); key != entries.end(); key++) {
-           //cout << key->first << " : " << key->second->node->name << ", " << key->second->node->type << "        ";
-        }
-        //cout << endl;
-
-        map<string, TableEntry*>::iterator wanted_entry = entries.find(key);
-        if (wanted_entry != entries.end()){
-            return wanted_entry->second->node;
+        TableEntry* wanted_entry;
+        for (auto & entry : entries) {
+            if(entry->node->name == key){
+                return entry->node;
+            }
         }
         return NULL;
     }
@@ -90,18 +86,17 @@ public:
         output::endScope();
         //cout << "++++++ Trying to end scope: "<< func_name << "++++++" << endl;
       
-        for (pair<string, TableEntry*> entry : entries) {
+        for ( auto entry : entries) {
  
-            string id = entry.first;
-            TableEntry* entry_value = entry.second;
+            string id = entry->node->name;
 
-            if(entry_value->is_var){
-                output::printID( id, entry_value->offset, toUpper(entry_value->node->type));
+            if(entry->is_var){
+                output::printID( id, entry->offset, toUpper(entry->node->type));
             }
             else{
-                vector<string> params_type = varNodeToVectString(((FuncNode*)(entry_value->node))->params);
-                string print_types = output::makeFunctionType(toUpper(entry_value->node->type), params_type);
-                output::printID( id, entry_value->offset, print_types);
+                vector<string> params_type = varNodeToVectString(((FuncNode*)(entry->node))->params);
+                string print_types = output::makeFunctionType(toUpper(entry->node->type), params_type);
+                output::printID( id, entry->offset, print_types);
             }
 
             // TODO is its a func print name, type, params, offset
