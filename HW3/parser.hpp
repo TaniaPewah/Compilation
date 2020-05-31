@@ -7,6 +7,11 @@
 #include <iostream>
 #include <algorithm>
 using namespace std;
+
+#ifndef YYINITEPTH
+# define YYINITDEPTH 10000
+#endif
+
 #define NA -1
 
 static string toUpper(string lower_type){

@@ -6,6 +6,7 @@
 #include "symbolTable.h"
 #include <string>
 
+
 SymbolTable symbolTable;
 string current_func = "";
 bool call_print = false;
