@@ -189,8 +189,8 @@ IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
 }
 ;
 
-whileScope : WHILE LPAREN {in_while = true;} NEWSCOPECREATION Exp RPAREN Statement {
-	in_while = false;
+whileScope : WHILE LPAREN {in_while++;} NEWSCOPECREATION Exp RPAREN Statement {
+	in_while--;
 	checkBoolExp( (ExpNode*)$5 );
 	symbolTable.closeScope();
 }

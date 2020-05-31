@@ -8,7 +8,8 @@
 
 SymbolTable symbolTable;
 string current_func = "";
-bool in_while = false, call_print = false;
+bool call_print = false;
+int in_while = 0;
 
 
 VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
@@ -36,7 +37,7 @@ ExpNode* ruleHandleString(ExpNode* string_value){
 }
 
 void ruleContinueCheck(Node* continue_sign) {
-    if(!in_while){
+    if(in_while <= 0){
         output::errorUnexpectedContinue(continue_sign->lineno);
         exit(0);
     }
@@ -45,7 +46,7 @@ void ruleContinueCheck(Node* continue_sign) {
 
 
 void ruleBreakCheck(Node* break_sign){
-    if(!in_while){
+    if(in_while <= 0){
         output::errorUnexpectedBreak(break_sign->lineno);
         exit(0);
     }
