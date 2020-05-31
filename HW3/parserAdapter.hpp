@@ -164,9 +164,8 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, string assign_type)
     VarNode* current_node = NULL;
 
     if((var_type != assign_type) && !(var_type == "int" && assign_type == "byte")){
-
-        // TODO raise proper error
-        cout << " bad type !! in line: "<< id_node->lineno << "type is: " << var_type << " and assign type is: "<< assign_type << endl;
+        output::errorMismatch(id_node->lineno);
+        exit(0);
 
     } else {
 	    current_node = new VarNode(id_node->lineno, name, var_type); 
