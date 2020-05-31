@@ -43,15 +43,18 @@ Program : INIT Funcs {
 
 	checkMain();
 	symbolTable.closeScope();
-	printProductionRule(1); }
+	//printProductionRule(1); 
+	}
 		;
 INIT : NEWSCOPECREATION {
 	addPrintAndPrinti();
 }
 
-Funcs :  %empty { printProductionRule(2); }
+Funcs :  %empty { //printProductionRule(2); 
+}
 	  | FuncDecl Funcs { 
-		  printProductionRule(3); }
+		  //printProductionRule(3); 
+		  }
 	  ;
 
 FuncDecl : RetType ID {
@@ -61,17 +64,17 @@ FuncDecl : RetType ID {
 		// check if ID exist if so- thow error
         LPAREN Formals RPAREN {
 
-			cout << "in func decl Formals" << endl;
+			//cout << "in func decl Formals" << endl;
 	
 			//TODO: funcDecl scope - the function given parameters should be in the same block as the function itself (after statments),
 			// open new scope?
 
-			cout << "in func decl Formals - type name " << ((TypeNode*)$1)->type_name <<endl;
-			cout << "in func decl Formals - id node id " << ((IdNode*)$2) -> name << endl;
-			cout << "in func decl Formals - params " << ((((FormalsList*)((Formals*)$5)->params)->functionParams).empty())<< endl;
+			//cout << "in func decl Formals - type name " << ((TypeNode*)$1)->type_name <<endl;
+			//cout << "in func decl Formals - id node id " << ((IdNode*)$2) -> name << endl;
+			//cout << "in func decl Formals - params " << ((((FormalsList*)((Formals*)$5)->params)->functionParams).empty())<< endl;
 			
 			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$5)->params)->functionParams );
-			printProductionRule(4);
+			//printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
 			ruleFuncDeclEndFunc();
@@ -82,89 +85,102 @@ FuncDecl : RetType ID {
 
 RetType : Type { 
 		$$ = (TypeNode*)$1;
-		printProductionRule(5); }
+		//printProductionRule(5); 
+		}
 		| VOID { 
 			$$ = (TypeNode*)$1;	
-			printProductionRule(6); }
+			//printProductionRule(6); 
+			}
 		;
 
 Formals :  %empty { 
-
 	$$ = new Formals();
-	printProductionRule(7); }
+	//printProductionRule(7); 
+	}
     | FormalsList { 
-
 		$$ = new Formals((FormalsList*)$1);
-
-		// create params empty vector
-		
-		printProductionRule(8); }
+		//printProductionRule(8); 
+		}
     ;
 
 FormalsList : FormalDecl { 
-	// varNode $1 addParam
 	$$ = ruleAddFormals( (FormalsList*)ruleCreateFormals( ((VarNode*)$1)->lineno ), (VarNode*)$1); 
-	
-	printProductionRule(9); }
+	//printProductionRule(9); 
+	}
 			| FormalDecl COMMA FormalsList { 
-				
 				$$ = ruleAddFormals((FormalsList*)$3, (VarNode*)$1);
-				printProductionRule(10); }
+				//printProductionRule(10); 
+				}
 			;
 
 FormalDecl : Type ID { 
 	$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2); 
-	printProductionRule(11); };
+	//printProductionRule(11); 
+	};
 Statements : Statement {
-				printProductionRule(12); }
+				//printProductionRule(12); 
+				}
 		   | Statements Statement { 
-				printProductionRule(13);}
+				//printProductionRule(13);
+				}
 		   ;
 
 Statement : LBRACE NEWSCOPECREATION Statements RBRACE { 
 			symbolTable.closeScope();
-			printProductionRule(14); }
-		  | Type ID SC { // add ID to symbolTable $1 is the type
-		  
-		  					$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
-		                    printProductionRule(15); }
+			//printProductionRule(14); 
+			}
+		  | Type ID SC { 
+				$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
+				//printProductionRule(15); 
+				}
 
 		  | Type ID ASSIGN Exp SC { 
-									$$ = ruleVarDeclAssign( (IdNode*)$2, 
-														   ((TypeNode*)$1)->type_name, 
-														   ((ExpNode*)$4)->type);
-		                            printProductionRule(16); }
+						$$ = ruleVarDeclAssign( (IdNode*)$2, 
+												((TypeNode*)$1)->type_name, 
+												((ExpNode*)$4)->type);
+						//printProductionRule(16); 
+						}
 
 		  | ID ASSIGN Exp SC { 
 			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
-			  printProductionRule(17); }
-		  | Call SC { printProductionRule(18); }
+			  //printProductionRule(17); 
+			  }
+		  | Call SC { //printProductionRule(18); 
+		  }
 		  | RETURN SC { 
-			  returnFromVoidFunction($1);
-			  printProductionRule(19); }
+			  ruleReturnVoid($1);
+			  //printProductionRule(19); 
+			  }
 		  | RETURN Exp SC { 
-			  ruleReturnFromNonVoidFunc($1, (ExpNode*)$2);
-			  printProductionRule(20); }
+			  ruleReturnNonVoid($1, (ExpNode*)$2);
+			  //printProductionRule(20); 
+			  }
 		  | IfScope %prec NO_ELSE { 
-			  printProductionRule(21); }
+			  //printProductionRule(21); 
+			  }
 
           | IfScope ELSE NEWSCOPECREATION Statement { 
 			  symbolTable.closeScope();
-			  printProductionRule(22); }
+			  //printProductionRule(22); 
+			  }
 
 		  |  whileScope %prec NO_ELSE { 
-			  printProductionRule(23); }
+			  //printProductionRule(23); 
+			  }
 
 		  | whileScope ELSE NEWSCOPECREATION Statement { 
 			  symbolTable.closeScope();
-			  printProductionRule(24); }
+			  //printProductionRule(24); 
+			  }
 
 		  | BREAK SC { 
 			  ruleBreakCheck($1);
-			  printProductionRule(25); }
+			  //printProductionRule(25); 
+			  }
 		  | CONTINUE SC { 
 			  ruleContinueCheck($1);
-			  printProductionRule(26); }
+			  //printProductionRule(26); 
+			  }
 		  ;
 
 IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
@@ -182,72 +198,93 @@ whileScope : WHILE LPAREN {in_while = true;} NEWSCOPECREATION Exp RPAREN Stateme
 
 Call : ID LPAREN {ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
 		$$ = ruleCallFunc((IdNode*)$1, (ExpList*)$4);
-		printProductionRule(27); }
+		//printProductionRule(27); 
+		}
 	
 	 | ID LPAREN RPAREN { 
 		$$ = ruleCallEmptyFunc((IdNode*)$1 );
-	 	printProductionRule(28); }
+	 	//printProductionRule(28); 
+		 }
 	 ;
 
 ExpList : Exp { 
 		$$ = new ExpList();
 		$$ = ruleAddExp( (ExpList*)$$, (ExpNode*)$1); 
-		printProductionRule(29); }
+		//printProductionRule(29); 
+		}
 		| Exp COMMA ExpList { 
 			$$ = ruleAddExp((ExpList*)$3, (ExpNode*)$1);
-			printProductionRule(30); }
+			//printProductionRule(30); 
+			}
 		;
 
 
-Type	: INT { printProductionRule(31); }
-		| BYTE { printProductionRule(32); }
-		| BOOL { printProductionRule(33); }
+Type	: INT { //printProductionRule(31); 
+}
+		| BYTE { //printProductionRule(32); 
+		}
+		| BOOL { //printProductionRule(33); 
+		}
 		;
 
 Exp : LPAREN Exp RPAREN { 
 		$$ = (ExpNode*)$2;
-		cout<<"current node type is :" <<((ExpNode*)$$)->type << endl;
-		printProductionRule(34); }
+		//cout<<"current node type is :" <<((ExpNode*)$$)->type << endl;
+		//printProductionRule(34); 
+		}
 	| Exp ADDITIVE Exp { 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
-		printProductionRule(35); }
+		//printProductionRule(35); 
+		}
 	| Exp MUL Exp { 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
-		printProductionRule(35); }
+		//printProductionRule(35); 
+		}
 	| ID { 
-		printProductionRule(36); }
+		//printProductionRule(36); 
+		}
 	| Call {
-		printProductionRule(37); }
+		//printProductionRule(37); 
+		}
 	| NUM { 
 		$$ = ruleExpNum((NumNode*)$1);
-		printProductionRule(38); }
+		//printProductionRule(38); 
+		}
 	| NUM B { 
 		$$ = (ruleExpNumB((NumNode*)$1));
-		printProductionRule(39); }
+		//printProductionRule(39); 
+		}
 	| STRING { 
 		$$ = ruleHandleString((ExpNode*)$1);
-		printProductionRule(40); }
+		//printProductionRule(40); 
+		}
 	| TRUE { $$ = (ExpNode*)$1;
-		printProductionRule(41); }
+		//printProductionRule(41); 
+		}
 	| FALSE { $$ = (ExpNode*)$1;
-		printProductionRule(42); }
+		//printProductionRule(42); 
+		}
 	| NOT Exp { 
 		$$ = ruleNotExp((ExpNode*)$2);
-		printProductionRule(43); }
+		//printProductionRule(43); 
+		}
 	| Exp AND Exp { 
 		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$3);
-		printProductionRule(44); }
+		//printProductionRule(44); 
+		}
 	| Exp OR Exp { 
 		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$3);
-		printProductionRule(45); }
+		//printProductionRule(45); 
+		}
 	| Exp RELOPLEFT Exp { 
 		
 		// check both Exp are numerical
 		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
-		//
-		
-		printProductionRule(46); }
-    | Exp RELOPNOTASS Exp { printProductionRule(46); }
+			
+		//printProductionRule(46); 
+		}
+    | Exp RELOPNOTASS Exp { //printProductionRule(46); 
+	}
 	;
 
 NEWSCOPECREATION :  %empty { symbolTable.newScope(); };

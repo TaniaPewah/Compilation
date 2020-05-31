@@ -16,8 +16,10 @@ class TableEntry{
 public:
 
     VarNode* node;
+    string type="";
     bool is_var;
 
+    // TODO - save type for every node
     TableEntry( VarNode* newNode, bool is_var ) : node(newNode), is_var(is_var) {
 
         if(is_var){
@@ -28,15 +30,17 @@ public:
         }
     }
     //TODO: add FunctionTableEntry
-
 };
 
 class Scope{
 public:
     map<string, TableEntry*> entries;
     int offset;
+    string func_name;
+    bool is_func_scope;
 
-    Scope(int offset) : offset(offset) {}
+    Scope(int offset) : offset(offset), func_name(""), is_func_scope(false) {}
+    Scope(int offset, string func_name) : offset(offset), func_name(func_name), is_func_scope(true) {}
 
     void addSymbolVar( VarNode* symbolToAdd ){
         TableEntry* entryToAdd = new TableEntry( symbolToAdd, true );
@@ -63,6 +67,22 @@ public:
         }
         return NULL;
     }
+
+    void endScope(){
+        output::endScope();
+        cout << "++++++ Trying to end scope: "<< func_name << "++++++" << endl;
+
+      
+        for (pair<string, TableEntry*> entry : entries) {
+ 
+            string id = entry.first;
+            TableEntry* entry_value = entry.second;
+            cout <<" entry name: " << id << " :: " << entry_value->type << std::endl;
+
+            // TODO is its a func print name, type, params, offset
+            // if its a var print name type offset
+        }
+    }
 };
 
 class SymbolTable {
@@ -87,8 +107,8 @@ public:
         stack.push_back(scopeToAdd);
     }
     void closeScope(){
+        stack.back()->endScope();
         stack.pop_back();
-        output::endScope();
     }
 
     void addSymbolVar( VarNode* symbolToAdd ){

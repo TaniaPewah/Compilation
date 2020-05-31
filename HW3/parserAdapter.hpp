@@ -44,7 +44,8 @@ void ruleBreakCheck(Node* break_sign){
 }
 
 
-void ruleReturnFromNonVoidFunc(Node* return_sign, ExpNode* return_value) {
+void ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
+
     string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
     if((func_type != return_value->type) && !(return_value->type == "byte" && func_type == "int")){
         output::errorMismatch(return_sign->lineno);
@@ -52,8 +53,9 @@ void ruleReturnFromNonVoidFunc(Node* return_sign, ExpNode* return_value) {
     }
 }
 
+void ruleReturnVoid(Node* return_sign){
 
-void returnFromVoidFunction(Node* return_sign){
+    // check what is the return type of the current function
     string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
     if(func_type != "void"){
         output::errorMismatch(return_sign->lineno);
@@ -76,14 +78,11 @@ void addPrintAndPrinti(){
 }
 
 ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b){
-    cout<< "node a atype is: "<< node_a->type <<endl;
-    cout<< "node b atype is: "<< node_a->type <<endl;
-
+   
     if(node_a->type != "bool" || node_b->type != "bool") {
         output::errorMismatch(node_a->lineno);
         exit(0);
     }
-    cout<< "is boll!!!"<<endl;
 
     ExpNode* new_exp_node = new ExpNode(node_a->lineno, "bool");
     delete(node_a);
@@ -100,7 +99,6 @@ ExpNode* ruleNotExp(ExpNode* node) {
         output::errorMismatch(node->lineno);
         exit(0);
     }
-    cout<< "is boll!!!"<<endl;
 
     ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
     delete(node);
@@ -127,10 +125,6 @@ VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> pa
     symbolTable.newScope();
     current_func = name;
     delete(id_node);
-    // for(int i=0; i< params.size(); i++) {
-    //     cout<< "try to insert !!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << params[i] << endl;
-    //     symbolTable.addSymbolVar(params[i]);
-    // }
     return current_node;
 }
 
@@ -288,7 +282,7 @@ void checkBoolExp( ExpNode* if_cond_exp ){
 }
 
 void checkMain(){
-    if (!symbolTable.hasMain) {
+    if (!symbolTable.hasMain()) {
 		output::errorMainMissing();
 		exit(0);
 	}
