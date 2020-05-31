@@ -50,7 +50,6 @@ public:
     void addSymbolFunc( FuncNode* funcToAdd ){
         TableEntry* entryToAdd = new TableEntry( funcToAdd, false );
         entries.insert(make_pair(funcToAdd->name, entryToAdd)); 
-        offset++;
     }
 
     VarNode* findSymbolInScope(string key) {
@@ -88,7 +87,7 @@ public:
             string id = entry.first;
             TableEntry* entry_value = entry.second;
 
-            output::printID( id, 0, toUpper(entry_value->node->type));
+            output::printID( id, entry_value->offset, toUpper(entry_value->node->type));
 
             // TODO is its a func print name, type, params, offset
             // if its a var print name type offset
