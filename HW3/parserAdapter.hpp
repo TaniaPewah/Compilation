@@ -56,7 +56,7 @@ void ruleBreakCheck(Node* break_sign){
 
 void ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
 
-    string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
+    string func_type = symbolTable.getFuncType(return_sign->lineno, current_func);
     if((func_type != return_value->type) && !(return_value->type == "byte" && func_type == "int")){
         output::errorMismatch(return_sign->lineno);
         exit(0);
@@ -66,7 +66,7 @@ void ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
 void ruleReturnVoid(Node* return_sign){
 
     // check what is the return type of the current function
-    string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
+    string func_type = symbolTable.getFuncType(return_sign->lineno, current_func);
     if(func_type != "void"){
         output::errorMismatch(return_sign->lineno);
         exit(0);
@@ -207,7 +207,7 @@ TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
     call_print = false;
     // search ID in symboltable, and get it's type
-    string returned_type = symbolTable.getIdType(id_node->lineno, id_node->name);
+    string returned_type = symbolTable.getFuncType(id_node->lineno, id_node->name);
 
     // get function arg types from symbol table
     FuncNode* func = (FuncNode*)symbolTable.findSymbolInStack(id_node->name);
