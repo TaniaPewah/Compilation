@@ -85,19 +85,20 @@ class ExpList: public Node{
     vector<ExpNode*> params;
     ExpList() : Node(NA){ }
 
-    // TODO use it
     void addParam( ExpNode* param_to_add){
         params.push_back(param_to_add);
     }
 
     // for every param of the func check whether the param in params list is same.
-    bool compareParams(FuncNode* func, vector<VarNode*> func_params){
+    void compareParams(FuncNode* func, vector<VarNode*> func_params){
+       
+        reverse(params.begin(), params.end()); 
+        
         if (params.size() != func_params.size()) {
-            cout << " ~~~~~~~~~ruleCallFunc params: WRONG NUMBER OF PARAMS" << params.size() << " " << func_params.size()<< endl;
-            return false;
+            vector<string> types = varNodeToVectString(func_params);
+            output::errorPrototypeMismatch( (*params.begin())->lineno, func->name, types );
+            exit(0);
         }
-
-        reverse(params.begin(), params.end());
 
         auto it_my = params.begin();
         for (auto it_func = func_params.begin(); 
@@ -109,7 +110,6 @@ class ExpList: public Node{
             }
         }
         reverse(params.begin(), params.end());
-        return true;
     }
 
     vector <string> varNodeToVectString(vector<VarNode*> func_params){

@@ -86,9 +86,6 @@ public:
                 string print_types = output::makeFunctionType(toUpper(entry->node->type), params_type);
                 output::printID( id, entry->offset, print_types);
             }
-
-            // TODO is its a func print name, type, params, offset
-            // if its a var print name type offset
         }
     }
 };

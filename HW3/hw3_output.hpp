@@ -9,11 +9,6 @@ namespace output{
     void endScope();
     void printID(const string& id, int offset, const string& type);
 
-    // TODO: remove before submit
-    extern const string rules[];
-    void printProductionRule(int ruleno);
-
-
     /* Do not save the string returned from this function in a data structure 
         as it is not dynamically allocated and will be destroyed(!) at the end of the calling scope.
     */

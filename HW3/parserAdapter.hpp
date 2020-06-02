@@ -30,7 +30,6 @@ void ruleAllowString(IdNode* id){
 
 ExpNode* ruleHandleString(ExpNode* string_value){
     if(!call_print){
-        //cout << "ruleHandleString" << endl;
         output::errorMismatch(string_value->lineno);
         exit(0);
     }
@@ -59,7 +58,6 @@ void ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
 
     string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
     if((func_type != return_value->type) && !(return_value->type == "byte" && func_type == "int")){
-        //cout << "ruleReturnNonVoid" << endl;
         output::errorMismatch(return_sign->lineno);
         exit(0);
     }
@@ -70,7 +68,6 @@ void ruleReturnVoid(Node* return_sign){
     // check what is the return type of the current function
     string func_type = symbolTable.getIdType(return_sign->lineno, current_func);
     if(func_type != "void"){
-        //cout << "ruleReturnVoid" << endl;
         output::errorMismatch(return_sign->lineno);
         exit(0);
     }
@@ -93,7 +90,6 @@ void addPrintAndPrinti(){
 ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b){
    
     if(node_a->type != "bool" || node_b->type != "bool") {
-        //cout << "ruleAndExp" << endl;
         output::errorMismatch(node_a->lineno);
         exit(0);
     }
@@ -110,7 +106,6 @@ ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b){
 
 ExpNode* ruleNotExp(ExpNode* node) {
     if(node->type != "bool") {
-         //cout << "ruleNotExp" << endl;
         output::errorMismatch(node->lineno);
         exit(0);
     }
@@ -136,7 +131,6 @@ VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> pa
 
     reverse(params.begin(), params.end());
 
-    // TODO params show be of type vector<VarNode*> in the calling function
 	FuncNode* current_node = new FuncNode(id_node->lineno, name, type, params); 
 	symbolTable.addSymbolFunc( current_node );
     symbolTable.newScope();
@@ -156,7 +150,6 @@ VarNode* ruleVarDecl( string type_name, IdNode* id_node) {
         exit(0);
     }
 	VarNode* current_node = new VarNode(id_node->lineno, name, type_name); 
-    // cout << "tring to add " << current_node->name <<" in ruleVarDecl" <<endl;
 	symbolTable.addSymbolVar( current_node );
     
     delete(id_node);
@@ -173,7 +166,6 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, string assign_type)
 
     } else {
 	    current_node = new VarNode(id_node->lineno, name, var_type); 
-        // cout << "tring to add " << current_node->name <<" in ruleVarDeclAssign" <<endl;
 	    symbolTable.addSymbolVar( current_node );
     }
 
@@ -190,7 +182,8 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     // Check exp_a & exp_b are num types. If not- raise exeption. Else, do binop and return higher num type
 
     if((exp_a->type != "int" && exp_a->type != "byte") || (exp_b->type != "int" && exp_b->type != "byte")){
-        cout<< " ERROR in line num: "<< binop->lineno << " not numaric type using binop!"<< endl;
+
+        output::errorMismatch(exp_a->lineno);
         exit(0);
     }
     else{
@@ -216,17 +209,11 @@ TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
     // search ID in symboltable, and get it's type
     string returned_type = symbolTable.getIdType(id_node->lineno, id_node->name);
 
-    // TODO: get function arg types from symbol table
-    // check whether the Exp list types are correct for this func else raise exception
+    // get function arg types from symbol table
     FuncNode* func = (FuncNode*)symbolTable.findSymbolInStack(id_node->name);
 
-    //cout << " ~~~~~~~~~ruleCallFunc params: " << func->params.front()->name << endl;
-
-    if(!params_list->compareParams(func, func->params)){
-
-        // TODO add error
-        cout << " ~~~~~~~~~ruleCallFunc params: WRONG TYPE" << endl;
-    }
+    // check whether the Exp list types are correct for this func else raise exception
+    params_list->compareParams(func, func->params);
 
     return (new TypeNode(id_node->lineno, returned_type )); 
 }
@@ -263,7 +250,6 @@ void ruleIdAssign( IdNode* id_node, ExpNode* exp){
         output::errorMismatch(id_node->lineno);
         exit(0);
     }
-    // TODO update value in symbol table
 }
 
 ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
@@ -277,23 +263,6 @@ ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
     return new ExpNode(exp1->lineno, "bool");
 }
 
-//TODO: didn't saw it. done another one
-// void addPrintandPrinti(){
-
-//     // print
-//     vector<VarNode*> params_print;
-//     params_print.push_back(new VarNode(NA, "string_to_print", "string"));
-
-//     FuncNode* print = new FuncNode(NA, "print", "void", params_print); 
-
-//     vector<VarNode*> params_printi;
-//     params_printi.push_back(new VarNode(NA, "int_to_print", "int"));
-
-//     FuncNode* printi = new FuncNode(NA, "printi", "void", params_printi); 
-
-// 	  symbolTable.addSymbolFunc( print );
-//     symbolTable.addSymbolFunc( printi );
-// }
 
 void checkBoolExp( ExpNode* if_cond_exp ){
     if(if_cond_exp->type != "bool"){

@@ -57,29 +57,15 @@ Funcs :  %empty { //printProductionRule(2);
 		  }
 	  ;
 
-FuncDecl : RetType ID {
-			// add function to global scope
-			// open new scope
-		}
+FuncDecl : RetType ID 
 		// check if ID exist if so- thow error
         LPAREN Formals RPAREN {
 
-			//cout << "in func decl Formals" << endl;
-	
-			//TODO: funcDecl scope - the function given parameters should be in the same block as the function itself (after statments),
-			// open new scope?
-
-			//cout << "in func decl Formals - type name " << ((TypeNode*)$1)->type_name <<endl;
-			//cout << "in func decl Formals - id node id " << ((IdNode*)$2) -> name << endl;
-			//cout << "in func decl Formals - params " << ((((FormalsList*)((Formals*)$5)->params)->functionParams).empty())<< endl;
-			
-			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$5)->params)->functionParams );
+			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
 			//printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
 			ruleFuncDeclEndFunc();
-
-		//TODO: CloseFunctionScope
 		}
 		;
 
@@ -230,7 +216,6 @@ Type	: INT { //printProductionRule(31);
 
 Exp : LPAREN Exp RPAREN { 
 		$$ = (ExpNode*)$2;
-		//cout<<"current node type is :" <<((ExpNode*)$$)->type << endl;
 		//printProductionRule(34); 
 		}
 	| Exp ADDITIVE Exp { 
