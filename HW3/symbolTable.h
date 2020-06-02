@@ -51,12 +51,12 @@ public:
         entries.push_back(entryToAdd); 
     }
 
-    VarNode* findSymbolInScope(string key) {
+    TableEntry* findSymbolInScope(string key) {
 
         TableEntry* wanted_entry;
         for (auto & entry : entries) {
             if(entry->node->name == key){
-                return entry->node;
+                return entry;
             }
         }
         return NULL;
@@ -157,10 +157,10 @@ public:
         }
     }
 
-    VarNode* findSymbolInStack(string symbol_name){
+    TableEntry* findSymbolInStack(string symbol_name){
        
         for(int i = 0; i < stack.size(); i++){
-            VarNode* entry = stack[i]->findSymbolInScope(symbol_name);
+            TableEntry* entry = stack[i]->findSymbolInScope(symbol_name);
             if(entry != NULL) {
                 return entry;
             }
@@ -170,12 +170,22 @@ public:
 
     string getIdType(int lineno, string id){
 
-        VarNode* wanted_entry = findSymbolInStack(id);
-        if(!wanted_entry) {
+        TableEntry* wanted_entry = findSymbolInStack(id);
+        if(!wanted_entry || !wanted_entry->is_var ) {
             output::errorUndef(lineno, id);
             exit(0);
        }
-       return wanted_entry->type;
+       return wanted_entry->node->type;
+    }
+
+    string getFuncType(int lineno, string id){
+
+        TableEntry* wanted_entry = findSymbolInStack(id);
+        if(!wanted_entry || wanted_entry->is_var) {
+            output::errorUndefFunc(lineno, id);
+            exit(0);
+       }
+       return wanted_entry->node->type;
     }
 
     bool ifExists(string name){
