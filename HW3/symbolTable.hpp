@@ -7,7 +7,6 @@
 #include "parser.hpp"
 #include "hw3_output.hpp"
 #include <map>
-#include <vector>
 #include <cctype> 
 
 using namespace std;
@@ -169,9 +168,8 @@ public:
     }
 
     string getIdType(int lineno, string id){
-
         TableEntry* wanted_entry = findSymbolInStack(id);
-        if(!wanted_entry || !wanted_entry->is_var ) {
+        if(!wanted_entry || !(wanted_entry->is_var) ) {
             output::errorUndef(lineno, id);
             exit(0);
        }
@@ -179,12 +177,12 @@ public:
     }
 
     string getFuncType(int lineno, string id){
-
         TableEntry* wanted_entry = findSymbolInStack(id);
         if(!wanted_entry || wanted_entry->is_var) {
             output::errorUndefFunc(lineno, id);
             exit(0);
        }
+
        return wanted_entry->node->type;
     }
 

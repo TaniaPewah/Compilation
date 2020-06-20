@@ -3,7 +3,7 @@
 #define PARSER_ADAPTER_HPP
 
 #include "parser.hpp"
-#include "symbolTable.hpp"
+#include "symbolTable.h"
 #include <string>
 
 
