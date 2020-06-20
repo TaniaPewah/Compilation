@@ -40,11 +40,13 @@ class IdNode: public Node{
     string name;
     IdNode( int lineno, string name ) : Node(lineno), name(name) {
 
-        Singleton* s = Singleton::getInstance(); // Ok   
+        //Singleton* p1 = Singleton::getInstance();
+
+        //S s = S::getInstance(); // Ok   
         cout <<" singelton"<< endl;     
-        //RegisterManager* regManager = RegisterManager::getInstance();
-        //Register* regID = regManager->getFreshReg();
-        //cout <<" new reg name : " << regID->getName() << endl;
+        RegisterManager* regManager = RegisterManager::getInstance();
+        Register* regID = regManager->getFreshReg();
+        cout <<" new reg name : " << regID->getName() << endl;
     };
 };
 

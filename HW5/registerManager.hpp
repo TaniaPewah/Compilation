@@ -27,62 +27,27 @@ public:
 	}
 };
 
-// class RegisterManager {
+class RegisterManager {
+private:
+   static RegisterManager *instance;
+    int register_index = 0;
 
-//     private: 
-//     /* Here will be the instance stored. */
-//     static RegisterManager* instance;
+   // Private constructor so that no objects can be created.
+   RegisterManager() {  }
 
-//     bool is_initalized = false;
-//     /* Private constructor to prevent instancing. */
-//     RegisterManager(); 
-//     int register_index = 0;
-    
-//     public:
-//     /* Static access method. */
-//     static RegisterManager* getInstance(){
-//         if (instance == 0)
-//         {
-//             instance = new RegisterManager();
-//         }
+   public:
+    RegisterManager(RegisterManager const&)       = delete;
+    RegisterManager& operator=(RegisterManager const&)  = delete;
+    static RegisterManager *getInstance() {
+        if (!instance)
+        instance = new RegisterManager;
+        return instance;
+    }
 
-//         return instance;
-//     }
-//     Register* getFreshReg(){
-//         // TODO: add "t" after %
-//         Register* ret = new Register(register_index, "%" + to_string(register_index));
-//         register_index++;
-//         return ret;
-//     }
-// };
-
-// RegisterManager* RegisterManager::instance = 0;
-// RegisterManager::RegisterManager()
-// {}
-
-class Singleton
-{
-    private:
-        /* Here will be the instance stored. */
-        static Singleton* instance;
-
-        /* Private constructor to prevent instancing. */
-        Singleton();
-
-    public:
-        /* Static access method. */
-        static Singleton* getInstance() {
-            if (instance == 0)
-            {
-                instance = new Singleton();
-            }
-
-            return instance;
-        }
+    Register* getFreshReg(){
+        // TODO: add "t" after %
+        Register* ret = new Register(register_index, "%" + to_string(register_index));
+        register_index++;
+        return ret;
+    }
 };
-
-/* Null, because instance will be initialized on demand. */
-Singleton* Singleton::instance = 0;
-
-
-//RegisterManager* RegisterManager::instance = 0;
