@@ -1,0 +1,292 @@
+%{
+	#include "hw3_output.hpp"
+	#include "parserAdapter.hpp"
+
+	using namespace std;
+	using namespace output;
+
+	extern int yylex();
+	extern int yylineno;
+	int yyerror(const char * message);
+%}
+
+
+%token BOOL VOID INT BYTE B
+%token TRUE FALSE
+%token WHILE RETURN
+%token BREAK CONTINUE
+%token SC COMMA
+%token STRING ID NUM
+
+%right ASSIGN
+
+%nonassoc NO_ELSE
+%nonassoc ELSE
+%right IF
+%left OR
+%left AND
+%left RELOPLEFT
+%nonassoc RELOPNOTASS
+
+
+%left ADDITIVE 
+%left MUL
+
+%right NOT
+
+
+%left LPAREN RPAREN LBRACE RBRACE
+
+%%
+
+Program : INIT Funcs { 
+
+	checkMain();
+	symbolTable.closeScope();
+	//printProductionRule(1); 
+	}
+		;
+INIT : NEWSCOPECREATION {
+	addPrintAndPrinti();
+}
+
+Funcs :  %empty { //printProductionRule(2); 
+}
+	  | FuncDecl Funcs { 
+		  //printProductionRule(3); 
+		  }
+	  ;
+
+FuncDecl : RetType ID 
+		// check if ID exist if so- thow error
+        LPAREN Formals RPAREN {
+
+			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
+			//printProductionRule(4);
+
+		} LBRACE Statements RBRACE {
+			ruleFuncDeclEndFunc();
+		}
+		;
+
+RetType : Type { 
+		$$ = (TypeNode*)$1;
+		//printProductionRule(5); 
+		}
+		| VOID { 
+			$$ = (TypeNode*)$1;	
+			//printProductionRule(6); 
+			}
+		;
+
+Formals :  %empty { 
+	$$ = new Formals();
+	//printProductionRule(7); 
+	}
+    | FormalsList { 
+		$$ = new Formals((FormalsList*)$1);
+		//printProductionRule(8); 
+		}
+    ;
+
+FormalsList : FormalDecl { 
+	$$ = ruleAddFormals( (FormalsList*)ruleCreateFormals( ((VarNode*)$1)->lineno ), (VarNode*)$1); 
+	//printProductionRule(9); 
+	}
+			| FormalDecl COMMA FormalsList { 
+				$$ = ruleAddFormals((FormalsList*)$3, (VarNode*)$1);
+				//printProductionRule(10); 
+				}
+			;
+
+FormalDecl : Type ID { 
+	$$ = ruleFormalDecl((TypeNode*)$1, (IdNode*)$2); 
+	//printProductionRule(11); 
+	};
+Statements : Statement {
+				//printProductionRule(12); 
+				}
+		   | Statements Statement { 
+				//printProductionRule(13);
+				}
+		   ;
+
+Statement : LBRACE NEWSCOPECREATION Statements RBRACE { 
+			symbolTable.closeScope();
+			//printProductionRule(14); 
+			}
+		  | Type ID SC { 
+				$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
+				//printProductionRule(15); 
+				}
+
+		  | Type ID ASSIGN Exp SC { 
+						$$ = ruleVarDeclAssign( (IdNode*)$2, 
+												((TypeNode*)$1)->type_name, 
+												((ExpNode*)$4)->type);
+						//printProductionRule(16); 
+						}
+
+		  | ID ASSIGN Exp SC { 
+			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
+			  //printProductionRule(17); 
+			  }
+		  | Call SC { //printProductionRule(18); 
+		  }
+		  | RETURN SC { 
+			  ruleReturnVoid($1);
+			  //printProductionRule(19); 
+			  }
+		  | RETURN Exp SC { 
+			  ruleReturnNonVoid($1, (ExpNode*)$2);
+			  //printProductionRule(20); 
+			  }
+		  | IfScope %prec NO_ELSE { 
+			  //printProductionRule(21); 
+			  }
+
+          | IfScope ELSE NEWSCOPECREATION Statement { 
+			  symbolTable.closeScope();
+			  //printProductionRule(22); 
+			  }
+
+		  |  whileScope %prec NO_ELSE { 
+			  //printProductionRule(23); 
+			  }
+
+		  | whileScope ELSE NEWSCOPECREATION Statement { 
+			  symbolTable.closeScope();
+			  //printProductionRule(24); 
+			  }
+
+		  | BREAK SC { 
+			  ruleBreakCheck($1);
+			  //printProductionRule(25); 
+			  }
+		  | CONTINUE SC { 
+			  ruleContinueCheck($1);
+			  //printProductionRule(26); 
+			  }
+		  ;
+
+IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
+	checkBoolExp( (ExpNode*)$4 );
+	symbolTable.closeScope();
+}
+;
+
+whileScope : WHILE LPAREN {in_while++;} NEWSCOPECREATION Exp RPAREN Statement {
+	in_while--;
+	checkBoolExp( (ExpNode*)$5 );
+	symbolTable.closeScope();
+}
+;
+
+Call : ID LPAREN {
+	 ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
+		$$ = ruleCallFunc((IdNode*)$1, (ExpList*)$4);
+		//printProductionRule(27); 
+		}
+	
+	 | ID LPAREN RPAREN { 
+		$$ = ruleCallEmptyFunc((IdNode*)$1 );
+	 	//printProductionRule(28); 
+		 }
+	 ;
+
+ExpList : Exp { 
+		$$ = new ExpList();
+		$$ = ruleAddExp( (ExpList*)$$, (ExpNode*)$1); 
+		//printProductionRule(29); 
+		}
+		| Exp COMMA ExpList { 
+			$$ = ruleAddExp((ExpList*)$3, (ExpNode*)$1);
+			//printProductionRule(30); 
+			}
+		;
+
+
+Type	: INT { //printProductionRule(31); 
+}
+		| BYTE { //printProductionRule(32); 
+		}
+		| BOOL { //printProductionRule(33); 
+		}
+		;
+
+Exp : LPAREN Exp RPAREN { 
+		$$ = (ExpNode*)$2;
+		//printProductionRule(34); 
+		}
+	| Exp ADDITIVE Exp { 
+		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
+		//printProductionRule(35); 
+		}
+	| Exp MUL Exp { 
+		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
+		//printProductionRule(35); 
+		}
+	| ID { 
+			$$ = ruleIDToExp((IdNode*)$1);
+		//printProductionRule(36); 
+		}
+	| Call {
+		//printProductionRule(37); 
+		}
+	| NUM { 
+		$$ = ruleExpNum((NumNode*)$1);
+		//printProductionRule(38); 
+		}
+	| NUM B { 
+		$$ = (ruleExpNumB((NumNode*)$1));
+		//printProductionRule(39); 
+		}
+	| STRING { 
+		$$ = ruleHandleString((ExpNode*)$1);
+		//printProductionRule(40); 
+		}
+	| TRUE { $$ = (ExpNode*)$1;
+		//printProductionRule(41); 
+		}
+	| FALSE { $$ = (ExpNode*)$1;
+		//printProductionRule(42); 
+		}
+	| NOT Exp { 
+		$$ = ruleNotExp((ExpNode*)$2);
+		//printProductionRule(43); 
+		}
+	| Exp AND Exp { 
+		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$3);
+		//printProductionRule(44); 
+		}
+	| Exp OR Exp { 
+		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$3);
+		//printProductionRule(45); 
+		}
+	| Exp RELOPLEFT Exp { 
+		
+		// check both Exp are numerical
+		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
+			
+		//printProductionRule(46); 
+		}
+    | Exp RELOPNOTASS Exp { 
+		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
+		//printProductionRule(46); 
+	}
+	;
+
+NEWSCOPECREATION :  %empty { symbolTable.newScope(); };
+
+%%
+
+int main()
+{
+	yyparse();
+}
+
+int yyerror(const char * message)
+{
+	output::errorSyn( yylineno );
+	exit(0);
+}
