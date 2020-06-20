@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <vector>
 using namespace std;
+#include "registerManager.hpp"
 
 #ifndef YYINITEPTH
 # define YYINITDEPTH 10000
@@ -38,6 +39,12 @@ class IdNode: public Node{
     public:
     string name;
     IdNode( int lineno, string name ) : Node(lineno), name(name) {
+
+        Singleton* s = Singleton::getInstance(); // Ok   
+        cout <<" singelton"<< endl;     
+        //RegisterManager* regManager = RegisterManager::getInstance();
+        //Register* regID = regManager->getFreshReg();
+        //cout <<" new reg name : " << regID->getName() << endl;
     };
 };
 

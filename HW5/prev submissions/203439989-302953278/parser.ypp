@@ -1,0 +1,194 @@
+%{
+	#include "yystype.hpp"
+	#include "hw3_output.hpp"
+	#include "Table.hpp"
+	#include "bp.hpp"
+	#include "LLVM_Assembly.hpp"
+	#include <iostream>
+    #include <string>
+
+    #include "parser_actions.h"
+    #include "parser_hw5.hpp"
+    #include "test_llvm.cpp"
+    #include "typeEnums.hpp"
+
+    using namespace std;
+    using namespace output;
+
+	extern int yylex();
+	extern int yylineno;
+	void yyerror(char const* str);
+
+    Table * symbols_table;
+    vector<string> stam;//just a vector for inputing var, or ExpList
+    vector<int> stam_lineno;//just a vector for inputing var, or ExpList
+    vector<E_TYPE> empty;
+    int while_ind = 0;
+    string current_func = "";
+    template <class T>
+    void printVec(vector<T> v);
+
+    CodeBuffer& codeBuffer = CodeBuffer::instance();
+
+
+%}
+
+%token VOID
+%token INT
+%token BYTE
+%token B
+%token BOOL
+%token ENUM
+%left OR
+%left AND
+%token TRUE
+%token FALSE
+%token RETURN
+%token IF
+%token WHILE
+%token BREAK
+%token CONTINUE
+%token SC
+%token COMMA
+%token LPAREN
+%token LBRACE
+%token RBRACE
+%right ASSIGN
+%left RELOPASSOC
+%nonassoc RELOPNONASSOC
+%left ADDSUB
+%left MULDIV
+%right NOT
+%nonassoc RPAREN
+%nonassoc SS
+%nonassoc ELSE
+%token ID
+%token NUM
+%token STRING
+
+%%
+Program        : {   initProgram();  }
+                   Enums Funcs {  endProgram();  }
+               ;
+
+Funcs          :    {   }
+			   | 	FuncDecl Funcs {   }
+               ;
+
+FuncDecl       :     RetType ID LPAREN Formals RPAREN   { RetType_ID_LPAREN_Formals_RPAREN(&$$, &$1, &$2, &$3, &$4, &$5);  }
+                     LBRACE                             {   RetType_ID_LPAREN_Formals_RPAREN_LBRACErBRACE_LBRACE (&$$, &$1, &$2, &$3, &$4, &$5, &$6, &$7);   }
+                     Statements RBRACE{  RetType_ID_LPAREN_Formals_RPAREN_LBRACErBRACE_LBRACE_LBRACErBRACE_Statements_RBRACE(&$$, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9);}
+               ;
+Enums          :    {                                }
+			   |	EnumDecl Enums {                               }
+               ;
+
+EnumDecl       :    ENUM ID LBRACE EnumeratorList RBRACE SC {   EnumDecl_Setup(&$$, &$1,&$2, &$3, &$4);                               }
+               ;
+
+RetType        :    Type {   $$.type = $1.type;  }
+			   |    VOID {   $$.type = $1.type;  }
+               ;
+Formals        :                {  Formals_epslion_Setup(&$$);  }
+			   |	FormalsList {  FormalsList_Setup(&$$, &$1);   }
+               ;
+
+FormalsList    :    FormalDecl {   FormalDecl_Setup(&$$, &$1);		}
+			   |    FormalDecl COMMA FormalsList {  FormalDecl_COMMA_FormalsList_Setup(&$$, &$1, &$2,&$3);		}
+               ;
+
+FormalDecl     :    Type ID {   Type_ID_Setup(&$$, &$1, &$2);		}
+			   |    EnumType ID {  EnumType_ID_Setup(&$$, &$1, &$2);                                }
+               ;
+
+EnumeratorList :    Enumerator {   Enumerator_Setup(&$$, &$1);                               }
+			   |    EnumeratorList COMMA Enumerator {  EnumeratorList_COMMA_Enumerator_Setup(&$$, &$1,&$2, &$3);          }
+               ;
+
+Enumerator     :    ID {   Enumerator_ID_Setup(&$$, &$1);    }
+               ;
+
+Statements     :    Statement {  Statement_Setup(&$$, &$1); }
+			   | 	Statements Statement { Statements_Statement_Setup(&$$, &$1, &$2); }
+               ;
+
+IfRule         :    IF LPAREN Exp RPAREN {  IF_LPAREN_Exp_RPAREN_Setup(&$$,&$1,&$2,&$3); }
+               ;
+
+EnumTypeIDAssign : EnumType ID ASSIGN{    EnumType_ID_ASSIGN_Setup(&$$, &$1, &$2);                    }
+                 ;
+
+M_WHILE         : WHILE { WHILE_Setup(&$$,&$1); }
+                ;
+
+Statement      :    LBRACE {   PushNewScope(symbols_table);  }  Statements  RBRACE { LBRACE_LBRACErBRACE_Statements_RBRACE(&$$, &$1, &$2, &$3, &$4); }
+			   | 	Type ID SC  { Type_ID_SC_Setup(&$$, &$1, &$2); }
+			   |	EnumType ID SC { EnumType_ID_SC_Setup(&$$, &$1, &$2); }
+			   | 	EnumDecl {   }
+			   |	Type ID ASSIGN Exp SC {    Type_ID_ASSIGN_Exp_SC(&$$, &$1, &$2, &$3, &$4);    }
+			   |	EnumTypeIDAssign Exp SC {   EnumTypeIDAssign_Exp_SC(&$$, &$1, &$2);  }
+			   |	ID ASSIGN Exp SC { ID_ASSIGN_Exp_SC_Setup(&$1,&$2,&$3);   }
+			   |	Call SC { Call_SC(&$$, &$1, &$2);  }
+			   | 	RETURN SC {  verifyFuncReturn(symbols_table,current_func ,"VOID", $1.lineno);  emit_ret_void();}
+			   |	RETURN Exp SC {  RETURN_Exp_SC_Setup(&$1,&$2);    }
+			   |    IfRule Statement %prec SS{  IfRule_Statement_prec_SS_Setup(&$$, &$1, &$2);   }
+			   |	IfRule Statement ELSE {   IfRule_Statement_ELSE_Setup(&$$, &$1, &$2, &$3); }
+			        Statement{    IfRule_Statement_ELSE_LBRACErBRACE_Statement_Setup(&$$, &$1, &$2, &$3, &$4, &$5);   }
+			   |	M_WHILE LPAREN Exp RPAREN{ WHILE_LPAREN_Exp_RPAREN_Setup( &$$, &$1, &$2,&$3); }
+			        Statement{ WHILE_LPAREN_Exp_RPAREN_LBRACErBRACE_Statement_Setup(&$$, &$1, &$2, &$3, &$4, &$5, &$6);    }
+			   | 	BREAK SC { BREAK_SC_Setup(&$$, &$1); }
+			   |	CONTINUE SC { CONTINUE_SC_Setup(&$$, &$1);  }
+               ;
+
+Call           :    ID LPAREN ExpList RPAREN {  ID_LPAREN_ExpList_RPAREN_Setup(&$$ , &$1, &$2,&$3);   }
+			   | 	ID LPAREN RPAREN {   ID_LPAREN_RPAREN_Setup(&$$ , &$1);  }
+               ;
+
+ExpList        :    Exp {    Exp_Setup(&$$,&$1); }
+			   | 	Exp COMMA ExpList {  Exp_COMMA_ExpList_Setup(&$$ , &$1, &$2,&$3);  }
+               ;
+
+Type           :    INT  {  IntTokenSetup( &$$ , &$1);  }
+			   | 	BYTE { ByteTokenSetup( &$$ , &$1);  }
+			   |  	BOOL {  BoolTokenSetup(&$$ , &$1);  }
+               ;
+
+EnumType       :    ENUM ID {   Enum_ID_Setup(&$$, &$1, &$2);	}
+               ;
+
+MOR             :          {     MOR_Setup(&$$);   }
+                ;
+MAND            :          {     MAND_Setup(&$$);   }
+                ;
+
+Exp            :    LPAREN Exp RPAREN { LPAREN_Exp_RPAREN(&$$ , &$1, &$2);  }
+			   |	Exp MULDIV Exp {  Exp_MULDIV_Exp(&$$ , &$1, &$2,&$3); }
+			   |    ID {    IdTokenSetup( &$$, &$1);  }
+			   | 	Call {  Call_Setup(&$$, &$1);  }
+			   | 	NUM {   NUM_Setup(&$$, &$1);  }
+			   |    NUM B { NUM_B_Setup(&$$, &$1);  }
+			   | 	STRING {   STRING_Setup (&$$, &$1) ;}
+			   |  	TRUE {   TRUE_Setup(&$$, &$1); }
+			   |	FALSE {  FALSE_Setup(&$$, &$1); }
+			   | 	NOT Exp { NOT_Exp_Setup(&$$ , &$1, &$2);  }
+			   | 	Exp AND MAND Exp {  Exp_AND_MAND_Exp_Setup(&$$ , &$1, &$2,&$3, &$4);    }
+			   |	Exp OR MOR Exp {   Exp_OR_MOR_Exp_Setup(&$$ , &$1, &$2, &$3, &$4);    }
+			   |  	Exp RELOPNONASSOC Exp {  Exp_RELOPNONASSOC_Exp_Setup(&$$ , &$1, &$2,&$3);  }
+			   |	LPAREN Type RPAREN Exp {    LPAREN_Type_RPAREN_Exp_Setup(&$$ , &$1, &$2,&$3,&$4);    }
+			   |	Exp ADDSUB Exp {  Exp_ADDSUB_Exp_Setup(&$$ , &$1, &$2,&$3);	   }
+               |	Exp RELOPASSOC Exp {  Exp_RELOPASSOC_Exp_Setup(&$$ , &$1, &$2,&$3);	  }
+               ;
+
+%%
+
+int main()
+{
+    yyparse();
+}
+
+void yyerror(char const* str)
+{
+	errorSyn(yylineno);
+	exit(0);
+}
+
