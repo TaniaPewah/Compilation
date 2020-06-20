@@ -3,7 +3,7 @@
 #define PARSER_ADAPTER_HPP
 
 #include "parser.hpp"
-#include "symbolTable.h"
+#include "symbolTable.hpp"
 #include <string>
 
 
@@ -210,7 +210,7 @@ TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
     string returned_type = symbolTable.getFuncType(id_node->lineno, id_node->name);
 
     // get function arg types from symbol table
-    FuncNode* func = (FuncNode*)symbolTable.findSymbolInStack(id_node->name);
+    FuncNode* func = (FuncNode*)(symbolTable.findSymbolInStack(id_node->name)->node);
 
     // check whether the Exp list types are correct for this func else raise exception
     params_list->compareParams(func, func->params);
@@ -220,7 +220,7 @@ TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
 TypeNode* ruleCallEmptyFunc(IdNode* id_node) {
      // search ID in symboltable, and get it's type
-    string returned_type = symbolTable.getIdType(id_node->lineno, id_node->name);
+    string returned_type = symbolTable.getFuncType(id_node->lineno, id_node->name);
     return (new TypeNode(id_node->lineno, returned_type )); 
 }
 

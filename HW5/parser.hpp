@@ -6,6 +6,7 @@
 #define HW3_PARSER_HPP
 #include <iostream>
 #include <algorithm>
+#include <vector>
 using namespace std;
 
 #ifndef YYINITEPTH
@@ -91,7 +92,6 @@ class ExpList: public Node{
 
     // for every param of the func check whether the param in params list is same.
     void compareParams(FuncNode* func, vector<VarNode*> func_params){
-       
         reverse(params.begin(), params.end()); 
         
         if (params.size() != func_params.size()) {

@@ -57,9 +57,7 @@ Funcs :  %empty { //printProductionRule(2);
 		  }
 	  ;
 
-FuncDecl : RetType ID 
-		// check if ID exist if so- thow error
-        LPAREN Formals RPAREN {
+FuncDecl : RetType ID LPAREN Formals RPAREN {
 
 			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
 			//printProductionRule(4);
