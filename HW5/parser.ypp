@@ -241,7 +241,8 @@ Exp : LPAREN Exp RPAREN {
 		$$ = ruleIDToExp((IdNode*)$1);
 		}
 	| Call {
-		 printProductionRule(37); 
+		printProductionRule(37); 
+		$$ = ruleCallToExp((TypeNode*)$1);
 		}
 	| NUM { 
 		printProductionRule(38); 

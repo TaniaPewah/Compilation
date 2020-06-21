@@ -197,16 +197,14 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
         if(exp_a->type == "int" || exp_b->type == "int"){
             cout << "creating expnode int  **********************" << endl;  
             ExpNode* expNode = new ExpNode(binop->lineno, "int");
-            string to_emit = expNode->llvm_reg;
-            // + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
+            string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
             cout << " to emit : " << to_emit << endl;
             //codeBuffer.emit(expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg);
             return expNode;
         }
 
         ExpNode* expNode = new ExpNode(binop->lineno, "byte");
-        string to_emit = expNode->llvm_reg;
-        // + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
+        string to_emit = expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
         cout << " to emit : " << to_emit << endl;
         //codeBuffer.emit(expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg);
         return expNode;
@@ -301,6 +299,12 @@ ExpNode* ruleIDToExp (IdNode* id_node){
     int line = id_node->lineno;
     delete id_node;
     return new ExpNode(line, type);
+}
+
+ExpNode* ruleCallToExp ( TypeNode* callNode ){
+    ExpNode* expNode = new ExpNode(callNode->lineno, callNode->type_name);
+    delete(callNode);
+    return expNode;
 }
 
 
