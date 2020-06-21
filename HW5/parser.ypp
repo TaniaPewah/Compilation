@@ -42,10 +42,11 @@
 %%
 
 Program : INIT Funcs { 
-
+	printProductionRule(1);
 	checkMain();
 	symbolTable.closeScope();
-	printProductionRule(1); 
+	endProgram();
+	 
 	}
 		;
 INIT : NEWSCOPECREATION {

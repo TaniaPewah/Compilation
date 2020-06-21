@@ -185,6 +185,9 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
         exit(0);
     }
     else{
+
+        // TODO 1. division by zero
+        // 2. result of MUL can be up to 64 bits
    
         if(exp_a->type == "int" || exp_b->type == "int"){  
             ExpNode* expNode = new ExpNode(binop->lineno, "int");
@@ -270,6 +273,11 @@ void ruleIdAssign( IdNode* id_node, ExpNode* exp){
         output::errorMismatch(id_node->lineno);
         exit(0);
     }
+
+    //codeBuffer.emit("load i32, i32* " + exp->llvm_reg);
+    // %x = alloca i32 // I now have an x
+    // store i32 3, i32* %x // write to x
+    // %temp = load i32, i32* %x  // temp = x = 3
 }
 
 ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
@@ -309,6 +317,12 @@ ExpNode* ruleCallToExp ( TypeNode* callNode ){
     ExpNode* expNode = new ExpNode(callNode->lineno, callNode->type_name);
     delete(callNode);
     return expNode;
+}
+
+void endProgram(){
+    codeBuffer.emitGlobal("\n \n; -----------------------  Program ------------------------ ");
+    //codeBuffer.printGlobalBuffer();
+    codeBuffer.printCodeBuffer();
 }
 
 

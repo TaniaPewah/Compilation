@@ -145,11 +145,15 @@ class BinopNode: public Node{
     public:
     string binop;
     BinopNode( int lineno, string binop ) : Node(lineno){
-        if(binop == "+"){
+
+        if (binop =="+")
             this->binop = "add";
-        } else if (binop == "-"){
+        else  if (binop =="-")
             this->binop = "sub";
-        }
+        else  if (binop =="*")
+            this->binop = "mul";
+        else  if (binop =="/")
+            this->binop = "sdiv";
     };
 };
 
