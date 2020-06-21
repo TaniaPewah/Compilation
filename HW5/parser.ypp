@@ -8,6 +8,8 @@
 	extern int yylex();
 	extern int yylineno;
 	int yyerror(const char * message);
+
+
 %}
 
 
@@ -110,42 +112,45 @@ Statements : Statement {
 		   ;
 
 Statement : LBRACE NEWSCOPECREATION Statements RBRACE { 
-			symbolTable.closeScope();
 			printProductionRule(14); 
+			symbolTable.closeScope();
 			}
 		  | Type ID SC { 
+			    printProductionRule(15); 
 				$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
-				printProductionRule(15); 
+				
 				}
 
 		  | Type ID ASSIGN Exp SC { 
+			  			printProductionRule(16); 
 						$$ = ruleVarDeclAssign( (IdNode*)$2, 
 												((TypeNode*)$1)->type_name, 
 												((ExpNode*)$4)->type);
-						printProductionRule(16); 
+						
 						}
 
 		  | ID ASSIGN Exp SC { 
-			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
 			  printProductionRule(17); 
+			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
+			  
 			  }
 		  | Call SC { printProductionRule(18); 
 		  }
 		  | RETURN SC { 
+			  printProductionRule(19);
 			  ruleReturnVoid($1);
-			  printProductionRule(19); 
 			  }
 		  | RETURN Exp SC { 
+			  printProductionRule(20);
 			  ruleReturnNonVoid($1, (ExpNode*)$2);
-			  printProductionRule(20); 
 			  }
 		  | IfScope %prec NO_ELSE { 
 			  printProductionRule(21); 
 			  }
 
           | IfScope ELSE NEWSCOPECREATION Statement { 
-			  symbolTable.closeScope();
 			  printProductionRule(22); 
+			  symbolTable.closeScope();
 			  }
 
 		  |  whileScope %prec NO_ELSE { 
@@ -153,17 +158,17 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  }
 
 		  | whileScope ELSE NEWSCOPECREATION Statement { 
-			  symbolTable.closeScope();
 			  printProductionRule(24); 
+			  symbolTable.closeScope();
 			  }
 
 		  | BREAK SC { 
-			  ruleBreakCheck($1);
 			  printProductionRule(25); 
+			  ruleBreakCheck($1);
 			  }
 		  | CONTINUE SC { 
-			  ruleContinueCheck($1);
 			  printProductionRule(26); 
+			  ruleContinueCheck($1);
 			  }
 		  ;
 
@@ -182,28 +187,28 @@ whileScope : WHILE LPAREN {in_while++;} NEWSCOPECREATION Exp RPAREN Statement {
 
 Call : ID LPAREN {
 	 ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
+		printProductionRule(27); 
 		cout << "call ID LPAREN ~~~~~~~~~~" << endl;
 		$$ = ruleCallFunc((IdNode*)$1, (ExpList*)$4);
-		printProductionRule(27); 
 		}
 	
 	 | ID LPAREN RPAREN { 
-		cout << "call ID LPAREN RPAREN ~~~~~~~~~~" << endl;
+		printProductionRule(28); 
+		 cout << "call ID LPAREN RPAREN ~~~~~~~~~~" << endl;
 		$$ = ruleCallEmptyFunc((IdNode*)$1 );
-	 	printProductionRule(28); 
-		 }
+	 	}
 	 ;
 
 ExpList : Exp { 
+		printProductionRule(29); 
 		cout << "ExpList : Exp new list ~~~~~~~~~~" << endl;
 		$$ = new ExpList();
 		$$ = ruleAddExp( (ExpList*)$$, (ExpNode*)$1); 
-		printProductionRule(29); 
 		}
 		| Exp COMMA ExpList { 
+			printProductionRule(30); 
 			cout << "ExpList : Exp add to list ~~~~~~~~~~" << endl;
 			$$ = ruleAddExp((ExpList*)$3, (ExpNode*)$1);
-			printProductionRule(30); 
 			}
 		;
 
@@ -217,72 +222,73 @@ Type	: INT { printProductionRule(31);
 		;
 
 Exp : LPAREN Exp RPAREN { 
+		printProductionRule(34); 
 		cout << "LPAREN Exp RPAREN **********************" << endl;
 		$$ = (ExpNode*)$2;
-		printProductionRule(34); 
 		}
 	| Exp ADDITIVE Exp {
+		printProductionRule(35); 
 		cout << "Exp ADDITIVE Exp **********************" << endl; 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
-		printProductionRule(35); 
 		}
 	| Exp MUL Exp {
+		printProductionRule(35); 
 		cout << "Exp MUL Exp **********************" << endl; 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
-		printProductionRule(35); 
 		}
 	| ID { 
-			$$ = ruleIDToExp((IdNode*)$1);
 		printProductionRule(36); 
+		$$ = ruleIDToExp((IdNode*)$1);
 		}
 	| Call {
 		 printProductionRule(37); 
 		}
 	| NUM { 
-		$$ = ruleExpNum((NumNode*)$1);
 		printProductionRule(38); 
+		$$ = ruleExpNum((NumNode*)$1);
 		}
 	| NUM B { 
-		$$ = (ruleExpNumB((NumNode*)$1));
 		printProductionRule(39); 
+		$$ = (ruleExpNumB((NumNode*)$1));
 		}
 	| STRING { 
-		$$ = ruleHandleString((ExpNode*)$1);
 		printProductionRule(40); 
+		$$ = ruleHandleString((ExpNode*)$1);
 		}
-	| TRUE { $$ = (ExpNode*)$1;
+	| TRUE { 
 		printProductionRule(41); 
+		$$ = (ExpNode*)$1;
 		}
-	| FALSE { $$ = (ExpNode*)$1;
+	| FALSE { 
 		printProductionRule(42); 
+		$$ = (ExpNode*)$1;
 		}
 	| NOT Exp {
+		printProductionRule(43); 
 		cout << "NOT Exp **********************" << endl; 
 		$$ = ruleNotExp((ExpNode*)$2);
-		printProductionRule(43); 
 		}
 	| Exp AND Exp {
+		printProductionRule(44); 
 		cout << "Exp AND Exp **********************" << endl; 
 		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$3);
-		printProductionRule(44); 
 		}
 	| Exp OR Exp {
+		printProductionRule(45); 
 		cout << "Exp OR Exp **********************" << endl; 
 		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$3);
-		printProductionRule(45); 
 		}
 	| Exp RELOPLEFT Exp { 
+		printProductionRule(46); 
 		cout << "Exp RELOPLEFT Exp **********************" << endl;
 		// check both Exp are numerical
-		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
-			
-		printProductionRule(46); 
+		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);	
 		}
     | Exp RELOPNOTASS Exp {
+		printProductionRule(46); 
 		cout << "Exp RELOPNOTASS Exp **********************" << endl; 
 		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
-		printProductionRule(46); 
-	}
+		}
 	;
 
 NEWSCOPECREATION :  %empty { symbolTable.newScope(); };

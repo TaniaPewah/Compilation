@@ -5,8 +5,10 @@
 #include "parser.hpp"
 #include "symbolTable.hpp"
 #include <string>
+#include "bp.hpp"
 
-
+//extern CodeBuffer& codeBuffer;
+CodeBuffer& codeBuffer = CodeBuffer::instance();
 SymbolTable symbolTable;
 string current_func = "";
 bool call_print = false;
@@ -182,23 +184,33 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     // Check exp_a & exp_b are num types. If not- raise exeption. Else, do binop and return higher num type
 
     cout << "ruleExpBinopExp start **********************" << endl; 
+    cout << "exp_a->type: "<< exp_a->type << endl;
+    cout << "exp_b->type: " << exp_b->type << endl;
+
     if((exp_a->type != "int" && exp_a->type != "byte") || (exp_b->type != "int" && exp_b->type != "byte")){
 
-        cout << "errorMismatch **********************" << endl; 
         output::errorMismatch(exp_a->lineno);
         exit(0);
     }
     else{
-        cout << "not missmatch  **********************" << endl;
+   
         if(exp_a->type == "int" || exp_b->type == "int"){
-            cout << "creating expnode int  **********************" << endl;
-            return new ExpNode(binop->lineno, "int");
+            cout << "creating expnode int  **********************" << endl;  
+            ExpNode* expNode = new ExpNode(binop->lineno, "int");
+            string to_emit = expNode->llvm_reg;
+            // + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
+            cout << " to emit : " << to_emit << endl;
+            //codeBuffer.emit(expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg);
+            return expNode;
         }
-        cout << "creating expnode byte  **********************" << endl;
-        return new ExpNode(binop->lineno, "byte");
-    }
-     cout << "not creating ExpNode ********************** " << endl;
-    
+
+        ExpNode* expNode = new ExpNode(binop->lineno, "byte");
+        string to_emit = expNode->llvm_reg;
+        // + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
+        cout << " to emit : " << to_emit << endl;
+        //codeBuffer.emit(expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg);
+        return expNode;
+    }   
 }
 
 ExpNode* ruleExpNumB(NumNode* num) {

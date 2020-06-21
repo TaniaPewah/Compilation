@@ -71,14 +71,15 @@ class NumNode: public TypeNode{
 
 class ExpNode: public Node{
     /* This class supports the rule expressions, need further checks on CALL methods*/
-    public:
-    string llvm_reg;
+    public: 
     string type;
-    ExpNode( int lineno, string type ) : Node(lineno), type(type) {
+    string llvm_reg;
+    ExpNode( int lineno, string type ) : Node(lineno), type(type)  {
         cout << " Expnode "<< endl;
         string regt = this->getFreshReg();
         cout << " Expnode, calling freshreg: " << regt << endl;
-        this->llvm_reg = regt;
+        llvm_reg = regt;
+        cout<< "llvm reg is: "<< llvm_reg << endl;
     };
 };
 
@@ -143,7 +144,12 @@ class BinopNode: public Node{
     /* This class supports Binop operataros , such as +, - ... */
     public:
     string binop;
-    BinopNode( int lineno, string binop ) : Node(lineno), binop(binop){
+    BinopNode( int lineno, string binop ) : Node(lineno){
+        if(binop == "+"){
+            this->binop = "add";
+        } else if (binop == "-"){
+            this->binop = "sub";
+        }
     };
 };
 
