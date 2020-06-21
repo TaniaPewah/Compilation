@@ -175,17 +175,9 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, string assign_type)
     return current_node;
 }
 
-ExpNode* ruleExpNum(NumNode* num_node){ 
-
-    return (new ExpNode(num_node->lineno, num_node->type_name));
-}
-
 ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     // Check exp_a & exp_b are num types. If not- raise exeption. Else, do binop and return higher num type
 
-    cout << "ruleExpBinopExp start **********************" << endl; 
-    cout << "exp_a->type: "<< exp_a->type << endl;
-    cout << "exp_b->type: " << exp_b->type << endl;
 
     if((exp_a->type != "int" && exp_a->type != "byte") || (exp_b->type != "int" && exp_b->type != "byte")){
 
@@ -194,21 +186,29 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     }
     else{
    
-        if(exp_a->type == "int" || exp_b->type == "int"){
-            cout << "creating expnode int  **********************" << endl;  
+        if(exp_a->type == "int" || exp_b->type == "int"){  
             ExpNode* expNode = new ExpNode(binop->lineno, "int");
             string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
-            cout << " to emit : " << to_emit << endl;
-            //codeBuffer.emit(expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg);
+            cout << "ruleExpBinopExp command : " << to_emit << endl;
+            codeBuffer.emit(to_emit);
             return expNode;
         }
 
         ExpNode* expNode = new ExpNode(binop->lineno, "byte");
         string to_emit = expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
-        cout << " to emit : " << to_emit << endl;
-        //codeBuffer.emit(expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg);
+        cout << "ruleExpBinopExp command : " << to_emit << endl;
+        codeBuffer.emit(to_emit);
         return expNode;
     }   
+}
+
+
+ExpNode* ruleExpNum(NumNode* num_node){
+
+    ExpNode* expNode = new ExpNode(num_node->lineno, num_node->type_name);
+    string command = expNode->llvm_reg + " = add i32 0, " + to_string(num_node->value); 
+    cout << "ruleExpNum command: " << command << endl;
+    return (expNode);
 }
 
 ExpNode* ruleExpNumB(NumNode* num) {
@@ -216,7 +216,11 @@ ExpNode* ruleExpNumB(NumNode* num) {
         output::errorByteTooLarge(num->lineno, to_string(num->value));
         exit(0);
     }
-    return new ExpNode(num->lineno, "byte");
+    ExpNode* expNode = new ExpNode(num->lineno, "byte");
+    string command = expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
+    cout << "ruleExpNumB command: " << command << endl;
+    codeBuffer.emit(command);
+    return (expNode);
 }
 
 TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
