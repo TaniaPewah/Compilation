@@ -25,6 +25,11 @@ namespace output{
     void errorUnexpectedContinue(int lineno);
     void errorMainMissing();
     void errorByteTooLarge(int lineno, const string& value);
+
+       // TODO: remove before submit
+    extern const string rules[];
+    void printProductionRule(int ruleno);
+
 }
 
 #endif

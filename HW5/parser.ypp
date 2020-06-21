@@ -43,24 +43,24 @@ Program : INIT Funcs {
 
 	checkMain();
 	symbolTable.closeScope();
-	//printProductionRule(1); 
+	printProductionRule(1); 
 	}
 		;
 INIT : NEWSCOPECREATION {
 	addPrintAndPrinti();
 }
 
-Funcs :  %empty { //printProductionRule(2); 
+Funcs :  %empty { printProductionRule(2); 
 }
 	  | FuncDecl Funcs { 
-		  //printProductionRule(3); 
+		  printProductionRule(3); 
 		  }
 	  ;
 
 FuncDecl : RetType ID LPAREN Formals RPAREN {
 
 			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
-			//printProductionRule(4);
+			printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
 			ruleFuncDeclEndFunc();
@@ -69,101 +69,101 @@ FuncDecl : RetType ID LPAREN Formals RPAREN {
 
 RetType : Type { 
 		$$ = (TypeNode*)$1;
-		//printProductionRule(5); 
+		printProductionRule(5); 
 		}
 		| VOID { 
 			$$ = (TypeNode*)$1;	
-			//printProductionRule(6); 
+			printProductionRule(6); 
 			}
 		;
 
 Formals :  %empty { 
 	$$ = new Formals();
-	//printProductionRule(7); 
+	printProductionRule(7); 
 	}
     | FormalsList { 
 		$$ = new Formals((FormalsList*)$1);
-		//printProductionRule(8); 
+		printProductionRule(8); 
 		}
     ;
 
 FormalsList : FormalDecl { 
 	$$ = ruleAddFormals( (FormalsList*)ruleCreateFormals( ((VarNode*)$1)->lineno ), (VarNode*)$1); 
-	//printProductionRule(9); 
+	printProductionRule(9); 
 	}
 			| FormalDecl COMMA FormalsList { 
 				$$ = ruleAddFormals((FormalsList*)$3, (VarNode*)$1);
-				//printProductionRule(10); 
+				printProductionRule(10); 
 				}
 			;
 
 FormalDecl : Type ID { 
 	$$ = ruleFormalDecl((TypeNode*)$1, (IdNode*)$2); 
-	//printProductionRule(11); 
+	printProductionRule(11); 
 	};
 Statements : Statement {
-				//printProductionRule(12); 
+				printProductionRule(12); 
 				}
 		   | Statements Statement { 
-				//printProductionRule(13);
+				printProductionRule(13);
 				}
 		   ;
 
 Statement : LBRACE NEWSCOPECREATION Statements RBRACE { 
 			symbolTable.closeScope();
-			//printProductionRule(14); 
+			printProductionRule(14); 
 			}
 		  | Type ID SC { 
 				$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
-				//printProductionRule(15); 
+				printProductionRule(15); 
 				}
 
 		  | Type ID ASSIGN Exp SC { 
 						$$ = ruleVarDeclAssign( (IdNode*)$2, 
 												((TypeNode*)$1)->type_name, 
 												((ExpNode*)$4)->type);
-						//printProductionRule(16); 
+						printProductionRule(16); 
 						}
 
 		  | ID ASSIGN Exp SC { 
 			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
-			  //printProductionRule(17); 
+			  printProductionRule(17); 
 			  }
-		  | Call SC { //printProductionRule(18); 
+		  | Call SC { printProductionRule(18); 
 		  }
 		  | RETURN SC { 
 			  ruleReturnVoid($1);
-			  //printProductionRule(19); 
+			  printProductionRule(19); 
 			  }
 		  | RETURN Exp SC { 
 			  ruleReturnNonVoid($1, (ExpNode*)$2);
-			  //printProductionRule(20); 
+			  printProductionRule(20); 
 			  }
 		  | IfScope %prec NO_ELSE { 
-			  //printProductionRule(21); 
+			  printProductionRule(21); 
 			  }
 
           | IfScope ELSE NEWSCOPECREATION Statement { 
 			  symbolTable.closeScope();
-			  //printProductionRule(22); 
+			  printProductionRule(22); 
 			  }
 
 		  |  whileScope %prec NO_ELSE { 
-			  //printProductionRule(23); 
+			  printProductionRule(23); 
 			  }
 
 		  | whileScope ELSE NEWSCOPECREATION Statement { 
 			  symbolTable.closeScope();
-			  //printProductionRule(24); 
+			  printProductionRule(24); 
 			  }
 
 		  | BREAK SC { 
 			  ruleBreakCheck($1);
-			  //printProductionRule(25); 
+			  printProductionRule(25); 
 			  }
 		  | CONTINUE SC { 
 			  ruleContinueCheck($1);
-			  //printProductionRule(26); 
+			  printProductionRule(26); 
 			  }
 		  ;
 
@@ -182,95 +182,106 @@ whileScope : WHILE LPAREN {in_while++;} NEWSCOPECREATION Exp RPAREN Statement {
 
 Call : ID LPAREN {
 	 ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
+		cout << "call ID LPAREN ~~~~~~~~~~" << endl;
 		$$ = ruleCallFunc((IdNode*)$1, (ExpList*)$4);
-		//printProductionRule(27); 
+		printProductionRule(27); 
 		}
 	
 	 | ID LPAREN RPAREN { 
+		cout << "call ID LPAREN RPAREN ~~~~~~~~~~" << endl;
 		$$ = ruleCallEmptyFunc((IdNode*)$1 );
-	 	//printProductionRule(28); 
+	 	printProductionRule(28); 
 		 }
 	 ;
 
 ExpList : Exp { 
+		cout << "ExpList : Exp new list ~~~~~~~~~~" << endl;
 		$$ = new ExpList();
 		$$ = ruleAddExp( (ExpList*)$$, (ExpNode*)$1); 
-		//printProductionRule(29); 
+		printProductionRule(29); 
 		}
 		| Exp COMMA ExpList { 
+			cout << "ExpList : Exp add to list ~~~~~~~~~~" << endl;
 			$$ = ruleAddExp((ExpList*)$3, (ExpNode*)$1);
-			//printProductionRule(30); 
+			printProductionRule(30); 
 			}
 		;
 
 
-Type	: INT { //printProductionRule(31); 
+Type	: INT { printProductionRule(31); 
 }
-		| BYTE { //printProductionRule(32); 
+		| BYTE { printProductionRule(32); 
 		}
-		| BOOL { //printProductionRule(33); 
+		| BOOL { printProductionRule(33); 
 		}
 		;
 
 Exp : LPAREN Exp RPAREN { 
+		cout << "LPAREN Exp RPAREN **********************" << endl;
 		$$ = (ExpNode*)$2;
-		//printProductionRule(34); 
+		printProductionRule(34); 
 		}
-	| Exp ADDITIVE Exp { 
+	| Exp ADDITIVE Exp {
+		cout << "Exp ADDITIVE Exp **********************" << endl; 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
-		//printProductionRule(35); 
+		printProductionRule(35); 
 		}
-	| Exp MUL Exp { 
+	| Exp MUL Exp {
+		cout << "Exp MUL Exp **********************" << endl; 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
-		//printProductionRule(35); 
+		printProductionRule(35); 
 		}
 	| ID { 
 			$$ = ruleIDToExp((IdNode*)$1);
-		//printProductionRule(36); 
+		printProductionRule(36); 
 		}
 	| Call {
-		//printProductionRule(37); 
+		 printProductionRule(37); 
 		}
 	| NUM { 
 		$$ = ruleExpNum((NumNode*)$1);
-		//printProductionRule(38); 
+		printProductionRule(38); 
 		}
 	| NUM B { 
 		$$ = (ruleExpNumB((NumNode*)$1));
-		//printProductionRule(39); 
+		printProductionRule(39); 
 		}
 	| STRING { 
 		$$ = ruleHandleString((ExpNode*)$1);
-		//printProductionRule(40); 
+		printProductionRule(40); 
 		}
 	| TRUE { $$ = (ExpNode*)$1;
-		//printProductionRule(41); 
+		printProductionRule(41); 
 		}
 	| FALSE { $$ = (ExpNode*)$1;
-		//printProductionRule(42); 
+		printProductionRule(42); 
 		}
-	| NOT Exp { 
+	| NOT Exp {
+		cout << "NOT Exp **********************" << endl; 
 		$$ = ruleNotExp((ExpNode*)$2);
-		//printProductionRule(43); 
+		printProductionRule(43); 
 		}
-	| Exp AND Exp { 
+	| Exp AND Exp {
+		cout << "Exp AND Exp **********************" << endl; 
 		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$3);
-		//printProductionRule(44); 
+		printProductionRule(44); 
 		}
-	| Exp OR Exp { 
+	| Exp OR Exp {
+		cout << "Exp OR Exp **********************" << endl; 
 		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$3);
-		//printProductionRule(45); 
+		printProductionRule(45); 
 		}
 	| Exp RELOPLEFT Exp { 
-		
+		cout << "Exp RELOPLEFT Exp **********************" << endl;
 		// check both Exp are numerical
 		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
 			
-		//printProductionRule(46); 
+		printProductionRule(46); 
 		}
-    | Exp RELOPNOTASS Exp { 
+    | Exp RELOPNOTASS Exp {
+		cout << "Exp RELOPNOTASS Exp **********************" << endl; 
 		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
-		//printProductionRule(46); 
+		printProductionRule(46); 
 	}
 	;
 

@@ -181,17 +181,23 @@ ExpNode* ruleExpNum(NumNode* num_node){
 ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     // Check exp_a & exp_b are num types. If not- raise exeption. Else, do binop and return higher num type
 
+    cout << "ruleExpBinopExp start **********************" << endl; 
     if((exp_a->type != "int" && exp_a->type != "byte") || (exp_b->type != "int" && exp_b->type != "byte")){
 
+        cout << "errorMismatch **********************" << endl; 
         output::errorMismatch(exp_a->lineno);
         exit(0);
     }
     else{
+        cout << "not missmatch  **********************" << endl;
         if(exp_a->type == "int" || exp_b->type == "int"){
+            cout << "creating expnode int  **********************" << endl;
             return new ExpNode(binop->lineno, "int");
         }
+        cout << "creating expnode byte  **********************" << endl;
         return new ExpNode(binop->lineno, "byte");
     }
+     cout << "not creating ExpNode ********************** " << endl;
     
 }
 

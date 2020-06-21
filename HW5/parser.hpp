@@ -32,21 +32,22 @@ class Node{
     public:
     int lineno;
     Node(int lineno) : lineno(lineno) {};
+
+    string getFreshReg(){
+        RegisterManager* regManager = RegisterManager::getInstance();
+        Register* regID = regManager->getFreshReg();
+        cout <<" new reg created name : " << regID->getName() << endl;
+        return regID->getName();
+    }
 };
 
 class IdNode: public Node{
     /* This class gives basic support all ID's (variable name) */
     public:
+    string llvm_reg;
     string name;
     IdNode( int lineno, string name ) : Node(lineno), name(name) {
-
-        //Singleton* p1 = Singleton::getInstance();
-
-        //S s = S::getInstance(); // Ok   
-        cout <<" singelton"<< endl;     
-        RegisterManager* regManager = RegisterManager::getInstance();
-        Register* regID = regManager->getFreshReg();
-        cout <<" new reg name : " << regID->getName() << endl;
+        this->llvm_reg = this->getFreshReg();
     };
 };
 
@@ -61,16 +62,23 @@ class TypeNode : public Node{
 class NumNode: public TypeNode{
     /* This class will support int variable without a name*/
     public:
+    string llvm_reg;
     int value;
     NumNode( int lineno, int value, string type ) : TypeNode(lineno, type), value(value) {
+        this->llvm_reg = this->getFreshReg();
     };
 };
 
 class ExpNode: public Node{
     /* This class supports the rule expressions, need further checks on CALL methods*/
     public:
+    string llvm_reg;
     string type;
     ExpNode( int lineno, string type ) : Node(lineno), type(type) {
+        cout << " Expnode "<< endl;
+        string regt = this->getFreshReg();
+        cout << " Expnode, calling freshreg: " << regt << endl;
+        this->llvm_reg = regt;
     };
 };
 
