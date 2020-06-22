@@ -30,12 +30,18 @@ void ruleAllowString(IdNode* id){
 }
 
 
-ExpNode* ruleHandleString(ExpNode* string_value){
+ExpNode* ruleHandleString(StringNode* string_node){
     if(!call_print){
-        output::errorMismatch(string_value->lineno);
+        output::errorMismatch(string_node->lineno);
         exit(0);
     }
-    return string_value;
+
+    cout << " string value is: " << string_node->value << endl;
+
+    string command = string_node->llvm_reg + " = constant [" + string_node->size + " x i8] c\""+ string_node->value + "\\00\"";
+    cout << "command is: " << command << endl;
+    codeBuffer.emitGlobal(command);
+    return (ExpNode*)string_node;
 }
 
 void ruleContinueCheck(Node* continue_sign) {
@@ -208,6 +214,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
 ExpNode* ruleExpNum(NumNode* num_node){
 
+    //TODO: Add constructor, to get existing reister
     ExpNode* expNode = new ExpNode(num_node->lineno, num_node->type_name);
     string command = expNode->llvm_reg + " = add i32 0, " + to_string(num_node->value); 
     cout << "ruleExpNum command: " << command << endl;
@@ -219,12 +226,22 @@ ExpNode* ruleExpNumB(NumNode* num) {
         output::errorByteTooLarge(num->lineno, to_string(num->value));
         exit(0);
     }
+    //TODO: Add constructor, to get existing reister
     ExpNode* expNode = new ExpNode(num->lineno, "byte");
     string command = expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
     cout << "ruleExpNumB command: " << command << endl;
     codeBuffer.emit(command);
     return (expNode);
 }
+
+
+ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
+    string command = bool_node->llvm_reg + " = add i1 0, " + bool_sign;
+    cout << "ruleBool command: " << command << endl;
+    codeBuffer.emit(command);
+    return (bool_node);
+}
+
 
 TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
@@ -321,7 +338,7 @@ ExpNode* ruleCallToExp ( TypeNode* callNode ){
 
 void endProgram(){
     codeBuffer.emitGlobal("\n \n; -----------------------  Program ------------------------ ");
-    //codeBuffer.printGlobalBuffer();
+    codeBuffer.printGlobalBuffer();
     codeBuffer.printCodeBuffer();
 }
 

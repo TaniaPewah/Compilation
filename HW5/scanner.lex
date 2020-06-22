@@ -41,7 +41,7 @@ continue                    { yylval =  new Node( yylineno); return CONTINUE; }
 (\*|\/)                     { yylval =  new BinopNode( yylineno, string(yytext)); return MUL; }
 [a-zA-Z]([a-zA-Z0-9])* 		{ yylval =  new IdNode( yylineno, string(yytext)); return ID; }
 0|[1-9][0-9]*   			{ yylval = new NumNode( yylineno, stoi(yytext), string("int")); return NUM; }
-\"([^\n\r\"\\]|\\[rnt\"\\])+\" { yylval = new ExpNode( yylineno, string("string")); return STRING; }
+\"([^\n\r\"\\]|\\[rnt\"\\])+\" { yylval = new StringNode( yylineno, string("string"),string(yytext)); return STRING; }
 [\t\n\r ]|\n				;
 \/\/[^\r\n]*[\r|\n|\r\n]?   ;
 .							handleGeneralError();

@@ -39,6 +39,13 @@ class Node{
         cout <<" new reg created name : " << regID->getName() << endl;
         return regID->getName();
     }
+
+    string getGlobalFreshReg(){
+        RegisterManager* regManager = RegisterManager::getInstance();
+        Register* regID = regManager->getGlobalFreshReg();
+        cout <<" new global reg created name : " << regID->getName() << endl;
+        return regID->getName();
+    }
 };
 
 class IdNode: public Node{
@@ -69,6 +76,7 @@ class NumNode: public TypeNode{
     };
 };
 
+
 class ExpNode: public Node{
     /* This class supports the rule expressions, need further checks on CALL methods*/
     public: 
@@ -81,7 +89,25 @@ class ExpNode: public Node{
         llvm_reg = regt;
         cout<< "llvm reg is: "<< llvm_reg << endl;
     };
+    
+    ExpNode(int lineno, string type, string llvm_reg) : Node(lineno), type(type), llvm_reg(llvm_reg) {
+        cout << "created new exp node, with givven register " << llvm_reg << endl;
+    }
 };
+
+
+class StringNode: public ExpNode{
+    /*This class supports string values without variable*/
+    public:
+    string value;
+    string size;
+
+    StringNode(int lineno, string type, string value) : ExpNode(lineno, type, getGlobalFreshReg()),
+     value(value) {
+         size = to_string(value.size() + 1);
+     }
+};
+
 
 class VarNode: public IdNode{
     /* This class supports variable types, such as int, bool... */

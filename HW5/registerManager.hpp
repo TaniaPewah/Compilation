@@ -8,7 +8,7 @@ class Register {
 	bool used;
     
 public: 
-    Register() : num(-1), name("invalid"), used(false) {}
+    Register() : num(0), name("invalid"), used(false) {}
     Register( int num, string name) : num(num), name(name), used(false){}
     bool isFree() {
 		return !used;
@@ -31,6 +31,7 @@ class RegisterManager {
 private:
    static RegisterManager *instance;
     int register_index = 0;
+    int global_register_index = 0;
 
    // Private constructor so that no objects can be created.
    RegisterManager() {  }
@@ -46,8 +47,15 @@ private:
 
     Register* getFreshReg(){
         // TODO: add "t" after %
-        Register* ret = new Register(register_index, "%" + to_string(register_index));
+        Register* ret = new Register(register_index, "%.reg" + to_string(register_index));
         register_index++;
+        return ret;
+    }
+
+    Register* getGlobalFreshReg(){
+        // TODO: add "t" after %
+        Register* ret = new Register(register_index, "@.g_reg" + to_string(global_register_index));
+        global_register_index++;
         return ret;
     }
 };

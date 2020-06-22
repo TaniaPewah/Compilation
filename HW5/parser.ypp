@@ -255,15 +255,15 @@ Exp : LPAREN Exp RPAREN {
 		}
 	| STRING { 
 		printProductionRule(40); 
-		$$ = ruleHandleString((ExpNode*)$1);
+		$$ = ruleHandleString((StringNode*)$1);
 		}
 	| TRUE { 
 		printProductionRule(41); 
-		$$ = (ExpNode*)$1;
+		$$ = ruleBool((ExpNode*)$1, "1");
 		}
 	| FALSE { 
 		printProductionRule(42); 
-		$$ = (ExpNode*)$1;
+		$$ = ruleBool((ExpNode*)$1, "0");
 		}
 	| NOT Exp {
 		printProductionRule(43); 
