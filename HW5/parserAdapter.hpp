@@ -190,25 +190,40 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
         output::errorMismatch(exp_a->lineno);
         exit(0);
     }
-    else{
+    
 
-        // TODO 1. division by zero
-        // 2. result of MUL can be up to 64 bits
-   
-        if(exp_a->type == "int" || exp_b->type == "int"){  
-            ExpNode* expNode = new ExpNode(binop->lineno, "int");
-            string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
-            cout << "ruleExpBinopExp command : " << to_emit << endl;
-            codeBuffer.emit(to_emit);
-            return expNode;
+    // TODO 1. division by zero
+    // 2. result of MUL can be up to 64 bits
+
+    if(exp_a->type == "int" || exp_b->type == "int") {  
+        ExpNode* expNode = new ExpNode(binop->lineno, "int");
+
+        if(exp_a->type !=  exp_b->type) {
+            //one is int, and the other one byte
+            string command;
+            if(exp_a->type == "byte") {
+                command = expNode->llvm_reg + " = zext i8 " + exp_a->llvm_reg + " to i32";
+            }
+            else{
+                command = expNode->llvm_reg + " = zext i8 " + exp_b->llvm_reg + " to i32";
+            }
+            cout << "command binup is: " << command << endl;
+            codeBuffer.emit(command);
         }
-
-        ExpNode* expNode = new ExpNode(binop->lineno, "byte");
-        string to_emit = expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
+        string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
         cout << "ruleExpBinopExp command : " << to_emit << endl;
         codeBuffer.emit(to_emit);
+        
         return expNode;
-    }   
+    }
+
+    // Both are byte
+    ExpNode* expNode = new ExpNode(binop->lineno, "byte");
+    string to_emit = expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
+    cout << "ruleExpBinopExp command : " << to_emit << endl;
+    codeBuffer.emit(to_emit);
+    return expNode;
+      
 }
 
 

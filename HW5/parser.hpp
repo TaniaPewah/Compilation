@@ -102,9 +102,9 @@ class StringNode: public ExpNode{
     string value;
     string size;
 
-    StringNode(int lineno, string type, string value) : ExpNode(lineno, type, getGlobalFreshReg()),
-     value(value) {
-         size = to_string(value.size() + 1);
+    StringNode(int lineno, string type, string raw_value) : ExpNode(lineno, type, getGlobalFreshReg()){
+        value = raw_value.substr(1, raw_value.size() - 2);
+        size = to_string(value.size() + 1);
      }
 };
 
