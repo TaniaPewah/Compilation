@@ -13,6 +13,8 @@ SymbolTable symbolTable;
 string current_func = "";
 bool call_print = false;
 int in_while = 0;
+RegisterManager* regManager = RegisterManager::getInstance();
+
 
 
 VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
@@ -181,6 +183,25 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, string assign_type)
     return current_node;
 }
 
+
+ExpNode* handlerDivZero(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
+    Register* zero_devision = regManager->getFreshReg();
+
+    if(exp_b->type == "byte"){
+        codeBuffer.emit(zero_devision->getName() + " = icmp eq i8 " + exp_b->llvm_reg + ", 0");
+    }
+    else{
+        codeBuffer.emit(zero_devision->getName() + " = icmp eq i32 " + exp_b->llvm_reg + ", 0");
+    }
+    
+    int location = codeBuffer.emit("br i1 " + zero_devision->getName() + ", label @, label @");
+    
+
+    
+
+}
+
+
 ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     // Check exp_a & exp_b are num types. If not- raise exeption. Else, do binop and return higher num type
 
@@ -194,6 +215,15 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
     // TODO 1. division by zero
     // 2. result of MUL can be up to 64 bits
+
+    // zero_division_register = fresh_register;
+
+    // codeBuffer.emit(zero_division_register + " = icmp eq i8 " + $3->llvm_register + ", 0");
+    // int location = codeBuffer.emit("br i1 " + zero_division_register + ", label @, label @");
+
+    if(binop->binop == "div"){
+        handlerDivZero(exp_a, binop, exp_b);
+    }
 
     if(exp_a->type == "int" || exp_b->type == "int") {  
         ExpNode* expNode = new ExpNode(binop->lineno, "int");
