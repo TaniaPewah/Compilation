@@ -123,14 +123,16 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 				}
 
 		  | Type ID ASSIGN Exp SC { 
-			  			printProductionRule(16); 
-						$$ = ruleVarDeclAssign( (IdNode*)$2, 
-												((TypeNode*)$1)->type_name, 
-												((ExpNode*)$4)->type);
-						
-						}
+			  	// Shahaf
+				printProductionRule(16); 
+				$$ = ruleVarDeclAssign( (IdNode*)$2, 
+										((TypeNode*)$1)->type_name, 
+										((ExpNode*)$4)->type);
+				
+				}
 
 		  | ID ASSIGN Exp SC { 
+			  // Shahaf
 			  printProductionRule(17); 
 			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
 			  
@@ -233,17 +235,16 @@ Exp : LPAREN Exp RPAREN {
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
 		}
 	| Exp MUL Exp {
-		// Add div shahaf
 		printProductionRule(35); 
 		cout << "Exp MUL Exp **********************" << endl; 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
 		}
 	| ID { 
-		// Tania
 		printProductionRule(36); 
 		$$ = ruleIDToExp((IdNode*)$1);
 		}
 	| Call {
+		//TODO: final level
 		printProductionRule(37); 
 		$$ = ruleCallToExp((TypeNode*)$1);
 		}
@@ -268,9 +269,7 @@ Exp : LPAREN Exp RPAREN {
 		$$ = ruleBool((ExpNode*)$1, "0");
 		}
 	| NOT Exp {
-		// Shahaf
 		printProductionRule(43); 
-		cout << "NOT Exp **********************" << endl; 
 		$$ = ruleNotExp((ExpNode*)$2);
 		}
 	| Exp AND Exp {
@@ -286,14 +285,12 @@ Exp : LPAREN Exp RPAREN {
 		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$3);
 		}
 	| Exp RELOPLEFT Exp {
-		// Shahaf
 		printProductionRule(46); 
 		cout << "Exp RELOPLEFT Exp **********************" << endl;
 		// check both Exp are numerical
 		$$ = ruleRelop((ExpNode*)$1, (RelopNode*)$2, (ExpNode*)$3);	
 		}
     | Exp RELOPNOTASS Exp {
-		// Shahaf
 		printProductionRule(46); 
 		cout << "Exp RELOPNOTASS Exp **********************" << endl; 
 		$$ = ruleRelop((ExpNode*)$1, (RelopNode*)$2, (ExpNode*)$3);
