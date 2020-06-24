@@ -33,6 +33,15 @@ public:
 	}
 };
 
+struct BackpatchInfo
+{
+    /* data */
+    int branch_location;
+    string lable_stay;
+    string lable_jump;
+};
+
+
 class IRManager {
 private:
    static IRManager *instance;
@@ -66,9 +75,10 @@ private:
         return ret;
     }
 
-    void emitToBuffer(string command){
-        int location = codeBuffer.emit(command);
+    int emitToBuffer(string command){
+        int emit_result = codeBuffer.emit(command);
         cout << "command is: " << command << endl;
+        return emit_result;
     }
 
     void emitGlobalToBuffer(string command){
@@ -110,7 +120,63 @@ private:
         }
     }
 
+    void exitFunction(){
+        string s;
+        s = "  %1 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.forPrintString, i32 0, i32 0), i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.str.1, i32 0, i32 0))\n"
+        "  call void @exit(i32 0) \n"
+        "  unreachable\n";
+        codeBuffer.emit(s);
 
+}
+
+    void zeroExit(){
+        string s = "@.str.1 = private unnamed_addr constant [23 x i8] c\"Error division by zero\\00\"\n"
+                "\n"
+                "\n"
+                "define void @print_error_exit()  {\n"
+                "print_error_exit_entry:\n"
+                "  %0 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.forPrintString, i32 0, i32 0), i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.str.1, i32 0, i32 0))\n"
+                "  call void @exit(i32 0) \n"
+                "  unreachable\n"
+                "                                                  ; No predecessors!\n"
+                "  ret void\n"
+                "}";
+        codeBuffer.emitGlobal(s);
+}
+
+    void zeroError(){
+        codeBuffer.emit("call void @print_error_exit()");
+        codeBuffer.emit("unreachable");
+    }
+
+    BackpatchInfo handlerDivZero(string exp_b_type, string exp_b_reg) {
+        Register* zero_devision = getFreshReg();
+
+        if(exp_b_type == "byte"){
+            emitToBuffer(zero_devision->getName() + " = icmp eq i8 " + exp_b_reg + ", 0");
+        }
+        else{
+            emitToBuffer(zero_devision->getName() + " = icmp eq i32 " + exp_b_reg + ", 0");
+        }
+
+        BackpatchInfo patching_info;
+        patching_info.branch_location = emitToBuffer("br i1 " + zero_devision->getName() + ", label @, label @");
+        
+
+        patching_info.lable_jump = codeBuffer.genLabel();
+        zeroError();
+        
+        patching_info.lable_stay = codeBuffer.genLabel();
+
+        return patching_info;
+    }
+
+    void handlePatching(BackpatchInfo patching_info){
+        pair<int, BranchLabelIndex>* p = new pair<int, BranchLabelIndex>({patching_info.branch_location, FIRST});
+        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_jump);
+        p = new pair<int, BranchLabelIndex>({patching_info.branch_location, SECOND});
+        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_stay);
+    }
 
 
 };

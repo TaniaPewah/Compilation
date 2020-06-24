@@ -50,7 +50,7 @@ Program : INIT Funcs {
 	}
 		;
 INIT : NEWSCOPECREATION {
-	addPrintAndPrinti();
+	ruleInit();
 }
 
 Funcs :  %empty { printProductionRule(2); 

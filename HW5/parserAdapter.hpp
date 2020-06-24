@@ -174,16 +174,11 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, string assign_type)
 }
 
 
-ExpNode* handlerDivZero(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
-    Register* zero_devision = regManager->getFreshReg();
-
-    if(exp_b->type == "byte"){
-        regManager->emitToBuffer(zero_devision->getName() + " = icmp eq i8 " + exp_b->llvm_reg + ", 0");
-    }
-    else{
-        regManager->emitToBuffer(zero_devision->getName() + " = icmp eq i32 " + exp_b->llvm_reg + ", 0");
-    }
-    regManager->emitToBuffer("br i1 " + zero_devision->getName() + ", label @, label @");
+void ruleInit(){
+    addPrintAndPrinti();
+    regManager->emitGlobalToBuffer("declare void @exit(i32) ");
+    regManager->exitFunction();
+    regManager->zeroExit();
 }
 
 
@@ -205,9 +200,9 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
     // codeBuffer.emit(zero_division_register + " = icmp eq i8 " + $3->llvm_register + ", 0");
     // int location = codeBuffer.emit("br i1 " + zero_division_register + ", label @, label @");
-
-    if(binop->binop == "div"){
-        handlerDivZero(exp_a, binop, exp_b);
+    BackpatchInfo patching_info;
+    if(binop->binop == "sdiv"){
+        patching_info = regManager->handlerDivZero(exp_b->type, exp_b->llvm_reg);
     }
 
     if(exp_a->type == "int" || exp_b->type == "int") {  
@@ -226,8 +221,11 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
             regManager->emitToBuffer(command);
         }
         string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
-        cout << "ruleExpBinopExp command : " << to_emit << endl;
         regManager->emitToBuffer(to_emit);
+
+        if(binop->binop == "sdiv"){
+            regManager->handlePatching(patching_info);
+        }
         
         return expNode;
     }
