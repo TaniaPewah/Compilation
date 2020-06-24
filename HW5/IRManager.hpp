@@ -33,9 +33,6 @@ public:
 	string getName() {
 		return name;
 	}
-    string setName(string Name){
-        this->name = name;
-    }
 };
 
 class IRManager {
@@ -71,7 +68,7 @@ private:
     }
 
     void emitToBuffer(string command){
-        codeBuffer.emit(command);
+        int location = codeBuffer.emit(command);
         cout << "command is: " << command << endl;
     }
 
@@ -98,6 +95,23 @@ private:
         
         return original_register;
     }
+ 
+    void loadID(string type, string reg, string id_name) {
+        if(type =="int"){
+            this->emitToBuffer(reg + " = load i32, i32* %" + id_name);
+        }
+        else if(type=="byte"){
+            this->emitToBuffer(reg + " = load i1, i1* %" + id_name);
+        }
+        else if(type=="bool"){
+            this->emitToBuffer(reg + " = load i8, i8* %" + id_name);
+        }
+        else {
+            cout<<"%%% WHAT TYPE IS THAT"<< endl;
+        }
+    }
+
+
 
 
 };

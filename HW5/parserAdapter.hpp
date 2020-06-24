@@ -183,12 +183,7 @@ ExpNode* handlerDivZero(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     else{
         regManager->emitToBuffer(zero_devision->getName() + " = icmp eq i32 " + exp_b->llvm_reg + ", 0");
     }
-    
-    
-    
-
-    
-
+    regManager->emitToBuffer("br i1 " + zero_devision->getName() + ", label @, label @");
 }
 
 
@@ -369,6 +364,7 @@ void checkMain(){
 ExpNode* ruleIDToExp (IdNode* id_node){
     string type = symbolTable.getIdType(id_node->lineno, id_node->name);
     int line = id_node->lineno;
+    regManager->loadID(type, id_node->llvm_reg, id_node->name);
     delete id_node;
     return new ExpNode(line, type);
 }
