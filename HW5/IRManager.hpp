@@ -7,8 +7,6 @@ using namespace std;
 #include <string>
 #include "bp.hpp"
 
-CodeBuffer& codeBuffer = CodeBuffer::instance();
-
 
 class Register {
 	int num;
@@ -40,6 +38,7 @@ private:
    static IRManager *instance;
     int register_index = 0;
     int global_register_index = 0;
+    CodeBuffer& codeBuffer = CodeBuffer::instance();
 
    // Private constructor so that no objects can be created.
    IRManager() {  }
