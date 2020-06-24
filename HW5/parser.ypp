@@ -290,13 +290,13 @@ Exp : LPAREN Exp RPAREN {
 		printProductionRule(46); 
 		cout << "Exp RELOPLEFT Exp **********************" << endl;
 		// check both Exp are numerical
-		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);	
+		$$ = ruleRelop((ExpNode*)$1, (RelopNode*)$2, (ExpNode*)$3);	
 		}
     | Exp RELOPNOTASS Exp {
 		// Shahaf
 		printProductionRule(46); 
 		cout << "Exp RELOPNOTASS Exp **********************" << endl; 
-		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
+		$$ = ruleRelop((ExpNode*)$1, (RelopNode*)$2, (ExpNode*)$3);
 		}
 	;
 

@@ -183,6 +183,28 @@ class BinopNode: public Node{
     };
 };
 
+
+class RelopNode: public Node{
+    /* This class supports relop operataros , such as ==, <= ... */
+    public:
+    string relop_sign;
+    RelopNode( int lineno, string relop_sign ) : Node(lineno){
+
+        if (relop_sign == "==")
+            this->relop_sign = "eq";
+        else  if (relop_sign == "!=")
+            this->relop_sign = "ne";
+        else  if (relop_sign == "<=")
+            this->relop_sign = "sle";
+        else  if (relop_sign == "<")
+            this->relop_sign = "slt";
+        else  if (relop_sign == ">=")
+            this->relop_sign = "sge";
+        else  if (relop_sign == ">")
+            this->relop_sign = "sgt";
+    };
+};
+
 class FormalsList: public Node {
     /* this class saves the function givven variables for every function */
     public:

@@ -1,3 +1,3 @@
-#include "registerManager.hpp"
+#include "IRManager.hpp"
 
-RegisterManager* RegisterManager::instance = 0;
+IRManager* IRManager::instance = 0;

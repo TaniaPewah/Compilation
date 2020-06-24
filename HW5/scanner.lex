@@ -35,8 +35,8 @@ continue                    { yylval =  new Node( yylineno); return CONTINUE; }
 \{                          return LBRACE;
 \}                          return RBRACE;
 =                           return ASSIGN;
-(==)|(!=)                   return RELOPLEFT;
-(<|>|(<=)|(>=))             return RELOPNOTASS;
+(==)|(!=)                   { yylval =  new RelopNode( yylineno, string(yytext)); return RELOPLEFT; }
+(<|>|(<=)|(>=))             { yylval =  new RelopNode( yylineno, string(yytext)); return RELOPNOTASS; }
 (\+|\-)                     { yylval =  new BinopNode( yylineno, string(yytext)); return ADDITIVE; }
 (\*|\/)                     { yylval =  new BinopNode( yylineno, string(yytext)); return MUL; }
 [a-zA-Z]([a-zA-Z0-9])* 		{ yylval =  new IdNode( yylineno, string(yytext)); return ID; }

@@ -112,7 +112,6 @@ ExpNode* ruleNotExp(ExpNode* node) {
 
     ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
     regManager->emitToBuffer(new_exp_node->llvm_reg + " = add i1 1, " + node->llvm_reg);
-    delete(node);
     return new_exp_node;
 }
 
@@ -333,15 +332,23 @@ void ruleIdAssign( IdNode* id_node, ExpNode* exp){
     // %temp = load i32, i32* %x  // temp = x = 3
 }
 
-ExpNode* ruleRelop(ExpNode* exp1, ExpNode* exp2){
+ExpNode* ruleRelop(ExpNode* exp1, RelopNode* compare_sign, ExpNode* exp2){
 
     if((exp1->type != "int" && exp1->type != "byte") || (exp2->type != "int" && exp2->type != "byte")){
 
         output::errorMismatch(exp1->lineno);
         exit(0);
     }
-      
-    return new ExpNode(exp1->lineno, "bool");
+
+    ExpNode* compare = new ExpNode(exp1->lineno, "bool");
+
+    string exp1_i32_register = regManager->fromI8RegisterToI32Register(exp1->type, exp1->llvm_reg);
+    string exp2_i32_register = regManager->fromI8RegisterToI32Register(exp2->type, exp2->llvm_reg);
+    
+    regManager->emitToBuffer(compare->llvm_reg + " = icmp " + compare_sign->relop_sign + " i32 " + 
+    exp1_i32_register + ", " + exp2_i32_register);
+    
+    return compare;
 }
 
 

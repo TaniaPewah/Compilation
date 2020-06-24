@@ -1,7 +1,12 @@
+
+#ifndef IR_MANAGER_HPP
+#define IR_MANAGER_HPP
+
 using namespace std;
 #include <iostream>
 #include <string>
 #include "bp.hpp"
+
 CodeBuffer& codeBuffer = CodeBuffer::instance();
 
 
@@ -28,6 +33,9 @@ public:
 	string getName() {
 		return name;
 	}
+    string setName(string Name){
+        this->name = name;
+    }
 };
 
 class IRManager {
@@ -78,5 +86,20 @@ private:
         codeBuffer.printCodeBuffer();
     }
 
+    string fromI8RegisterToI32Register(string type, string original_register){
+        // This function recives an exp node. if it's int -> returns the register name. Else->
+        // returns a register name, with the same value, but i32
+    
+        if(type == "byte"){
+            Register* exp_i32 = getFreshReg();
+            emitToBuffer(exp_i32->getName() + " = zext i8 " + original_register + " to i32");
+            return exp_i32->getName();
+        }
+        
+        return original_register;
+    }
+
 
 };
+
+#endif //IR_MANAGER_HPP
