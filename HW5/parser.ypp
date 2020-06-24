@@ -233,11 +233,13 @@ Exp : LPAREN Exp RPAREN {
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
 		}
 	| Exp MUL Exp {
+		// Add div shahaf
 		printProductionRule(35); 
 		cout << "Exp MUL Exp **********************" << endl; 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
 		}
 	| ID { 
+		// Tania
 		printProductionRule(36); 
 		$$ = ruleIDToExp((IdNode*)$1);
 		}
@@ -266,27 +268,32 @@ Exp : LPAREN Exp RPAREN {
 		$$ = ruleBool((ExpNode*)$1, "0");
 		}
 	| NOT Exp {
+		// Shahaf
 		printProductionRule(43); 
 		cout << "NOT Exp **********************" << endl; 
 		$$ = ruleNotExp((ExpNode*)$2);
 		}
 	| Exp AND Exp {
+		// Tania
 		printProductionRule(44); 
 		cout << "Exp AND Exp **********************" << endl; 
 		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$3);
 		}
 	| Exp OR Exp {
+		// Tania
 		printProductionRule(45); 
 		cout << "Exp OR Exp **********************" << endl; 
 		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$3);
 		}
-	| Exp RELOPLEFT Exp { 
+	| Exp RELOPLEFT Exp {
+		// Shahaf
 		printProductionRule(46); 
 		cout << "Exp RELOPLEFT Exp **********************" << endl;
 		// check both Exp are numerical
 		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);	
 		}
     | Exp RELOPNOTASS Exp {
+		// Shahaf
 		printProductionRule(46); 
 		cout << "Exp RELOPNOTASS Exp **********************" << endl; 
 		$$ = ruleRelop((ExpNode*)$1, (ExpNode*)$3);
