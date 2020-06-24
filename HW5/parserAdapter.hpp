@@ -1,21 +1,15 @@
 
 #ifndef PARSER_ADAPTER_HPP
 #define PARSER_ADAPTER_HPP
-
 #include "parser.hpp"
 #include "symbolTable.hpp"
 #include <string>
-#include "bp.hpp"
 
-//extern CodeBuffer& codeBuffer;
-CodeBuffer& codeBuffer = CodeBuffer::instance();
 SymbolTable symbolTable;
 string current_func = "";
 bool call_print = false;
 int in_while = 0;
-RegisterManager* regManager = RegisterManager::getInstance();
-
-
+IRManager* regManager = IRManager::getInstance();
 
 VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
     VarNode* new_var = new VarNode(type->lineno, id->name, type->type_name);
@@ -23,7 +17,6 @@ VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
     delete(id);
     return new_var;
 }
-
 
 void ruleAllowString(IdNode* id){
     if(id->name == "print") {
@@ -38,11 +31,8 @@ ExpNode* ruleHandleString(StringNode* string_node){
         exit(0);
     }
 
-    cout << " string value is: " << string_node->value << endl;
-
     string command = string_node->llvm_reg + " = constant [" + string_node->size + " x i8] c\""+ string_node->value + "\\00\"";
-    cout << "command is: " << command << endl;
-    codeBuffer.emitGlobal(command);
+    regManager.emitGlobalToBuffer(command)
     return (ExpNode*)string_node;
 }
 
@@ -188,13 +178,13 @@ ExpNode* handlerDivZero(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     Register* zero_devision = regManager->getFreshReg();
 
     if(exp_b->type == "byte"){
-        codeBuffer.emit(zero_devision->getName() + " = icmp eq i8 " + exp_b->llvm_reg + ", 0");
+        regManager.emitToBuffer(zero_devision->getName() + " = icmp eq i8 " + exp_b->llvm_reg + ", 0");
     }
     else{
-        codeBuffer.emit(zero_devision->getName() + " = icmp eq i32 " + exp_b->llvm_reg + ", 0");
+        regManager.emitToBuffer(zero_devision->getName() + " = icmp eq i32 " + exp_b->llvm_reg + ", 0");
     }
     
-    int location = codeBuffer.emit("br i1 " + zero_devision->getName() + ", label @, label @");
+    int location = regManager.emitToBuffer("br i1 " + zero_devision->getName() + ", label @, label @");
     
 
     
@@ -238,11 +228,11 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
                 command = expNode->llvm_reg + " = zext i8 " + exp_b->llvm_reg + " to i32";
             }
             cout << "command binup is: " << command << endl;
-            codeBuffer.emit(command);
+            regManager.emitToBuffer(command);
         }
         string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
         cout << "ruleExpBinopExp command : " << to_emit << endl;
-        codeBuffer.emit(to_emit);
+        regManager.emitToBuffer(to_emit);
         
         return expNode;
     }
@@ -251,7 +241,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     ExpNode* expNode = new ExpNode(binop->lineno, "byte");
     string to_emit = expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
     cout << "ruleExpBinopExp command : " << to_emit << endl;
-    codeBuffer.emit(to_emit);
+    regManager.emitToBuffer(to_emit);
     return expNode;
       
 }
@@ -275,7 +265,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
     ExpNode* expNode = new ExpNode(num->lineno, "byte");
     string command = expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
     cout << "ruleExpNumB command: " << command << endl;
-    codeBuffer.emit(command);
+    regManager.emitToBuffer(command);
     return (expNode);
 }
 
@@ -283,7 +273,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
 ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
     string command = bool_node->llvm_reg + " = add i1 0, " + bool_sign;
     cout << "ruleBool command: " << command << endl;
-    codeBuffer.emit(command);
+    
     return (bool_node);
 }
 
@@ -382,9 +372,8 @@ ExpNode* ruleCallToExp ( TypeNode* callNode ){
 }
 
 void endProgram(){
-    codeBuffer.emitGlobal("\n \n; -----------------------  Program ------------------------ ");
-    codeBuffer.printGlobalBuffer();
-    codeBuffer.printCodeBuffer();
+
+    regManager.endProgram();
 }
 
 

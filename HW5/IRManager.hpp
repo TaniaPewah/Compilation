@@ -1,6 +1,9 @@
 using namespace std;
 #include <iostream>
 #include <string>
+#include "bp.hpp"
+CodeBuffer& codeBuffer = CodeBuffer::instance();
+
 
 class Register {
 	int num;
@@ -27,21 +30,21 @@ public:
 	}
 };
 
-class RegisterManager {
+class IRManager {
 private:
-   static RegisterManager *instance;
+   static IRManager *instance;
     int register_index = 0;
     int global_register_index = 0;
 
    // Private constructor so that no objects can be created.
-   RegisterManager() {  }
+   IRManager() {  }
 
    public:
-    RegisterManager(RegisterManager const&)       = delete;
-    RegisterManager& operator=(RegisterManager const&)  = delete;
-    static RegisterManager *getInstance() {
+    IRManager(IRManager const&)       = delete;
+    IRManager& operator=(IRManager const&)  = delete;
+    static IRManager *getInstance() {
         if (!instance)
-        instance = new RegisterManager;
+        instance = new IRManager;
         return instance;
     }
 
@@ -58,4 +61,22 @@ private:
         global_register_index++;
         return ret;
     }
+
+    void emitToBuffer(string command){
+        codeBuffer.emit(command);
+        cout << "command is: " << command << endl;
+    }
+
+    void emitGlobalToBuffer(string command){
+        codeBuffer.emitGlobal(command);
+        cout << "global command is: " << command << endl;
+    }
+
+    void endProgram(){
+        codeBuffer.emitGlobal("\n \n; -----------------------  Program ------------------------ ");
+        codeBuffer.printGlobalBuffer();
+        codeBuffer.printCodeBuffer();
+    }
+
+
 };
