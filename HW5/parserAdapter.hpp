@@ -32,7 +32,7 @@ ExpNode* ruleHandleString(StringNode* string_node){
     }
 
     string command = string_node->llvm_reg + " = constant [" + string_node->size + " x i8] c\""+ string_node->value + "\\00\"";
-    regManager.emitGlobalToBuffer(command)
+    regManager->emitGlobalToBuffer(command);
     return (ExpNode*)string_node;
 }
 
@@ -111,6 +111,7 @@ ExpNode* ruleNotExp(ExpNode* node) {
     }
 
     ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
+    regManager->emitToBuffer(new_exp_node->llvm_reg + " = add i1 1, " + node->llvm_reg);
     delete(node);
     return new_exp_node;
 }
@@ -178,13 +179,13 @@ ExpNode* handlerDivZero(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     Register* zero_devision = regManager->getFreshReg();
 
     if(exp_b->type == "byte"){
-        regManager.emitToBuffer(zero_devision->getName() + " = icmp eq i8 " + exp_b->llvm_reg + ", 0");
+        regManager->emitToBuffer(zero_devision->getName() + " = icmp eq i8 " + exp_b->llvm_reg + ", 0");
     }
     else{
-        regManager.emitToBuffer(zero_devision->getName() + " = icmp eq i32 " + exp_b->llvm_reg + ", 0");
+        regManager->emitToBuffer(zero_devision->getName() + " = icmp eq i32 " + exp_b->llvm_reg + ", 0");
     }
     
-    int location = regManager.emitToBuffer("br i1 " + zero_devision->getName() + ", label @, label @");
+    
     
 
     
@@ -228,11 +229,11 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
                 command = expNode->llvm_reg + " = zext i8 " + exp_b->llvm_reg + " to i32";
             }
             cout << "command binup is: " << command << endl;
-            regManager.emitToBuffer(command);
+            regManager->emitToBuffer(command);
         }
         string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
         cout << "ruleExpBinopExp command : " << to_emit << endl;
-        regManager.emitToBuffer(to_emit);
+        regManager->emitToBuffer(to_emit);
         
         return expNode;
     }
@@ -241,7 +242,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     ExpNode* expNode = new ExpNode(binop->lineno, "byte");
     string to_emit = expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
     cout << "ruleExpBinopExp command : " << to_emit << endl;
-    regManager.emitToBuffer(to_emit);
+    regManager->emitToBuffer(to_emit);
     return expNode;
       
 }
@@ -265,7 +266,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
     ExpNode* expNode = new ExpNode(num->lineno, "byte");
     string command = expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
     cout << "ruleExpNumB command: " << command << endl;
-    regManager.emitToBuffer(command);
+    regManager->emitToBuffer(command);
     return (expNode);
 }
 
@@ -373,7 +374,7 @@ ExpNode* ruleCallToExp ( TypeNode* callNode ){
 
 void endProgram(){
 
-    regManager.endProgram();
+    regManager->endProgram();
 }
 
 
