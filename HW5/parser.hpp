@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <vector>
 using namespace std;
-#include "registerManager.hpp"
+#include "IRManager.hpp"
 
 #ifndef YYINITEPTH
 # define YYINITDEPTH 10000
@@ -34,14 +34,14 @@ class Node{
     Node(int lineno) : lineno(lineno) {};
 
     string getFreshReg(){
-        RegisterManager* regManager = RegisterManager::getInstance();
+        IRManager* regManager = IRManager::getInstance();
         Register* regID = regManager->getFreshReg();
         cout <<" new reg created name : " << regID->getName() << endl;
         return regID->getName();
     }
 
     string getGlobalFreshReg(){
-        RegisterManager* regManager = RegisterManager::getInstance();
+        IRManager* regManager = IRManager::getInstance();
         Register* regID = regManager->getGlobalFreshReg();
         cout <<" new global reg created name : " << regID->getName() << endl;
         return regID->getName();
