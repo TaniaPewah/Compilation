@@ -47,6 +47,7 @@ private:
    static IRManager *instance;
     int register_index = 0;
     int global_register_index = 0;
+    int stack_offset_pointer = 0;
     CodeBuffer& codeBuffer = CodeBuffer::instance();
 
    // Private constructor so that no objects can be created.
@@ -59,6 +60,33 @@ private:
         if (!instance)
         instance = new IRManager;
         return instance;
+    }
+
+    int addPointerToRegisterInStack(string llvm_reg){
+        // adds a variable to the stack, and creates a register that is a pointer to that location.
+        // this register will always be a pointer to the stack
+        cout << "REMEMBER TO INITIATE %stack LATER!!!" <<endl;
+        //TODO: initiate %stack. refer: line 104, parser_hw5.hpp
+        emitToBuffer(llvm_reg + " = getelementptr [50 x i32], [50 x i32]* %stack, i32 0, i32 " + to_string(stack_offset_pointer));
+        stack_offset_pointer++;
+        emitToBuffer("store i32 0, i32* " + llvm_reg);
+        return stack_offset_pointer - 1;
+    }
+
+    void assignExpNodeToVar(string variable_reg, string exp_node_reg, string exp_node_type){
+        // the variable is a register which points to a location in the string. we just neet to update the value in this location.
+        if(exp_node_type == "int"){
+            emitToBuffer("store i32 " + exp_node_reg + ", i32* " + variable_reg);
+        }else if(exp_node_type == "byte"){
+            Register* fresh_register = getFreshReg();
+            emitToBuffer(fresh_register->getName() + " = zext i8 " + exp_node_reg + " to i32");
+            emitToBuffer("store i32 " + fresh_register->getName() + ", i32* " + variable_reg);
+        }else{
+            Register* fresh_register = getFreshReg();
+            emitToBuffer(fresh_register->getName() + " = zext i1 " + exp_node_reg + " to i32");
+            emitToBuffer("store i32 " + fresh_register->getName() + ", i32* " + variable_reg);
+        }
+        return;
     }
 
     Register* getFreshReg(){
@@ -104,16 +132,17 @@ private:
         
         return original_register;
     }
+    
  
     void loadID(string type, string reg, string id_name) {
         if(type =="int"){
-            this->emitToBuffer(reg + " = load i32, i32* %" + id_name);
+            this->emitToBuffer(reg + " = load i32, i32* " + id_name);
         }
         else if(type=="byte"){
-            this->emitToBuffer(reg + " = load i1, i1* %" + id_name);
+            this->emitToBuffer(reg + " = load i1, i1* " + id_name);
         }
         else if(type=="bool"){
-            this->emitToBuffer(reg + " = load i8, i8* %" + id_name);
+            this->emitToBuffer(reg + " = load i8, i8* " + id_name);
         }
         else {
             cout<<"%%% WHAT TYPE IS THAT"<< endl;

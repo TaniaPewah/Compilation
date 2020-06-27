@@ -176,6 +176,15 @@ public:
        return wanted_entry->node->type;
     }
 
+    VarNode* getVarNode(int lineno, string id){
+        TableEntry* wanted_entry = findSymbolInStack(id);
+        if(!wanted_entry || !(wanted_entry->is_var) ) {
+            output::errorUndef(lineno, id);
+            exit(0);
+       }
+       return wanted_entry->node;
+    }
+
     string getFuncType(int lineno, string id){
         TableEntry* wanted_entry = findSymbolInStack(id);
         if(!wanted_entry || wanted_entry->is_var) {

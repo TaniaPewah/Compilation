@@ -117,22 +117,23 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			symbolTable.closeScope();
 			}
 		  | Type ID SC { 
+			  	// DONE
 			    printProductionRule(15); 
 				$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
 				
 				}
 
 		  | Type ID ASSIGN Exp SC { 
-			  	// Shahaf
+			  	// DONE
 				printProductionRule(16); 
 				$$ = ruleVarDeclAssign( (IdNode*)$2, 
 										((TypeNode*)$1)->type_name, 
-										((ExpNode*)$4)->type);
+										((ExpNode*)$4));
 				
 				}
 
 		  | ID ASSIGN Exp SC { 
-			  // Shahaf
+			  // DONE
 			  printProductionRule(17); 
 			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
 			  

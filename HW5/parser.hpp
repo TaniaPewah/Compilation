@@ -113,7 +113,16 @@ class VarNode: public IdNode{
     /* This class supports variable types, such as int, bool... */
     public:
     string type;
-    VarNode( int lineno, string name, string type ) : IdNode(lineno, name), type(type) {
+    int stack_offset;
+    bool is_function;
+    VarNode( int lineno, string name, string type , bool is_function) : IdNode(lineno, name), type(type) , is_function(is_function){
+        if(is_function){
+            stack_offset = -1;
+        }
+        else{
+            IRManager* regManager = IRManager::getInstance();
+            stack_offset = regManager->addPointerToRegisterInStack(llvm_reg);
+        }    
     };
 };
 
@@ -121,7 +130,7 @@ class FuncNode: public VarNode{
     /* This class supports variable types, such as int, bool... */
     public:
     vector<VarNode*> params;
-    FuncNode( int lineno, string name, string type, vector<VarNode*> params ) : VarNode(lineno, name, type), params(params) {
+    FuncNode( int lineno, string name, string type, vector<VarNode*> params ) : VarNode(lineno, name, type, true), params(params) {
     };
 };
 
