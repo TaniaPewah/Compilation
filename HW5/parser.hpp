@@ -236,6 +236,15 @@ class Formals: public Node {
     Formals( FormalsList* params): Node(NA), params(params){ }
 };
 
+class LabelNode: public Node {
+    public:
+    string label;
+
+    LabelNode(): Node(NA){
+        label = regManager->createLabel();
+    }
+}
+
 
 
 #define YYSTYPE Node*
