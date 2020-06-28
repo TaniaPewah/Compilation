@@ -227,6 +227,8 @@ private:
         // if node_a false go to FalseList label
         // if node_b false go to FalseList label
 
+        cout << "merging AND false lists" << endl;
+
         // merge false lists of node_a node_b
         list_of_labels[label_list_key_gen] = codeBuffer.merge(list_of_labels[node_a->false_list_id], 
                                                               list_of_labels[node_b->false_list_id]);
@@ -242,6 +244,9 @@ private:
         // the new truelist id is the right exp truelist
         // TODO check where node_b->true_list_id is initiallized
 	    resultExp->true_list_id = node_b->true_list_id;
+        // TODO : not sure to use :
+        // codeBuffer.emit(or_register + " = phi i1 [ 0 , %" + label_false + "], [ 1 , %" + label_true + "]");
+
     }
 
     void orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel, ExpNode* resultExp){
@@ -250,6 +255,8 @@ private:
         
         // erase the bpached list
         list_of_labels.erase(node_a->false_list_id);
+
+        cout << "merging OR true lists" << endl;
 
         // if node_a true go to TrueList label
         // if node_b true go to TrueList label
@@ -264,6 +271,9 @@ private:
         // if node_b false go to FalseList label
         // the new falselist id is the right exp falselist
         resultExp->false_list_id = node_b->false_list_id;
+
+        // TODO : not sure to use :
+        // codeBuffer.emit(or_register + " = phi i1 [ 0 , %" + label_false + "], [ 1 , %" + label_true + "]");
 
     }
 };
