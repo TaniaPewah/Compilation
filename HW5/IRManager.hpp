@@ -37,8 +37,8 @@ struct BackpatchInfo
 {
     /* data */
     int branch_location;
-    string lable_false;
-    string lable_true;
+    string label_false;
+    string label_true;
 };
 
 
@@ -192,27 +192,58 @@ private:
         patching_info.branch_location = emitToBuffer("br i1 " + zero_devision->getName() + ", label @, label @");
         
 
-        patching_info.lable_true = codeBuffer.genLabel();
+        patching_info.label_true = codeBuffer.genLabel();
         zeroError();
         
-        patching_info.lable_false = codeBuffer.genLabel();
+        patching_info.label_false = codeBuffer.genLabel();
 
         return patching_info;
     }
 
     void handlePatching(BackpatchInfo patching_info){
         pair<int, BranchLabelIndex>* p = new pair<int, BranchLabelIndex>({patching_info.branch_location, FIRST});
-        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_true);
+        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.label_true);
         p = new pair<int, BranchLabelIndex>({patching_info.branch_location, SECOND});
-        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_false);
+        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.label_false);
     }
 
     string createLabel(){
         return codeBuffer.genLabel();
     }
 
-    void andPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
-        pair<int, BranchLabelIndex> *p = new pair<int, BranchLabelIndex>({label->location, FIRST});
+    void andPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MAlabel ){
+
+        // if node_a true go to MAlabel
+        // if node_a false go to FalseList label
+        // if node_b true go to TrueList label
+        // if node_b false go to FalseList label
+
+        BackpatchInfo patching_info;
+        patching_info.branch_location = MAlabel->location;
+        patching_info.label_true = MAlabel->label;
+
+        //
+
+        handlePatching(patching_info);
+
+    }
+
+    void orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel ){
+
+        // if node_a true go to TrueList label
+        // if node_a false go to MOlabel label
+        // if node_b true go to TrueList label
+        // if node_b false go to FalseList label
+
+
+        BackpatchInfo patching_info;
+        patching_info.branch_location = MOlabel->location;
+        patching_info.label_true = MOlabel->label;
+
+        //
+
+        handlePatching(patching_info);
+
     }
 };
 
