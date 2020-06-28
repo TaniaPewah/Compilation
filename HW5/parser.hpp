@@ -8,8 +8,7 @@
 #include <algorithm>
 #include <vector>
 using namespace std;
-#include "bp.hpp"
-#include "hw3_output.hpp"
+#include "IRManager.hpp"
 
 #ifndef YYINITEPTH
 # define YYINITDEPTH 10000
@@ -33,6 +32,20 @@ class Node{
     public:
     int lineno;
     Node(int lineno) : lineno(lineno) {};
+
+    string getFreshReg(){
+        IRManager* regManager = IRManager::getInstance();
+        Register* regID = regManager->getFreshReg();
+        cout <<" new reg created name : " << regID->getName() << endl;
+        return regID->getName();
+    }
+
+    string getGlobalFreshReg(){
+        IRManager* regManager = IRManager::getInstance();
+        Register* regID = regManager->getGlobalFreshReg();
+        cout <<" new global reg created name : " << regID->getName() << endl;
+        return regID->getName();
+    }
 };
 
 class IdNode: public Node{
@@ -40,7 +53,9 @@ class IdNode: public Node{
     public:
     string llvm_reg;
     string name;
-    IdNode( int lineno, string name ) : Node(lineno), name(name) { };
+    IdNode( int lineno, string name ) : Node(lineno), name(name) {
+        this->llvm_reg = this->getFreshReg();
+    };
 };
 
 class TypeNode : public Node{
@@ -56,7 +71,9 @@ class NumNode: public TypeNode{
     public:
     string llvm_reg;
     int value;
-    NumNode( int lineno, int value, string type ) : TypeNode(lineno, type), value(value) { };
+    NumNode( int lineno, int value, string type ) : TypeNode(lineno, type), value(value) {
+        this->llvm_reg = this->getFreshReg();
+    };
 };
 
 
@@ -68,7 +85,13 @@ class ExpNode: public Node{
     int true_list_id;
     int false_list_id;
 
-    ExpNode( int lineno, string type ) : Node(lineno), type(type)  {  };
+    ExpNode( int lineno, string type ) : Node(lineno), type(type)  {
+        cout << " Expnode "<< endl;
+        string regt = this->getFreshReg();
+        cout << " Expnode, calling freshreg: " << regt << endl;
+        llvm_reg = regt;
+        cout<< "llvm reg is: "<< llvm_reg << endl;
+    };
     
     ExpNode(int lineno, string type, string llvm_reg) : Node(lineno), type(type), llvm_reg(llvm_reg) {
         cout << "created new exp node, with givven register " << llvm_reg << endl;
@@ -82,7 +105,7 @@ class StringNode: public ExpNode{
     string value;
     string size;
 
-    StringNode(int lineno, string type, string raw_value) : ExpNode(lineno, type){
+    StringNode(int lineno, string type, string raw_value) : ExpNode(lineno, type, getGlobalFreshReg()){
         value = raw_value.substr(1, raw_value.size() - 2);
         size = to_string(value.size() + 1);
      }
@@ -95,8 +118,14 @@ class VarNode: public IdNode{
     string type;
     int stack_offset;
     bool is_function;
-    VarNode( int lineno, string name, string type , bool is_function) :
-                IdNode(lineno, name), type(type), is_function(is_function){
+    VarNode( int lineno, string name, string type , bool is_function) : IdNode(lineno, name), type(type) , is_function(is_function){
+        if(is_function){
+            stack_offset = -1;
+        }
+        else{
+            IRManager* regManager = IRManager::getInstance();
+            stack_offset = regManager->addPointerToRegisterInStack(llvm_reg);
+        }    
     };
 };
 
@@ -216,9 +245,9 @@ class LabelNode: public Node {
     int location;
 
     LabelNode(): Node(NA){
-        CodeBuffer& codeBuffer = CodeBuffer::instance();
-        location = codeBuffer.emit("br i1 @ , label @ , label @");
-        label = codeBuffer.genLabel();
+        IRManager* regManager = IRManager::getInstance();
+        location = regManager->emitToBuffer("br i1 @ , label @ , label @");
+        label = regManager->createLabel();
     }
 };
 
