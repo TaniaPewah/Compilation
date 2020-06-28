@@ -87,7 +87,7 @@ void addPrintAndPrinti(){
 
 }
 
-ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b){
+ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
    
     if(node_a->type != "bool" || node_b->type != "bool") {
         output::errorMismatch(node_a->lineno);
@@ -95,6 +95,12 @@ ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b){
     }
 
     ExpNode* new_exp_node = new ExpNode(node_a->lineno, "bool");
+
+    // get short circuit label label_if_true_continue
+    // TODO why need regsize and substring of nodea_llvmreg -1??
+
+    //regManager->andPatching(node_a, node_b, label);
+    
     delete(node_a);
     delete(node_b);
     return new_exp_node;
@@ -380,5 +386,9 @@ void endProgram(){
     regManager->endProgram();
 }
 
+LabelNode* ruleBranchLabel(){
+    regManager->emitToBuffer("br i1 @ , label @ , label @");
+    return new LabelNode();
+}
 
 #endif //PARSER_ADAPTER_HPP

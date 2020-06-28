@@ -224,7 +224,9 @@ Type	: INT { printProductionRule(31);
 		| BOOL { printProductionRule(33); 
 		}
 		;
-
+MA : {
+	$$ = ruleBranchLabel();
+};
 Exp : LPAREN Exp RPAREN { 
 		printProductionRule(34); 
 		cout << "LPAREN Exp RPAREN **********************" << endl;
@@ -273,11 +275,11 @@ Exp : LPAREN Exp RPAREN {
 		printProductionRule(43); 
 		$$ = ruleNotExp((ExpNode*)$2);
 		}
-	| Exp AND Exp {
+	| Exp AND MA Exp {
 		// Tania
 		printProductionRule(44); 
 		cout << "Exp AND Exp **********************" << endl; 
-		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$3);
+		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
 		}
 	| Exp OR Exp {
 		// Tania
