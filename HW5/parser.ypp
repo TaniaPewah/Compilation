@@ -176,10 +176,9 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  }
 		  ;
 
-IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN MA Statement {
+IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
 	checkBoolExp( (ExpNode*)$4 );
 	symbolTable.closeScope();
-	return $6;
 }
 ;
 
@@ -226,7 +225,7 @@ Type	: INT { printProductionRule(31);
 		}
 		;
 
-MA : {
+MA : %empty {
 		$$ = ruleBranchLabel();
 	}
 	;

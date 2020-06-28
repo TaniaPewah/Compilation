@@ -2,6 +2,7 @@
 #ifndef PARSER_ADAPTER_HPP
 #define PARSER_ADAPTER_HPP
 #include "parser.hpp"
+#include "IRManager.hpp"
 #include "symbolTable.hpp"
 #include <string>
 
@@ -13,6 +14,9 @@ IRManager* regManager = IRManager::getInstance();
 
 VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
     VarNode* new_var = new VarNode(type->lineno, id->name, type->type_name, false);
+    new_var->llvm_reg = regManager->getFreshReg()->getName();
+    new_var->stack_offset = regManager->addPointerToRegisterInStack(new_var->llvm_reg);
+        
     delete(type);
     delete(id);
     return new_var;
@@ -30,6 +34,8 @@ ExpNode* ruleHandleString(StringNode* string_node){
         output::errorMismatch(string_node->lineno);
         exit(0);
     }
+
+    string_node->llvm_reg = regManager->getGlobalFreshReg()->getName();
 
     string command = string_node->llvm_reg + " = constant [" + string_node->size + " x i8] c\""+ string_node->value + "\\00\"";
     regManager->emitGlobalToBuffer(command);
@@ -95,6 +101,7 @@ ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
     }
 
     ExpNode* new_exp_node = new ExpNode(node_a->lineno, "bool");
+    new_exp_node->llvm_reg = regManager->getFreshReg()->getName();
 
     // get short circuit label label_if_true_continue
     // TODO why need regsize and substring of nodea_llvmreg -1??
@@ -113,11 +120,12 @@ ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b,  LabelNode* label){
     }
 
     ExpNode* new_exp_node = new ExpNode(node_a->lineno, "bool");
+    new_exp_node->llvm_reg = regManager->getFreshReg()->getName();
 
     regManager->orPatching(node_a, node_b, label, new_exp_node);
     delete(node_a);
     delete(node_b);
-    
+
     return new_exp_node;
 }
 
@@ -128,6 +136,7 @@ ExpNode* ruleNotExp(ExpNode* node) {
     }
 
     ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
+    new_exp_node->llvm_reg = regManager->getFreshReg()->getName();
     regManager->emitToBuffer(new_exp_node->llvm_reg + " = add i1 1, " + node->llvm_reg);
     return new_exp_node;
 }
@@ -184,6 +193,7 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_node) 
     } 
 
     current_node = new VarNode(id_node->lineno, name, var_type, false); 
+    current_node->llvm_reg = regManager->getFreshReg()->getName();
     symbolTable.addSymbolVar( current_node );
 
     regManager->assignExpNodeToVar(current_node->llvm_reg, exp_node->llvm_reg, exp_node->type);
@@ -223,6 +233,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
     if(exp_a->type == "int" || exp_b->type == "int") {  
         ExpNode* expNode = new ExpNode(binop->lineno, "int");
+        expNode->llvm_reg = regManager->getFreshReg()->getName();
 
         if(exp_a->type !=  exp_b->type) {
             //one is int, and the other one byte
@@ -248,6 +259,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
     // Both are byte
     ExpNode* expNode = new ExpNode(binop->lineno, "byte");
+    expNode->llvm_reg = regManager->getFreshReg()->getName();
     string to_emit = expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
 
     regManager->emitToBuffer(to_emit);
@@ -260,6 +272,7 @@ ExpNode* ruleExpNum(NumNode* num_node){
 
     //TODO: Add constructor, to get existing reister
     ExpNode* expNode = new ExpNode(num_node->lineno, num_node->type_name);
+    expNode->llvm_reg = regManager->getFreshReg()->getName();
     string command = expNode->llvm_reg + " = add i32 0, " + to_string(num_node->value); 
     regManager->emitToBuffer(command);
     return (expNode);
@@ -272,6 +285,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
     }
     //TODO: Add constructor, to get existing reister
     ExpNode* expNode = new ExpNode(num->lineno, "byte");
+    expNode->llvm_reg = regManager->getFreshReg()->getName();
     string command = expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
 
     regManager->emitToBuffer(command);
@@ -280,6 +294,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
 
 
 ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
+    bool_node->llvm_reg = regManager->getFreshReg()->getName();
     string command = bool_node->llvm_reg + " = add i1 0, " + bool_sign;
     regManager->emitToBuffer(command);
     

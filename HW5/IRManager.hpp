@@ -6,7 +6,7 @@ using namespace std;
 #include <iostream>
 #include <string>
 #include <unordered_map> 
-#include "bp.hpp"
+#include "parser.hpp"
 
 
 class Register {
@@ -216,26 +216,25 @@ private:
         return codeBuffer.genLabel();
     }
 
-    void andPatching( int node_a_true_id, int node_a_false_id,
-                      int node_b_true_id, int node_b_false_id, LabelNode* MAlabel, ExpNode* resultExp){
+    void andPatching(ExpNode* node_a, ExpNode* node_b, LabelNode* MAlabel, ExpNode* resultExp){
 
         // if node_a true go to MAlabel
-        codeBuffer.bpatch(list_of_labels[node_a_true_id], MAlabel->label);
+        codeBuffer.bpatch(list_of_labels[node_a->true_list_id], MAlabel->label);
 
         // erase the bpached list
-        list_of_labels.erase(node_a_true_id);
+        list_of_labels.erase(node_a->true_list_id);
 
         // if node_a false go to FalseList label
         // if node_b false go to FalseList label
 
         // merge false lists of node_a node_b
-        list_of_labels[label_list_key_gen] = codeBuffer.merge(list_of_labels[node_a_false_id], 
-                                                              list_of_labels[node_b_false_id]);
+        list_of_labels[label_list_key_gen] = codeBuffer.merge(list_of_labels[node_a->false_list_id], 
+                                                              list_of_labels[node_b->false_list_id]);
         resultExp->false_list_id = label_list_key_gen++;
 
         // erase merged lists
-        list_of_labels.erase(node_a_false_id);         // erasing by key
-	    list_of_labels.erase(node_b_false_id);        // erasing by key
+        list_of_labels.erase(node_a->false_list_id);         // erasing by key
+	    list_of_labels.erase(node_b->false_list_id);        // erasing by key
 
 
         // if node_b true go to TrueList label
