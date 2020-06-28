@@ -99,7 +99,7 @@ ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
     // get short circuit label label_if_true_continue
     // TODO why need regsize and substring of nodea_llvmreg -1??
 
-    //regManager->andPatching(node_a, node_b, label);
+    regManager->andPatching(node_a, node_b, label);
     
     delete(node_a);
     delete(node_b);
@@ -395,7 +395,6 @@ void endProgram(){
 }
 
 LabelNode* ruleBranchLabel(){
-    regManager->emitToBuffer("br i1 @ , label @ , label @");
     return new LabelNode();
 }
 

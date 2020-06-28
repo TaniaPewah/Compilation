@@ -239,8 +239,10 @@ class Formals: public Node {
 class LabelNode: public Node {
     public:
     string label;
+    int location;
 
     LabelNode(): Node(NA){
+        location = regManager->emitToBuffer("br i1 @ , label @ , label @");
         label = regManager->createLabel();
     }
 }

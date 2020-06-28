@@ -210,6 +210,10 @@ private:
     string createLabel(){
         return codeBuffer.genLabel();
     }
+
+    void andPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
+        pair<int, BranchLabelIndex> *p = new pair<int, BranchLabelIndex>({label->location, FIRST});
+    }
 };
 
 #endif //IR_MANAGER_HPP
