@@ -207,7 +207,9 @@ private:
         codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_stay);
     }
 
-
+    string createLabel(){
+        return codeBuffer.genLabel();
+    }
 };
 
 #endif //IR_MANAGER_HPP
