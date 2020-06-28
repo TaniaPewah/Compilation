@@ -37,8 +37,8 @@ struct BackpatchInfo
 {
     /* data */
     int branch_location;
-    string lable_stay;
-    string lable_jump;
+    string lable_false;
+    string lable_true;
 };
 
 
@@ -192,19 +192,19 @@ private:
         patching_info.branch_location = emitToBuffer("br i1 " + zero_devision->getName() + ", label @, label @");
         
 
-        patching_info.lable_jump = codeBuffer.genLabel();
+        patching_info.lable_true = codeBuffer.genLabel();
         zeroError();
         
-        patching_info.lable_stay = codeBuffer.genLabel();
+        patching_info.lable_false = codeBuffer.genLabel();
 
         return patching_info;
     }
 
     void handlePatching(BackpatchInfo patching_info){
         pair<int, BranchLabelIndex>* p = new pair<int, BranchLabelIndex>({patching_info.branch_location, FIRST});
-        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_jump);
+        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_true);
         p = new pair<int, BranchLabelIndex>({patching_info.branch_location, SECOND});
-        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_stay);
+        codeBuffer.bpatch(codeBuffer.makelist(*p), patching_info.lable_false);
     }
 
     string createLabel(){
