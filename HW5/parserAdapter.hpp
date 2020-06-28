@@ -205,14 +205,6 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
         exit(0);
     }
     
-
-    // TODO 1. division by zero
-    // 2. result of MUL can be up to 64 bits
-
-    // zero_division_register = fresh_register;
-
-    // codeBuffer.emit(zero_division_register + " = icmp eq i8 " + $3->llvm_register + ", 0");
-    // int location = codeBuffer.emit("br i1 " + zero_division_register + ", label @, label @");
     BackpatchInfo patching_info;
     if(binop->binop == "sdiv"){
         patching_info = regManager->handlerDivZero(exp_b->type, exp_b->llvm_reg);
