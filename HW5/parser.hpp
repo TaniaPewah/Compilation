@@ -82,6 +82,9 @@ class ExpNode: public Node{
     public: 
     string type;
     string llvm_reg;
+    int true_list_id;
+    int false_list_id;
+
     ExpNode( int lineno, string type ) : Node(lineno), type(type)  {
         cout << " Expnode "<< endl;
         string regt = this->getFreshReg();

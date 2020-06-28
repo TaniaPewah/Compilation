@@ -285,11 +285,11 @@ Exp : LPAREN Exp RPAREN {
 		cout << "Exp AND Exp **********************" << endl; 
 		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
 		}
-	| Exp OR Exp {
+	| Exp OR MA Exp {
 		// Tania
 		printProductionRule(45); 
 		cout << "Exp OR Exp **********************" << endl; 
-		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$3);
+		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
 		}
 	| Exp RELOPLEFT Exp {
 		printProductionRule(46); 

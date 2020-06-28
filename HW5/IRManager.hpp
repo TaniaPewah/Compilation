@@ -5,6 +5,7 @@
 using namespace std;
 #include <iostream>
 #include <string>
+#include <unordered_map> 
 #include "bp.hpp"
 
 
@@ -49,9 +50,13 @@ private:
     int global_register_index = 0;
     int stack_offset_pointer = 0;
     CodeBuffer& codeBuffer = CodeBuffer::instance();
+    unordered_map<int, vector<pair<int,BranchLabelIndex>>> list_of_labels;
+    int label_list_key_gen = 0;
 
    // Private constructor so that no objects can be created.
-   IRManager() {  }
+   IRManager() { 
+       list_of_labels = unordered_map<int, vector<pair<int,BranchLabelIndex>>>();
+    }
 
    public:
     IRManager(IRManager const&)       = delete;
@@ -211,38 +216,54 @@ private:
         return codeBuffer.genLabel();
     }
 
-    void andPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MAlabel ){
+    void andPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MAlabel, ExpNode* resultExp){
 
         // if node_a true go to MAlabel
+        codeBuffer.bpatch(list_of_labels[node_a->true_list_id], MAlabel->label);
+
+        // erase the bpached list
+        list_of_labels.erase(node_a->true_list_id);
+
         // if node_a false go to FalseList label
-        // if node_b true go to TrueList label
         // if node_b false go to FalseList label
 
-        BackpatchInfo patching_info;
-        patching_info.branch_location = MAlabel->location;
-        patching_info.label_true = MAlabel->label;
+        // merge false lists of node_a node_b
+        list_of_labels[label_list_key_gen] = codeBuffer.merge(list_of_labels[node_a->false_list_id], 
+                                                              list_of_labels[node_b->false_list_id]);
+        resultExp->false_list_id = label_list_key_gen++;
 
-        //
+        // erase merged lists
+        list_of_labels.erase(node_a->false_list_id);         // erasing by key
+	    list_of_labels.erase(node_b->false_list_id);        // erasing by key
 
-        handlePatching(patching_info);
 
+        // if node_b true go to TrueList label
+
+        // the new truelist id is the right exp truelist
+        // TODO check where node_b->true_list_id is initiallized
+	    resultExp->true_list_id = node_b->true_list_id;
     }
 
-    void orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel ){
+    void orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel, ExpNode* resultExp){
+        // if node_a false go to MOlabel label
+        codeBuffer.bpatch(list_of_labels[node_a->false_list_id], MOlabel->label);
+        
+        // erase the bpached list
+        list_of_labels.erase(node_a->false_list_id);
 
         // if node_a true go to TrueList label
-        // if node_a false go to MOlabel label
         // if node_b true go to TrueList label
+        list_of_labels[label_list_key_gen] = codeBuffer.merge(list_of_labels[node_a->true_list_id], 
+                                                              list_of_labels[node_b->true_list_id]);
+        resultExp->true_list_id = label_list_key_gen++;
+
+        // erase merged lists
+        list_of_labels.erase(node_a->true_list_id);         // erasing by key
+	    list_of_labels.erase(node_b->true_list_id);        // erasing by key
+        
         // if node_b false go to FalseList label
-
-
-        BackpatchInfo patching_info;
-        patching_info.branch_location = MOlabel->location;
-        patching_info.label_true = MOlabel->label;
-
-        //
-
-        handlePatching(patching_info);
+        // the new falselist id is the right exp falselist
+        resultExp->false_list_id = node_b->false_list_id;
 
     }
 };

@@ -99,15 +99,26 @@ ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
     // get short circuit label label_if_true_continue
     // TODO why need regsize and substring of nodea_llvmreg -1??
 
-    regManager->andPatching(node_a, node_b, label);
+    regManager->andPatching(node_a, node_b, label, new_exp_node);
     
     delete(node_a);
     delete(node_b);
     return new_exp_node;
 }
 
-ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b){
-    return ruleAndExp(node_a, node_b);
+ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b,  LabelNode* label){
+    if(node_a->type != "bool" || node_b->type != "bool") {
+        output::errorMismatch(node_a->lineno);
+        exit(0);
+    }
+
+    ExpNode* new_exp_node = new ExpNode(node_a->lineno, "bool");
+
+    regManager->orPatching(node_a, node_b, label, new_exp_node);
+    delete(node_a);
+    delete(node_b);
+    
+    return new_exp_node;
 }
 
 ExpNode* ruleNotExp(ExpNode* node) {
