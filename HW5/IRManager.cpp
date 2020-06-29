@@ -260,3 +260,26 @@ void IRManager::expPassListNotRule(ExpNode* old_node, ExpNode* new_node){
     new_node->true_list_id = old_node ->false_list_id;
     return;
 }
+
+void IRManager::expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* exp2, RelopNode* compare_sign){
+    string exp1_i32_register = fromI8RegisterToI32Register(exp1->type, exp1->llvm_reg);
+    string exp2_i32_register = fromI8RegisterToI32Register(exp2->type, exp2->llvm_reg);
+    
+    emitToBuffer(compare->llvm_reg + " = icmp " + compare_sign->relop_sign + " i32 " + 
+    exp1_i32_register + ", " + exp2_i32_register);
+
+    int branch_location = emitToBuffer("br i1 " + compare->llvm_reg + ", label @, label @");
+	
+	// make a new truelist
+	vector<pair<int,BranchLabelIndex>> true_list = codeBuffer.makelist({branch_location,FIRST});
+	list_of_labels[label_list_key_gen] = true_list;
+	compare->true_list_id = label_list_key_gen;
+    label_list_key_gen++;
+	
+	// make a new falselist
+	vector<pair<int,BranchLabelIndex>> false_list = codeBuffer.makelist({branch_location,SECOND});
+	list_of_labels[label_list_key_gen] = false_list;
+	compare->false_list_id = label_list_key_gen;
+    label_list_key_gen++;
+    return;
+}

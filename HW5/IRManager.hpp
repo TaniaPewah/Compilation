@@ -11,6 +11,7 @@ using namespace std;
 class VarNode;
 class ExpNode;
 class LabelNode;
+class RelopNode;
 
 
 class Register {
@@ -89,6 +90,7 @@ public:
     void orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel, ExpNode* resultExp);
     void createFalseListAndTrueList(ExpNode* bool_node, string bool_sign);
     void expPassListNotRule(ExpNode* old_node, ExpNode* new_node);
+    void expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* exp2, RelopNode* compare_sign);
 
 };
 

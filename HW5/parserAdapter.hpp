@@ -129,6 +129,7 @@ ExpNode* ruleNotExp(ExpNode* node) {
 
     ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
     regManager->emitToBuffer(new_exp_node->llvm_reg + " = add i1 1, " + node->llvm_reg);
+    
     regManager->expPassListNotRule(node, new_exp_node);
 
     return new_exp_node;
@@ -360,11 +361,7 @@ ExpNode* ruleRelop(ExpNode* exp1, RelopNode* compare_sign, ExpNode* exp2){
 
     ExpNode* compare = new ExpNode(exp1->lineno, "bool");
 
-    string exp1_i32_register = regManager->fromI8RegisterToI32Register(exp1->type, exp1->llvm_reg);
-    string exp2_i32_register = regManager->fromI8RegisterToI32Register(exp2->type, exp2->llvm_reg);
-    
-    regManager->emitToBuffer(compare->llvm_reg + " = icmp " + compare_sign->relop_sign + " i32 " + 
-    exp1_i32_register + ", " + exp2_i32_register);
+    regManager->expRelopExpCreateBr(compare, exp1, exp2, compare_sign);
     
     return compare;
 }
