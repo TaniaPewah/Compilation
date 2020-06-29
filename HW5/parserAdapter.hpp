@@ -375,7 +375,7 @@ StatementNode* ruleHandleIfNoElse( ExpNode* if_cond_exp , LabelNode* marker, Sta
        exit(0); 
     }
 
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ruleHandleIfNoElse";
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ruleHandleIfNoElse"<< endl;
 
     StatementNode* result =  new StatementNode();
     regManager->patchIf(if_cond_exp, marker, statement, result);

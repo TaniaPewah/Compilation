@@ -288,7 +288,7 @@ void IRManager::expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* ex
 void IRManager::patchIf( ExpNode* if_cond_exp , LabelNode* marker, 
                         StatementNode* statement, StatementNode* result_state ){
 
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::patchIf";
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::patchIf"<< endl;
     // if if_cond_exp true go to marker label
     codeBuffer.bpatch(list_of_labels[if_cond_exp->true_list_id], marker->label);
     // erase the bpached list
@@ -306,7 +306,7 @@ void IRManager::patchIf( ExpNode* if_cond_exp , LabelNode* marker,
 }
 
 void IRManager::goToNext( StatementNode* returned ){
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::goToNext";
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::goToNext"<< endl;
     int branch_location = emitToBuffer("br label @");
     vector<pair<int,BranchLabelIndex>> next_list = codeBuffer.makelist({branch_location, FIRST});
 	list_of_labels[label_list_key_gen] = next_list;
