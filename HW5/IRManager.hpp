@@ -58,6 +58,9 @@ public:
     CodeBuffer& codeBuffer = CodeBuffer::instance();
     unordered_map<int, vector<pair<int,BranchLabelIndex>>> list_of_labels;
     int label_list_key_gen = 0;
+    int loop_counter = 0;
+    vector<vector<pair<int,BranchLabelIndex>>> break_list;
+	vector<vector<pair<int,BranchLabelIndex>>> continue_list;
 
    // Private constructor so that no objects can be created.
    IRManager() { 
@@ -97,7 +100,9 @@ public:
                            StatementNode* if_statement, StatementNode* go_to_else, 
                            LabelNode* marker_else_st, StatementNode* else_statement, StatementNode* result_state );
     void goToNext( StatementNode* returned );
-    void patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker, LabelNode* after_exp_marker, ExpNode* exp_node, StatementNode* returned_statment );
+    void patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,
+     LabelNode* after_exp_marker, ExpNode* exp_node, StatementNode* returned_statment, LabelNode* end_lable );
+    void handleBreake();
 };
 
 #endif //IR_MANAGER_HPP

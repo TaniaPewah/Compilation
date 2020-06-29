@@ -160,14 +160,14 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			   symbolTable.closeScope();
 			  }
 
-		  |   WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement %prec NO_ELSE { 
+		  |   WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement JMA %prec NO_ELSE { 
 			  	printProductionRule(23); 
 
-				$$ = ruleWhileNoElse((StatementNode*)$8, (LabelNode*)$2, (LabelNode*)$7, (ExpNode*)$5 );
+				$$ = ruleWhileNoElse((StatementNode*)$8, (LabelNode*)$2, (LabelNode*)$7, (ExpNode*)$5, (LableNode*)$9 );
 				symbolTable.closeScope();
 			  }
 
-		  |  WHILE JMA LPAREN  ENTERLOOP Exp RPAREN JMA Statement ELSE NEWSCOPECREATION Statement { 
+		  |  WHILE JMA LPAREN  ENTERLOOP Exp RPAREN JMA Statement ELSE NEWSCOPECREATION Statement JMA { 
 			  printProductionRule(24); 
 			  symbolTable.closeScope();
 			  }
