@@ -106,9 +106,13 @@ FormalDecl : Type ID {
 	};
 Statements : Statement {
 				printProductionRule(12); 
+				$$ = ruleStatements((StatementNode*)$1);
 				}
-		   | Statements Statement { 
-				printProductionRule(13);
+
+		   | Statements JMA Statement {
+			   printProductionRule(13);
+			   	$$ = rulePatchStatements((StatementNode*)$1, (LabelNode*)$2, (StatementNode*)$3);
+				
 				}
 		   ;
 

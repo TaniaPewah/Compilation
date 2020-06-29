@@ -107,6 +107,7 @@ public:
                                    StatementNode* statment_node, StatementNode* returned);
     void handleBreake();
     void enterLoop();
+    void handleContinue();
 
 };
 
