@@ -412,6 +412,14 @@ StatementNode* ruleIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st,
     return result;
 }
 
+StatementNode* ruleStatements(StatementNode* statements_node){
+
+    StatementNode* result =  new StatementNode();
+
+    result->next_list_id = statements_node->next_list_id;
+    return result;
+}
+
 void checkMain(){
     if (!symbolTable.hasMain()) {
 		output::errorMainMissing();
@@ -461,6 +469,15 @@ StatementNode* ruleWhileNoElse( StatementNode* statment_node, LabelNode* before_
     regManager->patchWhileNoElse(statment_node, before_exp_marker, after_exp_marker, exp_node, returned, end_lable);
 
     return returned;
+}
+
+StatementNode* rulePatchStatements(StatementNode* statments_node, LabelNode* before_statement_marker, 
+                                   StatementNode* statment_node){
+
+    StatementNode* returned = new StatementNode();
+
+    regManager->patchStatements(statments_node, before_statement_marker, statment_node, returned);
+    return returned;                                   
 }
 
 #endif //PARSER_ADAPTER_HPP

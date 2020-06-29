@@ -105,15 +105,18 @@ FormalDecl : Type ID {
 	printProductionRule(11); 
 	};
 Statements : Statement {
+				$$ = ruleStatements((StatementNode*)$1);
 				printProductionRule(12); 
 				}
-		   | Statements Statement { 
+		   | Statements JMA Statement {
+			   	rulePatchStatements((StatementNode*)$1, (LabelNode*)$2, (StatementNode*)$3);
 				printProductionRule(13);
 				}
 		   ;
 
 Statement : LBRACE NEWSCOPECREATION Statements RBRACE { 
 			printProductionRule(14); 
+			$$ = ruleStatements((StatementNode*)$3);
 			symbolTable.closeScope();
 			}
 		  | Type ID SC { 
