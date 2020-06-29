@@ -332,6 +332,25 @@ void IRManager::patchIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st,
     list_of_labels.erase(else_statement->next_list_id);
 }
 
+
+void IRManager::patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,LabelNode* after_exp_marker,
+ ExpNode* exp_node , StatementNode* returned_statment){
+
+     codeBuffer.bpatch(list_of_labels[statment_node->next_list_id], before_exp_marker->label);
+    // erase the bpached list
+    list_of_labels.erase(statment_node->next_list_id);
+
+    codeBuffer.bpatch(list_of_labels[exp_node->true_list_id], after_exp_marker->label);
+    // erase the bpached list
+    list_of_labels.erase(exp_node->true_list_id);
+
+    returned_statment->next_list_id = exp_node->false_list_id;
+
+    emitToBuffer("br label " + before_exp_marker->label);
+
+    return;
+}
+
 void IRManager::goToNext( StatementNode* returned ){
     cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::goToNext"<< endl;
     int branch_location = emitToBuffer("br label @");
@@ -340,3 +359,5 @@ void IRManager::goToNext( StatementNode* returned ){
 	returned->next_list_id = label_list_key_gen;
     label_list_key_gen++;
 }
+
+                        

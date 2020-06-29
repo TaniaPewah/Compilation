@@ -160,14 +160,18 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			   symbolTable.closeScope();
 			  }
 
-		  |  whileScope %prec NO_ELSE { 
-			  printProductionRule(23); 
+		  |   WHILE JMA LPAREN {in_while++;}  NEWSCOPECREATION Exp RPAREN JMA Statement %prec NO_ELSE { 
+			  	printProductionRule(23); 
+			  	in_while--;
+
+				$$ = ruleWhileNoElse((StatementNode*)$9, (LabelNode*)$2, (LabelNode*)$8, (ExpNode*)$6 );
+				symbolTable.closeScope();
 			  }
 
-		  | whileScope ELSE NEWSCOPECREATION Statement { 
-			  printProductionRule(24); 
-			  symbolTable.closeScope();
-			  }
+	//	  |  WHILE JMA LPAREN {in_while++;} NEWSCOPECREATION Exp RPAREN JMA Statement ELSE NEWSCOPECREATION Statement { 
+	//		  printProductionRule(24); 
+	//		  symbolTable.closeScope();
+	//		  }
 
 		  | BREAK SC { 
 			  printProductionRule(25); 
@@ -179,14 +183,6 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  }
 		  ;
 
-
-
-whileScope : WHILE LPAREN {in_while++;} JMA NEWSCOPECREATION Exp RPAREN Statement {
-	in_while--;
-	//ruleIfNoElse( (ExpNode*)$5 , (LabelNode*)$4, (StatementNode*)$8 );
-	symbolTable.closeScope();
-}
-;
 
 Call : ID LPAREN {
 	 ruleAllowString((IdNode*)$1);} ExpList RPAREN { 

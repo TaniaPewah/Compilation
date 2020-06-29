@@ -440,4 +440,13 @@ StatementNode* ruleNextJump(){
     return returned;
 }
 
+StatementNode* ruleWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,
+                     LabelNode* after_exp_marker, ExpNode* exp_node ){
+    StatementNode* returned = new StatementNode();
+
+    regManager->patchWhileNoElse(statment_node, before_exp_marker, after_exp_marker, exp_node, returned);
+
+    return returned;
+}
+
 #endif //PARSER_ADAPTER_HPP

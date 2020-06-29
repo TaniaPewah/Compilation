@@ -97,6 +97,7 @@ public:
                            StatementNode* if_statement, StatementNode* go_to_else, 
                            LabelNode* marker_else_st, StatementNode* else_statement, StatementNode* result_state );
     void goToNext( StatementNode* returned );
+    void patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker, LabelNode* after_exp_marker, ExpNode* exp_node, StatementNode* returned_statment );
 };
 
 #endif //IR_MANAGER_HPP
