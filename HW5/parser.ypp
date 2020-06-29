@@ -148,15 +148,16 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  printProductionRule(20);
 			  ruleReturnNonVoid($1, (ExpNode*)$2);
 			  }
-		  | IfScope %prec NO_ELSE { 
+		  | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE NJ %prec NO_ELSE { 	
 			  printProductionRule(21); 
-			  $$ = (StatementNode*)$1;
-			  }
+			  $$ = ruleIfNoElse( (ExpNode*)$3, (LabelNode*)$5, (StatementNode*)$7 );
+			}
 
-          | IfScope ELSE JMA NEWSCOPECREATION Statement { 
-			  printProductionRule(22); 
-			  symbolTable.closeScope();
-			  $$ = $2;
+          | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE NJ ELSE JMA NEWSCOPECREATION Statement {
+			   printProductionRule(22); 
+			   $$ = ruleIfElse( (ExpNode*)$3, (LabelNode*)$5, (StatementNode*)$7, 
+			   						  (StatementNode*)$9,  (LabelNode*)$11, (StatementNode*)$13); 
+			   symbolTable.closeScope();
 			  }
 
 		  |  whileScope %prec NO_ELSE { 
@@ -178,14 +179,11 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  }
 		  ;
 
-IfScope : IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE NJ {
-	$$ = ruleHandleIfNoElse( (ExpNode*)$3, (LabelNode*)$5, (StatementNode*)$7 );
-}
-;
+
 
 whileScope : WHILE LPAREN {in_while++;} JMA NEWSCOPECREATION Exp RPAREN Statement {
 	in_while--;
-	ruleHandleIfNoElse( (ExpNode*)$5 , (LabelNode*)$4, (StatementNode*)$8 );
+	//ruleIfNoElse( (ExpNode*)$5 , (LabelNode*)$4, (StatementNode*)$8 );
 	symbolTable.closeScope();
 }
 ;

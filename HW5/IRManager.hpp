@@ -93,6 +93,9 @@ public:
     void expPassListNotRule(ExpNode* old_node, ExpNode* new_node);
     void expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* exp2, RelopNode* compare_sign);
     void patchIf( ExpNode* if_cond_exp , LabelNode* marker, StatementNode* statement, StatementNode* result_state );
+    void patchIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st, 
+                           StatementNode* if_statement, StatementNode* go_to_else, 
+                           LabelNode* marker_else_st, StatementNode* else_statement, StatementNode* result_state );
     void goToNext( StatementNode* returned );
 };
 

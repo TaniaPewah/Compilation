@@ -369,16 +369,33 @@ ExpNode* ruleRelop(ExpNode* exp1, RelopNode* compare_sign, ExpNode* exp2){
 }
 
 
-StatementNode* ruleHandleIfNoElse( ExpNode* if_cond_exp , LabelNode* marker, StatementNode* statement ){
+StatementNode* ruleIfNoElse( ExpNode* if_cond_exp , LabelNode* marker, StatementNode* statement ){
     if(if_cond_exp->type != "bool"){
        output::errorMismatch(if_cond_exp->lineno);
        exit(0); 
     }
 
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ruleHandleIfNoElse"<< endl;
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ruleIfNoElse"<< endl;
 
     StatementNode* result =  new StatementNode();
     regManager->patchIf(if_cond_exp, marker, statement, result);
+
+    return result;
+}
+
+StatementNode* ruleIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st, 
+                           StatementNode* if_statement, StatementNode* go_to_else, 
+                           LabelNode* marker_else_st, StatementNode* else_statement ){
+    if(if_cond_exp->type != "bool"){
+       output::errorMismatch(if_cond_exp->lineno);
+       exit(0); 
+    }
+
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ruleIfNoElse"<< endl;
+
+    StatementNode* result =  new StatementNode();
+    regManager->patchIfElse(if_cond_exp, marker_if_st, if_statement, go_to_else, 
+                            marker_else_st, else_statement,result);
 
     return result;
 }
