@@ -129,6 +129,8 @@ ExpNode* ruleNotExp(ExpNode* node) {
 
     ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
     regManager->emitToBuffer(new_exp_node->llvm_reg + " = add i1 1, " + node->llvm_reg);
+    regManager->expPassListNotRule(node, new_exp_node);
+
     return new_exp_node;
 }
 

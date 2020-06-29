@@ -254,3 +254,9 @@ void IRManager::createFalseListAndTrueList(ExpNode* bool_node, string bool_sign)
     cout <<" node_a truelist: " << bool_node->true_list_id << endl;
 	
 }
+
+void IRManager::expPassListNotRule(ExpNode* old_node, ExpNode* new_node){
+    new_node->false_list_id = old_node->true_list_id;
+    new_node->true_list_id = old_node ->false_list_id;
+    return;
+}

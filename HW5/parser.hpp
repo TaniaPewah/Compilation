@@ -85,7 +85,7 @@ class ExpNode: public Node{
     int true_list_id;
     int false_list_id;
 
-    ExpNode( int lineno, string type ) : Node(lineno), type(type)  {
+    ExpNode( int lineno, string type ) : Node(lineno), type(type), true_list_id(-1), false_list_id(-1)  {
         cout << " Expnode "<< endl;
         string regt = this->getFreshReg();
         cout << " Expnode, calling freshreg: " << regt << endl;
@@ -93,7 +93,7 @@ class ExpNode: public Node{
         cout<< "llvm reg is: "<< llvm_reg << endl;
     };
     
-    ExpNode(int lineno, string type, string llvm_reg) : Node(lineno), type(type), llvm_reg(llvm_reg) {
+    ExpNode(int lineno, string type, string llvm_reg) : Node(lineno), type(type), llvm_reg(llvm_reg), true_list_id(-1), false_list_id(-1) {
         cout << "created new exp node, with givven register " << llvm_reg << endl;
     }
 };
