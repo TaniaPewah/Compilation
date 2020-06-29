@@ -106,6 +106,7 @@ ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
 }
 
 ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b,  LabelNode* label){
+    cout << "handling ruleOrExp function" << endl;
     if(node_a->type != "bool" || node_b->type != "bool") {
         output::errorMismatch(node_a->lineno);
         exit(0);
@@ -279,8 +280,15 @@ ExpNode* ruleExpNumB(NumNode* num) {
 
 
 ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
-    string command = bool_node->llvm_reg + " = add i1 0, " + bool_sign;
-    regManager->emitToBuffer(command);
+    if(bool_sign == "1"){
+        cout << "now handling true with register " << bool_node->llvm_reg << endl;
+    }
+    else{
+        cout << "now handling false with register " << bool_node->llvm_reg << endl;
+    }
+    regManager->emitToBuffer(bool_node->llvm_reg + " = add i1 0, " + bool_sign);
+
+    regManager->createFalseListAndTrueList(bool_node, bool_sign);
     
     return (bool_node);
 }
@@ -397,6 +405,7 @@ void endProgram(){
 }
 
 LabelNode* ruleBranchLabel(){
+    cout << "in OR marker" << endl;
     return new LabelNode();
 }
 

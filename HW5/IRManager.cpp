@@ -166,7 +166,6 @@ string IRManager::createLabel(){
 
 void IRManager::andPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MAlabel, ExpNode* resultExp){
 
-    
     // if node_a true go to MAlabel
     codeBuffer.bpatch(list_of_labels[node_a->true_list_id], MAlabel->label);
 
@@ -205,7 +204,9 @@ void IRManager::orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel
     // erase the bpached list
     list_of_labels.erase(node_a->false_list_id);
 
-    cout << "merging OR true lists" << endl;
+    cout << "merging OR true lists:" << endl;
+    cout <<" node_a truelist: " << node_a->true_list_id << endl;
+    cout <<" node_b truelist: " << node_b->true_list_id << endl;
 
     // if node_a true go to TrueList label
     // if node_b true go to TrueList label
@@ -224,8 +225,32 @@ void IRManager::orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel
     // codeBuffer.emit(or_register + " = phi i1 [ 0 , %" + label_false + "], [ 1 , %" + label_true + "]");
 
     }
-};
 
 
+void IRManager::createFalseListAndTrueList(ExpNode* bool_node, string bool_sign){
+        
+    int br_command_location = emitToBuffer("br label @");
+	vector<pair<int,BranchLabelIndex>> false_list;
+    vector<pair<int,BranchLabelIndex>> true_list;
 
+    if(bool_sign == "1"){
+        // we don't really need false_list
+        false_list = vector<pair<int,BranchLabelIndex>>();
+        true_list = codeBuffer.makelist({br_command_location,FIRST});
+    }else{
+        // we don't really need true_list
+        true_list = vector<pair<int,BranchLabelIndex>>();
+        false_list = codeBuffer.makelist({br_command_location,FIRST}); 
+    }
+
+    list_of_labels[label_list_key_gen] = true_list;
+    bool_node->true_list_id = label_list_key_gen;
+    label_list_key_gen++;
+
+    list_of_labels[label_list_key_gen] = false_list;
+    bool_node->false_list_id = label_list_key_gen;
+    label_list_key_gen++;
+
+    cout <<" node_a truelist: " << bool_node->true_list_id << endl;
+	
 }

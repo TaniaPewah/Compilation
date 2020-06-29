@@ -87,6 +87,7 @@ public:
     string createLabel();
     void andPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MAlabel, ExpNode* resultExp);
     void orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel, ExpNode* resultExp);
+    void createFalseListAndTrueList(ExpNode* bool_node, string bool_sign);
 
 };
 
