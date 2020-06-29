@@ -153,7 +153,7 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  $$ = (StatementNode*)$1;
 			  }
 
-          | IfScope NJ ELSE JMA NEWSCOPECREATION Statement { 
+          | IfScope ELSE JMA NEWSCOPECREATION Statement { 
 			  printProductionRule(22); 
 			  symbolTable.closeScope();
 			  $$ = $2;
@@ -178,7 +178,7 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  }
 		  ;
 
-IfScope : IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE {
+IfScope : IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE NJ {
 	$$ = ruleHandleIfNoElse( (ExpNode*)$3, (LabelNode*)$5, (StatementNode*)$7 );
 }
 ;
