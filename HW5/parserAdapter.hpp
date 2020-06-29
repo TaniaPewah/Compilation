@@ -7,7 +7,6 @@
 SymbolTable symbolTable;
 string current_func = "";
 bool call_print = false;
-int in_while = 0;
 IRManager* regManager = IRManager::getInstance();
 
 VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
@@ -23,6 +22,16 @@ void ruleAllowString(IdNode* id){
     }
 }
 
+void enterWhile(){
+    symbolTable.in_while++;
+    symbolTable.newScope();
+    // add break & countinue;
+}
+
+void exitWhile(){
+    symbolTable.in_while--;
+}
+
 
 ExpNode* ruleHandleString(StringNode* string_node){
     if(!call_print){
@@ -36,7 +45,7 @@ ExpNode* ruleHandleString(StringNode* string_node){
 }
 
 void ruleContinueCheck(Node* continue_sign) {
-    if(in_while <= 0){
+    if(symbolTable.in_while <= 0){
         output::errorUnexpectedContinue(continue_sign->lineno);
         exit(0);
     }
@@ -45,7 +54,7 @@ void ruleContinueCheck(Node* continue_sign) {
 
 
 void ruleBreakCheck(Node* break_sign){
-    if(in_while <= 0){
+    if(symbolTable.in_while <= 0){
         output::errorUnexpectedBreak(break_sign->lineno);
         exit(0);
     }
@@ -450,6 +459,8 @@ StatementNode* ruleNextJump(){
 
 StatementNode* ruleWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,
                      LabelNode* after_exp_marker, ExpNode* exp_node ){
+
+    exitWhile();
     StatementNode* returned = new StatementNode();
 
     regManager->patchWhileNoElse(statment_node, before_exp_marker, after_exp_marker, exp_node, returned);

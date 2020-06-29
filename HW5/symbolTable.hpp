@@ -93,6 +93,7 @@ class SymbolTable {
 public:
     vector <Scope*> stack;
     bool has_main = false;
+    int in_while = 0;
 
     SymbolTable() {}
 
