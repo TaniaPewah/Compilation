@@ -105,7 +105,7 @@ public:
     ExpNode* exp_node, StatementNode* returned_statment);
     void patchStatements( StatementNode* statments_node, LabelNode* before_statement_marker, 
                                    StatementNode* statment_node, StatementNode* returned);
-    void handleBreake();
+    void handleBreak();
     void enterLoop();
     void handleContinue();
 
