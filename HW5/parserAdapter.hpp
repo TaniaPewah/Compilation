@@ -49,6 +49,8 @@ void ruleContinueCheck(Node* continue_sign) {
         output::errorUnexpectedContinue(continue_sign->lineno);
         exit(0);
     }
+
+    regManager->handleContinue();
     delete(continue_sign);
 }
 
@@ -59,7 +61,7 @@ void ruleBreakCheck(Node* break_sign){
         exit(0);
     }
 
-    regManager->handleBreake();
+    regManager->handleBreak();
 
     delete(break_sign);
 }

@@ -360,9 +360,14 @@ void IRManager::patchWhileNoElse( StatementNode* statment_node, LabelNode* befor
     return;
 }
 
-void IRManager::handleBreake(){
+void IRManager::handleBreak(){
     int br_location = emitToBuffer("br label @");
     break_list[loop_counter - 1].push_back({br_location, FIRST});
+}
+
+void IRManager::handleContinue(){
+    int br_location = emitToBuffer("br label @");
+    continue_list[loop_counter - 1].push_back({br_location, FIRST});
 }
 
 void IRManager::goToNext( StatementNode* returned ){
