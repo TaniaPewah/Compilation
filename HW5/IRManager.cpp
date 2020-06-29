@@ -336,7 +336,7 @@ void IRManager::patchIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st,
 void IRManager::patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,LabelNode* after_exp_marker,
  ExpNode* exp_node , StatementNode* returned_statment){
 
-     codeBuffer.bpatch(list_of_labels[statment_node->next_list_id], before_exp_marker->label);
+    codeBuffer.bpatch(list_of_labels[statment_node->next_list_id], before_exp_marker->label);
     // erase the bpached list
     list_of_labels.erase(statment_node->next_list_id);
 
@@ -358,6 +358,14 @@ void IRManager::goToNext( StatementNode* returned ){
 	list_of_labels[label_list_key_gen] = next_list;
 	returned->next_list_id = label_list_key_gen;
     label_list_key_gen++;
+}
+
+void IRManager::patchStatements( StatementNode* statments_node, LabelNode* before_statement_marker, 
+                                   StatementNode* statment_node, StatementNode* returned){
+    codeBuffer.bpatch(list_of_labels[statments_node->next_list_id], before_statement_marker->label);
+    // erase the bpached list
+    list_of_labels.erase(statments_node->next_list_id);
+    returned->next_list_id = statment_node->next_list_id;
 }
 
                         
