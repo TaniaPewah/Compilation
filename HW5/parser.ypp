@@ -150,11 +150,13 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  }
 		  | IfScope %prec NO_ELSE { 
 			  printProductionRule(21); 
+			  $$ = (StatementNode*)$1;
 			  }
 
-          | IfScope ELSE NEWSCOPECREATION Statement { 
+          | IfScope NJ ELSE JMA NEWSCOPECREATION Statement { 
 			  printProductionRule(22); 
 			  symbolTable.closeScope();
+			  $$ = $2;
 			  }
 
 		  |  whileScope %prec NO_ELSE { 
@@ -176,15 +178,14 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  }
 		  ;
 
-IfScope : IF LPAREN NEWSCOPECREATION Exp RPAREN Statement {
-	checkBoolExp( (ExpNode*)$4 );
-	symbolTable.closeScope();
+IfScope : IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE {
+	$$ = ruleHandleIfNoElse( (ExpNode*)$3, (LabelNode*)$5, (StatementNode*)$7 );
 }
 ;
 
-whileScope : WHILE LPAREN {in_while++;} NEWSCOPECREATION Exp RPAREN Statement {
+whileScope : WHILE LPAREN {in_while++;} JMA NEWSCOPECREATION Exp RPAREN Statement {
 	in_while--;
-	checkBoolExp( (ExpNode*)$5 );
+	ruleHandleIfNoElse( (ExpNode*)$5 , (LabelNode*)$4, (StatementNode*)$8 );
 	symbolTable.closeScope();
 }
 ;
@@ -225,10 +226,14 @@ Type	: INT { printProductionRule(31);
 		}
 		;
 
-MA : %empty {
+JMA : %empty {
 		$$ = ruleBranchLabel();
 	}
 	;
+
+NJ : %empty {
+	$$ = ruleNextJump();
+};
 
 Exp : LPAREN Exp RPAREN { 
 		printProductionRule(34); 
@@ -278,14 +283,12 @@ Exp : LPAREN Exp RPAREN {
 		printProductionRule(43); 
 		$$ = ruleNotExp((ExpNode*)$2);
 		}
-	| Exp AND MA Exp {
-		// Tania
+	| Exp AND JMA Exp {
 		printProductionRule(44); 
 		cout << "Exp AND Exp **********************" << endl; 
 		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
 		}
-	| Exp OR MA Exp {
-		// Tania
+	| Exp OR JMA Exp {
 		printProductionRule(45); 
 		cout << "Exp OR Exp **********************" << endl; 
 		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
@@ -304,6 +307,8 @@ Exp : LPAREN Exp RPAREN {
 	;
 
 NEWSCOPECREATION :  %empty { symbolTable.newScope(); };
+
+ENDSCOPE : %empty { symbolTable.closeScope(); };
 
 %%
 

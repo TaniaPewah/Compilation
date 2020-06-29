@@ -72,7 +72,7 @@ class NumNode: public TypeNode{
     string llvm_reg;
     int value;
     NumNode( int lineno, int value, string type ) : TypeNode(lineno, type), value(value) {
-        this->llvm_reg = this->getFreshReg();
+        llvm_reg = getFreshReg();
     };
 };
 
@@ -86,11 +86,7 @@ class ExpNode: public Node{
     int false_list_id;
 
     ExpNode( int lineno, string type ) : Node(lineno), type(type), true_list_id(-1), false_list_id(-1)  {
-        cout << " Expnode "<< endl;
-        string regt = this->getFreshReg();
-        cout << " Expnode, calling freshreg: " << regt << endl;
-        llvm_reg = regt;
-        cout<< "llvm reg is: "<< llvm_reg << endl;
+        llvm_reg = getFreshReg();
     };
     
     ExpNode(int lineno, string type, string llvm_reg) : Node(lineno), type(type), llvm_reg(llvm_reg), true_list_id(-1), false_list_id(-1) {
@@ -242,12 +238,19 @@ class Formals: public Node {
 class LabelNode: public Node {
     public:
     string label;
-    int location;
+    
 
     LabelNode(): Node(NA){
         IRManager* regManager = IRManager::getInstance();
-        location = regManager->emitToBuffer("br i1 @ , label @ , label @");
         label = regManager->createLabel();
+    }
+};
+
+class StatementNode: public Node {
+    public:
+    int next_list_id;
+
+    StatementNode(): Node(NA), next_list_id(-1){
     }
 };
 

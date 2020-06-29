@@ -162,7 +162,7 @@ VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> pa
     return current_node;
 }
 
-VarNode* ruleVarDecl( string type_name, IdNode* id_node) {
+StatementNode* ruleVarDecl( string type_name, IdNode* id_node) {
     string name = id_node->name;
 
     if( symbolTable.ifExists(name) ){
@@ -173,10 +173,11 @@ VarNode* ruleVarDecl( string type_name, IdNode* id_node) {
 	symbolTable.addSymbolVar( current_node );
 
     delete(id_node);
-    return current_node;
+    StatementNode* returned = new StatementNode();
+    return returned;
 }
 
-VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_node) {
+StatementNode* ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_node) {
     string name = id_node->name;
     VarNode* current_node = NULL;
 
@@ -192,7 +193,8 @@ VarNode* ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_node) 
     regManager->assignExpNodeToVar(current_node->llvm_reg, exp_node->llvm_reg, exp_node->type);
 
     delete(id_node);
-    return current_node;
+    StatementNode* returned = new StatementNode();
+    return returned;
 }
 
 
@@ -367,11 +369,18 @@ ExpNode* ruleRelop(ExpNode* exp1, RelopNode* compare_sign, ExpNode* exp2){
 }
 
 
-void checkBoolExp( ExpNode* if_cond_exp ){
+StatementNode* ruleHandleIfNoElse( ExpNode* if_cond_exp , LabelNode* marker, StatementNode* statement ){
     if(if_cond_exp->type != "bool"){
        output::errorMismatch(if_cond_exp->lineno);
        exit(0); 
     }
+
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ruleHandleIfNoElse";
+
+    StatementNode* result =  new StatementNode();
+    regManager->patchIf(if_cond_exp, marker, statement, result);
+
+    return result;
 }
 
 void checkMain(){
@@ -406,6 +415,12 @@ void endProgram(){
 LabelNode* ruleBranchLabel(){
     cout << "in OR marker" << endl;
     return new LabelNode();
+}
+
+StatementNode* ruleNextJump(){
+    StatementNode* returned = new StatementNode();
+    regManager->goToNext(returned);
+    return returned;
 }
 
 #endif //PARSER_ADAPTER_HPP

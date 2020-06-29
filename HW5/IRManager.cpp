@@ -283,3 +283,33 @@ void IRManager::expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* ex
     label_list_key_gen++;
     return;
 }
+
+
+void IRManager::patchIf( ExpNode* if_cond_exp , LabelNode* marker, 
+                        StatementNode* statement, StatementNode* result_state ){
+
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::patchIf";
+    // if if_cond_exp true go to marker label
+    codeBuffer.bpatch(list_of_labels[if_cond_exp->true_list_id], marker->label);
+    // erase the bpached list
+    list_of_labels.erase(if_cond_exp->true_list_id);
+
+    // if node_a true go to TrueList label
+    // if node_b true go to TrueList label
+    list_of_labels[label_list_key_gen] = codeBuffer.merge(list_of_labels[if_cond_exp->false_list_id], 
+                                                            list_of_labels[statement->next_list_id]);
+    result_state->next_list_id = label_list_key_gen++;
+
+    // erase merged lists
+    list_of_labels.erase(if_cond_exp->true_list_id);         // erasing by key
+    list_of_labels.erase(statement->next_list_id);        // erasing by key
+}
+
+void IRManager::goToNext( StatementNode* returned ){
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::goToNext";
+    int branch_location = emitToBuffer("br label @");
+    vector<pair<int,BranchLabelIndex>> next_list = codeBuffer.makelist({branch_location, FIRST});
+	list_of_labels[label_list_key_gen] = next_list;
+	returned->next_list_id = label_list_key_gen;
+    label_list_key_gen++;
+}

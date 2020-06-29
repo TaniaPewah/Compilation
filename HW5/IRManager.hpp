@@ -12,6 +12,7 @@ class VarNode;
 class ExpNode;
 class LabelNode;
 class RelopNode;
+class StatementNode;
 
 
 class Register {
@@ -91,7 +92,8 @@ public:
     void createFalseListAndTrueList(ExpNode* bool_node, string bool_sign);
     void expPassListNotRule(ExpNode* old_node, ExpNode* new_node);
     void expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* exp2, RelopNode* compare_sign);
-
+    void patchIf( ExpNode* if_cond_exp , LabelNode* marker, StatementNode* statement, StatementNode* result_state );
+    void goToNext( StatementNode* returned );
 };
 
 #endif //IR_MANAGER_HPP
