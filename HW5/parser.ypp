@@ -105,18 +105,15 @@ FormalDecl : Type ID {
 	printProductionRule(11); 
 	};
 Statements : Statement {
-				$$ = ruleStatements((StatementNode*)$1);
 				printProductionRule(12); 
 				}
-		   | Statements JMA Statement {
-			   	rulePatchStatements((StatementNode*)$1, (LabelNode*)$2, (StatementNode*)$3);
+		   | Statements Statement { 
 				printProductionRule(13);
 				}
 		   ;
 
 Statement : LBRACE NEWSCOPECREATION Statements RBRACE { 
 			printProductionRule(14); 
-			$$ = ruleStatements((StatementNode*)$3);
 			symbolTable.closeScope();
 			}
 		  | Type ID SC { 
@@ -163,14 +160,14 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			   symbolTable.closeScope();
 			  }
 
-		  |   WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement JMA %prec NO_ELSE { 
+		  |   WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement %prec NO_ELSE { 
 			  	printProductionRule(23); 
 
-				$$ = ruleWhileNoElse((StatementNode*)$8, (LabelNode*)$2, (LabelNode*)$7, (ExpNode*)$5, (LableNode*)$9 );
+				$$ = ruleWhileNoElse((StatementNode*)$8, (LabelNode*)$2, (LabelNode*)$7, (ExpNode*)$5 );
 				symbolTable.closeScope();
 			  }
 
-		  |  WHILE JMA LPAREN  ENTERLOOP Exp RPAREN JMA Statement ELSE NEWSCOPECREATION Statement JMA { 
+		  |  WHILE JMA LPAREN  ENTERLOOP Exp RPAREN JMA Statement ELSE JMA NEWSCOPECREATION Statement { 
 			  printProductionRule(24); 
 			  symbolTable.closeScope();
 			  }

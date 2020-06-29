@@ -23,9 +23,10 @@ void ruleAllowString(IdNode* id){
 }
 
 void enterWhile(){
-    regManager->loop_counter++;
     symbolTable.newScope();
-    // add break & countinue;
+
+    regManager->enterLoop();
+    
 }
 
 void exitWhile(){
@@ -461,12 +462,12 @@ StatementNode* ruleNextJump(){
 }
 
 StatementNode* ruleWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,
-                     LabelNode* after_exp_marker, ExpNode* exp_node, LabelNode* end_lable ){
+                     LabelNode* after_exp_marker, ExpNode* exp_node ){
 
     StatementNode* returned = new StatementNode();
 
     exitWhile();
-    regManager->patchWhileNoElse(statment_node, before_exp_marker, after_exp_marker, exp_node, returned, end_lable);
+    regManager->patchWhileNoElse(statment_node, before_exp_marker, after_exp_marker, exp_node, returned);
 
     return returned;
 }

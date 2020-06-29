@@ -334,7 +334,9 @@ void IRManager::patchIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st,
 
 
 void IRManager::patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,LabelNode* after_exp_marker,
- ExpNode* exp_node , StatementNode* returned_statment, LabelNode* end_label){
+ ExpNode* exp_node , StatementNode* returned_statment){
+
+     cout<<"in here1"<<endl;
 
     codeBuffer.bpatch(list_of_labels[statment_node->next_list_id], before_exp_marker->label);
     // erase the bpached list
@@ -348,15 +350,18 @@ void IRManager::patchWhileNoElse( StatementNode* statment_node, LabelNode* befor
 
     emitToBuffer("br label " + before_exp_marker->label);
 
+     
 
+    string end_label = codeBuffer.genLabel();
+    cout<<"in here2        loop counter: "<<loop_counter <<endl;
     // break branches should go to loop_end_label
-	codeBuffer.bpatch(break_list[loop_counter], end_label->label);
+	codeBuffer.bpatch(break_list[loop_counter], end_label);
 	break_list.pop_back();
-		
+		cout<<"in here3"<<endl;
 	// continue branches should go to cond_label
 	CodeBuffer::instance().bpatch(continue_list[loop_counter], before_exp_marker->label);
 	continue_list.pop_back();
-
+cout<<"in here4"<<endl;
     return;
 }
 
@@ -380,6 +385,12 @@ void IRManager::patchStatements( StatementNode* statments_node, LabelNode* befor
     // erase the bpached list
     list_of_labels.erase(statments_node->next_list_id);
     returned->next_list_id = statment_node->next_list_id;
+}
+
+void IRManager::enterLoop(){
+    loop_counter++;
+    break_list.push_back(vector<pair<int,BranchLabelIndex>>());
+	continue_list.push_back(vector<pair<int,BranchLabelIndex>>());
 }
 
                         

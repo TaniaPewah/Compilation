@@ -101,10 +101,12 @@ public:
                            LabelNode* marker_else_st, StatementNode* else_statement, StatementNode* result_state );
     void goToNext( StatementNode* returned );
 
-    void patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker, LabelNode* after_exp_marker, ExpNode* exp_node, StatementNode* returned_statment );
+    void patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker, LabelNode* after_exp_marker, 
+    ExpNode* exp_node, StatementNode* returned_statment);
     void patchStatements( StatementNode* statments_node, LabelNode* before_statement_marker, 
                                    StatementNode* statment_node, StatementNode* returned);
     void handleBreake();
+    void enterLoop();
 
 };
 
