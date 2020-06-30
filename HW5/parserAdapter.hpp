@@ -474,6 +474,17 @@ StatementNode* ruleWhileNoElse( StatementNode* statment_node, LabelNode* before_
     return returned;
 }
 
+StatementNode* ruleWhileElse ( LabelNode* cond_marker, ExpNode* exp_cond, LabelNode* while_block_marker, 
+                                StatementNode* while_state_block, StatementNode* go_to_cond, 
+										LabelNode* else_block_marker, StatementNode* else_state_block){
+
+    StatementNode * returned = new StatementNode();
+    regManager->patchWhileElse(cond_marker, exp_cond, while_block_marker, while_state_block, go_to_cond,
+                                  else_block_marker, else_state_block, returned);
+
+    return returned;                                       
+}
+
 StatementNode* rulePatchStatements(StatementNode* statments_node, LabelNode* before_statement_marker, 
                                    StatementNode* statment_node){
 

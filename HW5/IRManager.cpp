@@ -333,36 +333,61 @@ void IRManager::patchIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st,
 }
 
 
-void IRManager::patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,LabelNode* after_exp_marker,
+void IRManager::patchWhileNoElse( StatementNode* statment_node, LabelNode* cond_marker,LabelNode* while_block_marker,
  ExpNode* exp_node , StatementNode* returned_statment){
 
-     cout<<"in here1"<<endl;
-
-    codeBuffer.bpatch(list_of_labels[statment_node->next_list_id], before_exp_marker->label);
-    // erase the bpached list
+    codeBuffer.bpatch(list_of_labels[statment_node->next_list_id], cond_marker->label);
     list_of_labels.erase(statment_node->next_list_id);
 
-    codeBuffer.bpatch(list_of_labels[exp_node->true_list_id], after_exp_marker->label);
-    // erase the bpached list
+    codeBuffer.bpatch(list_of_labels[exp_node->true_list_id], while_block_marker->label);
     list_of_labels.erase(exp_node->true_list_id);
 
     returned_statment->next_list_id = exp_node->false_list_id;
 
-    emitToBuffer("br label " + before_exp_marker->label);
-
-     
+    emitToBuffer("br label " + cond_marker->label);
 
     string end_label = codeBuffer.genLabel();
-    cout<<"in here2        loop counter: "<<loop_counter <<endl;
+
     // break branches should go to loop_end_label
 	codeBuffer.bpatch(break_list[loop_counter], end_label);
 	break_list.pop_back();
-		cout<<"in here3"<<endl;
+
 	// continue branches should go to cond_label
-	CodeBuffer::instance().bpatch(continue_list[loop_counter], before_exp_marker->label);
+	CodeBuffer::instance().bpatch(continue_list[loop_counter], cond_marker->label);
 	continue_list.pop_back();
-cout<<"in here4"<<endl;
+
     return;
+}
+
+void IRManager::patchWhileElse ( LabelNode* cond_marker, 
+                          ExpNode* exp_cond, 
+                          LabelNode* while_block_marker, 
+                          StatementNode* while_state_block, 
+                          StatementNode* go_to_cond, 
+						  LabelNode* else_block_marker, 
+                          StatementNode* else_statement, 
+                          StatementNode* returned){
+
+    codeBuffer.bpatch(list_of_labels[while_state_block->next_list_id], while_block_marker->label);
+    list_of_labels.erase(while_state_block->next_list_id);
+
+    codeBuffer.bpatch(list_of_labels[exp_cond->true_list_id], while_block_marker->label);
+    list_of_labels.erase(exp_cond->true_list_id);
+
+    codeBuffer.bpatch(list_of_labels[exp_cond->false_list_id], else_block_marker->label);
+    list_of_labels.erase(exp_cond->false_list_id);
+
+     vector<pair<int,BranchLabelIndex>> temp = codeBuffer.merge(list_of_labels[while_state_block->next_list_id], 
+                                                               list_of_labels[go_to_cond->next_list_id]);
+
+    list_of_labels[label_list_key_gen] = codeBuffer.merge(temp, list_of_labels[else_statement->next_list_id]);                                                           
+               
+    returned->next_list_id = label_list_key_gen++;
+
+    // erase merged lists
+    list_of_labels.erase(while_state_block->next_list_id);  // erasing by key
+    list_of_labels.erase(go_to_cond->next_list_id);        // erasing by key
+    list_of_labels.erase(else_statement->next_list_id);
 }
 
 void IRManager::handleBreak(){

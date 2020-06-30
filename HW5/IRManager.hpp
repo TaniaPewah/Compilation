@@ -103,6 +103,16 @@ public:
 
     void patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker, LabelNode* after_exp_marker, 
     ExpNode* exp_node, StatementNode* returned_statment);
+    
+    void patchWhileElse ( LabelNode* cond_marker, 
+                          ExpNode* exp_cond, 
+                          LabelNode* while_block_marker, 
+                          StatementNode* while_state_block, 
+                          StatementNode* go_to_cond, 
+						  LabelNode* else_block_marker, 
+                          StatementNode* else_state_block, 
+                          StatementNode* returned);
+
     void patchStatements( StatementNode* statments_node, LabelNode* before_statement_marker, 
                                    StatementNode* statment_node, StatementNode* returned);
     void handleBreak();
