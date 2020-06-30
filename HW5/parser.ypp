@@ -171,7 +171,7 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 				symbolTable.closeScope();
 			  }
 
-		  |  WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement NJ ELSE JMA NEWSCOPECREATION Statement { 
+		  |  WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement ELSE NJ JMA NEWSCOPECREATION Statement { 
 				printProductionRule(24);  
 				$$ = ruleWhileElse((LabelNode*)$2, (ExpNode*)$5, (LabelNode*)$7, (StatementNode*)$8, (StatementNode*)$9, 
 										(LabelNode*)$11, (StatementNode*)$13);
