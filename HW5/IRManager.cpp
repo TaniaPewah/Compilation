@@ -459,4 +459,54 @@ void IRManager::startBoolJump(ExpNode* exp_node){
     emitToBuffer(exp_node->llvm_reg + " = phi i32 [1, %" + true_lable + "], [0, %" + false_lable + "]");
 }
 
+string _addFunctionSingleVar(ExpNode* current_node){
+    if(current_node->type == "string"){
+        return "i8* getelementptr inbounds ([" + ((StringNode*)current_node)->size + \
+         " x i8], [" + ((StringNode*)current_node)->size + " x i8]* @" + current_node->llvm_reg + ", i32 0, i32 0)";
+    }
+    else{
+        return "i32 %" + current_node->llvm_reg;
+    }
+}
+
+void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, ExpNode* returned_value){
+
+    //TODO: check this call function
+    cout << "I'M NOT SURE ABOUT THIS CALL FUNCTION!!!" << endl;
+
+    string call_start = "";
+    if(func_node->type == "void"){
+        call_start = "call void @" + func_node->name;
+    }else{
+        call_start = returned_value->llvm_reg + " = call i32 @";
+    }
+
+    string call_func_variables = "";
+    if(params_list->params.size() > 0){
+        call_func_variables = _addFunctionSingleVar(params_list->params[0]);
+        for(int i = 1; i < params_list->params.size(); i++){
+            call_func_variables += ", " + _addFunctionSingleVar(params_list->params[i]);
+        }
+    }
+
+    emitToBuffer(call_start + "(" + call_func_variables + ")");
+
+    // Check if the function is bool- and patc
+    if(func_node->type == "bool"){
+        Register* fresh_reg = getFreshReg();
+
+        emitToBuffer(fresh_reg->getName() + " = icmp eq i32 " + returned_value->llvm_reg + ", 1";
+
+       	int branch_location = emitToBuffer( "br i1 " + fresh_reg->getName() + ", label @, label @");
+		
+		list_of_labels[label_list_key_gen] = codeBuffer.makelist({branch_location,FIRST});
+		returned_value->true_list_id = label_list_key_gen;
+        label_list_key_gen++;
+		
+        list_of_labels[label_list_key_gen] = codeBuffer.makelist({branch_location,SECOND});
+		returned_value->false_list_id = label_list_key_gen;
+		label_list_key_gen++;
+    }
+}
+
                         

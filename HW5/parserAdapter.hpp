@@ -312,7 +312,7 @@ ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
 }
 
 
-TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
+ExpNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
     call_print = false;
     // search ID in symboltable, and get it's type
@@ -324,7 +324,11 @@ TypeNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
     // check whether the Exp list types are correct for this func else raise exception
     params_list->compareParams(func, func->params);
 
-    return (new TypeNode(id_node->lineno, returned_type )); 
+    ExpNode* returned_value = new ExpNode(id_node->lineno, returned_type);
+
+    regManager->handleCallFunction(func, params_list, returned_value);
+
+    return returned_value; 
 }
 
 TypeNode* ruleCallEmptyFunc(IdNode* id_node) {

@@ -13,6 +13,9 @@ class ExpNode;
 class LabelNode;
 class RelopNode;
 class StatementNode;
+class IdNode;
+class ExpList;
+class FuncNode;
 
 
 class Register {
@@ -121,6 +124,7 @@ public:
     void defineNewFunction(IdNode* id_node, string type, vector<VarNode*>* params);
 
     void startBoolJump(ExpNode* exp_node);
+    void handleCallFunction(FuncNode* func_node, ExpList* params_list, ExpNode* returned_value);
 
 };
 
