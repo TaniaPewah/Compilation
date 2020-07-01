@@ -151,11 +151,12 @@ ExpNode* ruleNotExp(ExpNode* node) {
 }
 
 void ruleFuncDeclEndFunc(){
+    regManager->emitToBuffer("}");
     current_func = "";
     symbolTable.closeScope();
 }
 
-VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> params) {
+FuncNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> params) {
 
     string name = id_node->name;
 
@@ -173,8 +174,12 @@ VarNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> pa
         symbolTable.addSymbolVarForFunction(params[i], 0 - i - 1 );
     }
     current_func = name;
+
+    regManager->defineNewFunction(id_node, type, &params);
+
     delete(id_node);
     return current_node;
+
 }
 
 StatementNode* ruleVarDecl( string type_name, IdNode* id_node) {
@@ -340,6 +345,10 @@ FormalsList* ruleAddFormals( FormalsList* params_list ,VarNode* param_to_add){
 }
 
 ExpList* ruleAddExp(ExpList* exp_list, ExpNode* exp){
+
+    if(exp->type == "bool") {
+        regManager->startBoolJump(exp);
+    }
 
     exp_list->addParam(exp);
     return exp_list;

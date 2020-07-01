@@ -413,4 +413,50 @@ void IRManager::definePrintAndPrinti() {
     emitToBuffer("define void @print(i8*) { call i32 (i8*, ...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0), i8* %0) ret void }");
 }
 
+void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>* params){
+    string llvm_function_type = "";
+    if(type == "void"){
+        llvm_function_type = "void";
+    } else{
+        llvm_function_type = "i32";
+    }
+    
+    string params_list = "";
+    if(params->size() > 0){
+        params_list += "i32";
+    }
+    for(int i = 0; i < params->size() - 1; i++){
+        params_list += ", i32";
+    }
+
+    //TODO: check how to add the parameters correctly!!
+    cout << "NOT SURE HOW TO ADD VARIABLES TO FUNCTION!!!" << endl;
+
+    emitToBuffer("define " + llvm_function_type + "@" + id_node->name + "(" + params_list + " { ");
+    emitToBuffer("%stack = alloca [50 x i32]");
+    
+}
+
+void IRManager::startBoolJump(ExpNode* exp_node){
+
+    // if true
+    string true_lable = codeBuffer.genLabel();
+    codeBuffer.bpatch(list_of_labels[exp_node->true_list_id], true_lable);
+    list_of_labels.erase(exp_node->true_list_id);
+    int true_branch_location = emitToBuffer("br label @");
+
+    //if false
+    string false_lable = codeBuffer.genLabel();
+    codeBuffer.bpatch(list_of_labels[exp_node->false_list_id], true_lable);
+    list_of_labels.erase(exp_node->false_list_id);
+    int false_branch_location = emitToBuffer("br label @");
+
+    //finally
+    string end_lable = codeBuffer.genLabel();
+    codeBuffer.bpatch(codeBuffer.makelist({true_branch_location, FIRST}), end_lable);
+    codeBuffer.bpatch(codeBuffer.makelist({false_branch_location, FIRST}), end_lable);
+
+    emitToBuffer(exp_node->llvm_reg + " = phi i32 [1, %" + true_lable + "], [0, %" + false_lable + "]");
+}
+
                         

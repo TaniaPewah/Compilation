@@ -118,6 +118,9 @@ public:
     void enterLoop();
     void handleContinue();
     void definePrintAndPrinti();
+    void defineNewFunction(IdNode* id_node, string type, vector<VarNode*>* params);
+
+    void startBoolJump(ExpNode* exp_node);
 
 };
 
