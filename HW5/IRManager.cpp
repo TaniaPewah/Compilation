@@ -95,36 +95,15 @@ void IRManager::loadID(string type, string reg, string id_name) {
     }
 }
 
-void IRManager::exitFunction(){
-    
-    string s;
-    s = "  %1 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.forPrintString, i32 0, i32 0), i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.str.1, i32 0, i32 0))\n"
-    "  call void @exit(i32 0) \n"
-    "  unreachable\n";
-    codeBuffer.emit(s);
-
-}
-
-void IRManager::zeroExit(){
-    
-    string s = "@.str.1 = private unnamed_addr constant [23 x i8] c\"Error division by zero\\00\"\n"
-            "\n"
-            "\n"
-            "define void @print_error_exit()  {\n"
-            "print_error_exit_entry:\n"
-            "  %0 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.forPrintString, i32 0, i32 0), i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.str.1, i32 0, i32 0))\n"
-            "  call void @exit(i32 0) \n"
-            "  unreachable\n"
-            "                                                  ; No predecessors!\n"
-            "  ret void\n"
-            "}";
-    codeBuffer.emitGlobal(s);
-}
 
 void IRManager::zeroError(){
     
-    codeBuffer.emit("call void @print_error_exit()");
-    codeBuffer.emit("unreachable");
+    emitGlobalToBuffer("@.zero_error  = constant [23 x i8] c\"Error division by zero\\00\"");
+
+    emitToBuffer("call void @print(i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.zero_error, i32 0, i32 0))");
+    emitToBuffer("call void @exit(i32 0)");
+    emitToBuffer("SHOULD NOT BE PRINTED");
+
 }
 
 
@@ -421,6 +400,17 @@ void IRManager::enterLoop(){
     loop_counter++;
     break_list.push_back(vector<pair<int,BranchLabelIndex>>());
 	continue_list.push_back(vector<pair<int,BranchLabelIndex>>());
+}
+
+void IRManager::definePrintAndPrinti() {
+    emitGlobalToBuffer("@.str_specifier = internal constant [4 x i8] c\"%s\\0A\\00\"");
+    emitGlobalToBuffer("@.int_specifier = internal constant [4 x i8] c\"%d\\0A\\00\"");
+    
+    emitGlobalToBuffer("declare void @exit(i32) ");
+    emitGlobalToBuffer("declare i32 @printf(i8*, ...)");
+
+    emitToBuffer("define void @printi(i32) { call i32 (i8*, ...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0), i32 %0) ret void}");
+    emitToBuffer("define void @print(i8*) { call i32 (i8*, ...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0), i8* %0) ret void }");
 }
 
                         

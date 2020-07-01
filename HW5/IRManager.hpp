@@ -84,8 +84,7 @@ public:
     void endProgram();
     string fromI8RegisterToI32Register(string type, string original_register);
     void loadID(string type, string reg, string id_name);
-    void exitFunction();
-    void zeroExit();
+
     void zeroError();
     BackpatchInfo handlerDivZero(string exp_b_type, string exp_b_reg);
     void handlePatching(BackpatchInfo patching_info);
@@ -118,6 +117,7 @@ public:
     void handleBreak();
     void enterLoop();
     void handleContinue();
+    void definePrintAndPrinti();
 
 };
 

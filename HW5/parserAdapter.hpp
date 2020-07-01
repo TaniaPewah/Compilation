@@ -215,14 +215,7 @@ StatementNode* ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_
 
 void ruleInit(){
     addPrintAndPrinti();
-    regManager->emitGlobalToBuffer("@.forPrintString = internal constant [4 x i8] c\"%s\\0A\\00\"");
-    regManager->emitGlobalToBuffer("@.forPrinti = internal constant [4 x i8] c\"%d\\0A\\00\"");
-    
-    regManager->emitGlobalToBuffer("declare void @exit(i32) ");
-    regManager->emitGlobalToBuffer("declare i32 @printf(i8*, ...)");
-    
-    regManager->exitFunction();
-    regManager->zeroExit();
+    regManager->definePrintAndPrinti();
 }
 
 
