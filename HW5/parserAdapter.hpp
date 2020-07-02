@@ -201,7 +201,7 @@ void ruleVarDecl( string type_name, IdNode* id_node) {
         output::errorDef(id_node->lineno, name);
         exit(0);
     }
-	VarNode* current_node = new VarNode(id_node->lineno, name, type_name, false); 
+	VarNode* current_node = new VarNode(id_node->lineno, name, type_name, true); 
 	symbolTable.addSymbolVar( current_node );
 
     delete(id_node);
@@ -218,7 +218,7 @@ void ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_node) {
 
     } 
 
-    current_node = new VarNode(id_node->lineno, name, var_type, false); 
+    current_node = new VarNode(id_node->lineno, name, var_type, true); 
     symbolTable.addSymbolVar( current_node );
 
     regManager->assignExpNodeToVar(current_node->llvm_reg, exp_node->llvm_reg, exp_node->type);

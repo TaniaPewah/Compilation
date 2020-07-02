@@ -70,7 +70,7 @@ public:
     }
 
     void endScope(){
-        output::endScope();
+        //output::endScope();
         //cout << "++++++ Trying to end scope: "<< func_name << "++++++" << endl;
       
         for ( auto entry : entries) {
@@ -78,12 +78,12 @@ public:
             string id = entry->node->name;
 
             if(entry->is_var){
-                output::printID( id, entry->offset, toUpper(entry->node->type));
+                //output::printID( id, entry->offset, toUpper(entry->node->type));
             }
             else{
                 vector<string> params_type = varNodeToVectString(((FuncNode*)(entry->node))->params);
                 string print_types = output::makeFunctionType(toUpper(entry->node->type), params_type);
-                output::printID( id, entry->offset, print_types);
+                //output::printID( id, entry->offset, print_types);
             }
         }
     }

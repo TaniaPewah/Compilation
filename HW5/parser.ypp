@@ -42,7 +42,7 @@
 %%
 
 Program : INIT Funcs { 
-	printProductionRule(1);
+	//printProductionRule(1);
 	checkMain();
 	symbolTable.closeScope();
 	endProgram();
@@ -53,16 +53,16 @@ INIT : NEWSCOPECREATION {
 	ruleInit();
 }
 
-Funcs :  %empty { printProductionRule(2); 
+Funcs :  %empty { //printProductionRule(2); 
 }
 	  | FuncDecl Funcs { 
-		  printProductionRule(3); 
+		  //printProductionRule(3); 
 		  }
 	  ;
 
 FuncDecl : RetType ID { ruleNewFunc((IdNode*)$2, ((TypeNode*)$1)->type_name);} LPAREN Formals RPAREN {
 			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$5)->params)->functionParams );
-			printProductionRule(4);
+			//printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
 			ruleFuncDeclEndFunc();
@@ -71,61 +71,61 @@ FuncDecl : RetType ID { ruleNewFunc((IdNode*)$2, ((TypeNode*)$1)->type_name);} L
 
 RetType : Type { 
 		$$ = (TypeNode*)$1;
-		printProductionRule(5); 
+		//printProductionRule(5); 
 		}
 		| VOID { 
 			$$ = (TypeNode*)$1;	
-			printProductionRule(6); 
+			//printProductionRule(6); 
 			}
 		;
 
 Formals :  %empty { 
 	$$ = new Formals();
-	printProductionRule(7); 
+	//printProductionRule(7); 
 	}
     | FormalsList { 
 		$$ = new Formals((FormalsList*)$1);
-		printProductionRule(8); 
+		//printProductionRule(8); 
 		}
     ;
 
 FormalsList : FormalDecl { 
 	$$ = ruleAddFormals( (FormalsList*)ruleCreateFormals( ((VarNode*)$1)->lineno ), (VarNode*)$1); 
-	printProductionRule(9); 
+	//printProductionRule(9); 
 	}
 			| FormalDecl COMMA FormalsList { 
 				$$ = ruleAddFormals((FormalsList*)$3, (VarNode*)$1);
-				printProductionRule(10); 
+				//printProductionRule(10); 
 				}
 			;
 
 FormalDecl : Type ID { 
 	$$ = ruleFormalDecl((TypeNode*)$1, (IdNode*)$2); 
-	printProductionRule(11); 
+	//printProductionRule(11); 
 	};
 Statements : Statement {
-				printProductionRule(12); 
+				//printProductionRule(12); 
 				}
 
 		   | Statements Statement {
-			   	printProductionRule(13);
+			   	//printProductionRule(13);
 				}
 		   ;
 
 Statement : LBRACE NEWSCOPECREATION Statements RBRACE { 
-			printProductionRule(14); 
+			//printProductionRule(14); 
 			symbolTable.closeScope();
 			}
 		  | Type ID SC { 
 			  	// DONE
-			    printProductionRule(15); 
+			    //printProductionRule(15); 
 				ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
 				
 				}
 
 		  | Type ID ASSIGN Exp SC { 
 			  	// DONE
-				printProductionRule(16); 
+				//printProductionRule(16); 
 				ruleVarDeclAssign( (IdNode*)$2, 
 										((TypeNode*)$1)->type_name, 
 										((ExpNode*)$4));
@@ -134,51 +134,51 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 
 		  | ID ASSIGN Exp SC { 
 			  // DONE
-			  printProductionRule(17); 
+			  //printProductionRule(17); 
 			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
 			  
 			  }
 		  | Call SC { 
-			  printProductionRule(18);
+			  //printProductionRule(18);
 			  ruleCallStatment((ExpNode*)$1); 
 		  }
 		  | RETURN SC { 
-			  printProductionRule(19);
+			  //printProductionRule(19);
 			  ruleReturnVoid($1);
 			  }
 		  | RETURN Exp SC { 
-			  printProductionRule(20);
+			  //printProductionRule(20);
 			  ruleReturnNonVoid($1, (ExpNode*)$2);
 			  }
 		  | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE BM %prec NO_ELSE { 	
-			  printProductionRule(21); 
+			  //printProductionRule(21); 
 			  ruleIfNoElse( (ExpNode*)$3, (LabelNode*)$5, (BrNode*)$9 );
 			}
 
           | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE BM ELSE JMA NEWSCOPECREATION Statement BM {
-			   printProductionRule(22); 
+			   //printProductionRule(22); 
 			   ruleIfElse( (ExpNode*)$3, (LabelNode*)$5, (BrNode*)$9, (LabelNode*)$11, (BrNode*)$14); 
 			   symbolTable.closeScope();
 			  }
 
 		  | WHILE ENTERLOOP BM JMA LPAREN Exp RPAREN JMA Statement BM %prec NO_ELSE { 
-			  	printProductionRule(23); 
+			  	//printProductionRule(23); 
 
 				ruleWhileNoElse( (BrNode*)$3, (LabelNode*)$4, (ExpNode*)$6, (LabelNode*)$8, (BrNode*)$10);
 				symbolTable.closeScope();
 			}
 		  |  WHILE ENTERLOOP BM JMA LPAREN Exp RPAREN JMA Statement BM ELSE JMA NEWSCOPECREATION Statement BM { 
-				printProductionRule(24);  
+				//printProductionRule(24);  
 				ruleWhileElse((BrNode*)$3, (LabelNode*)$4, (ExpNode*)$6, (LabelNode*)$8, (BrNode*)$10, (LabelNode*)$12, (BrNode*)$15);
 				symbolTable.closeScope();
 			  }
 
 		  | BREAK SC { 
-			  printProductionRule(25); 
+			  //printProductionRule(25); 
 			  ruleBreakCheck($1);
 			  }
 		  | CONTINUE SC { 
-			  printProductionRule(26); 
+			  //printProductionRule(26); 
 			  ruleContinueCheck($1);
 			  }
 		  ;
@@ -190,33 +190,33 @@ ENTERLOOP : %empty {
 
 Call : ID LPAREN {
 	 ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
-		printProductionRule(27); 
+		//printProductionRule(27); 
 		$$ = ruleCallFunc((IdNode*)$1, (ExpList*)$4);
 		}
 	
 	 | ID LPAREN RPAREN { 
-		printProductionRule(28); 
+		//printProductionRule(28); 
 		$$ = ruleCallEmptyFunc((IdNode*)$1 );
 	 	}
 	 ;
 
 ExpList : Exp { 
-		printProductionRule(29); 
+		//printProductionRule(29); 
 		$$ = new ExpList();
 		$$ = ruleAddExp( (ExpList*)$$, (ExpNode*)$1); 
 		}
 		| Exp COMMA ExpList { 
-			printProductionRule(30); 
+			//printProductionRule(30); 
 			$$ = ruleAddExp((ExpList*)$3, (ExpNode*)$1);
 			}
 		;
 
 
-Type	: INT { printProductionRule(31); 
+Type	: INT { //printProductionRule(31); 
 }
-		| BYTE { printProductionRule(32); 
+		| BYTE { //printProductionRule(32); 
 		}
-		| BOOL { printProductionRule(33); 
+		| BOOL { //printProductionRule(33); 
 		}
 		;
 
@@ -230,65 +230,65 @@ BM : %empty {
 };
 
 Exp : LPAREN Exp RPAREN { 
-		printProductionRule(34); 
+		//printProductionRule(34); 
 		$$ = (ExpNode*)$2;
 		}
 	| Exp ADDITIVE Exp {
-		printProductionRule(35); 
+		//printProductionRule(35); 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
 		}
 	| Exp MUL Exp {
-		printProductionRule(35); 
+		//printProductionRule(35); 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
 		}
 	| ID { 
-		printProductionRule(36); 
+		//printProductionRule(36); 
 		$$ = ruleIDToExp((IdNode*)$1);
 		}
 	| Call {
 		//TODO: final level
-		printProductionRule(37); 
+		//printProductionRule(37); 
 		$$ = $1;
 		}
 	| NUM { 
-		printProductionRule(38); 
+		//printProductionRule(38); 
 		$$ = ruleExpNum((NumNode*)$1);
 		}
 	| NUM B { 
-		printProductionRule(39); 
+		//printProductionRule(39); 
 		$$ = (ruleExpNumB((NumNode*)$1));
 		}
 	| STRING { 
-		printProductionRule(40); 
+		//printProductionRule(40); 
 		$$ = ruleHandleString((StringNode*)$1);
 		}
 	| TRUE { 
-		printProductionRule(41); 
+		//printProductionRule(41); 
 		$$ = ruleBool((ExpNode*)$1, "1");
 		}
 	| FALSE { 
-		printProductionRule(42); 
+		//printProductionRule(42); 
 		$$ = ruleBool((ExpNode*)$1, "0");
 		}
 	| NOT Exp {
-		printProductionRule(43); 
+		//printProductionRule(43); 
 		$$ = ruleNotExp((ExpNode*)$2);
 		}
 	| Exp AND JMA Exp {
-		printProductionRule(44); 
+		//printProductionRule(44); 
 		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
 		}
 	| Exp OR JMA Exp {
-		printProductionRule(45); 
+		//printProductionRule(45); 
 		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
 		}
 	| Exp RELOPLEFT Exp {
-		printProductionRule(46); 
+		//printProductionRule(46); 
 		// check both Exp are numerical
 		$$ = ruleRelop((ExpNode*)$1, (RelopNode*)$2, (ExpNode*)$3);	
 		}
     | Exp RELOPNOTASS Exp {
-		printProductionRule(46); 
+		//printProductionRule(46); 
 		$$ = ruleRelop((ExpNode*)$1, (RelopNode*)$2, (ExpNode*)$3);
 		}
 	;

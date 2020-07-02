@@ -7,7 +7,7 @@ int IRManager::addPointerToRegisterInStack(string llvm_reg){
         // adds a variable to the stack, and creates a register that is a pointer to that location.
         // this register will always be a pointer to the stack
 
-        emitToBuffer(llvm_reg + " = getelementptr [50 x i32], [50 x i32]* %stack, i32 0, i32 " + to_string(stack_offset_pointer));
+        emitToBuffer(llvm_reg + " = getelementptr inbounds [50 x i32], [50 x i32]* %stack, i32 0, i32 " + to_string(stack_offset_pointer));
         stack_offset_pointer++;
         emitToBuffer("store i32 0, i32* " + llvm_reg);
         return stack_offset_pointer - 1;
@@ -32,7 +32,7 @@ void IRManager::assignExpNodeToVar(string variable_reg, string exp_node_reg, str
 Register* IRManager::getFreshReg(){
     // TODO: add "t" after %
     
-    Register* ret = new Register(register_index , "%.reg" + to_string(register_index));
+    Register* ret = new Register(register_index , "%reg" + to_string(register_index));
    register_index++;
     return ret;
 }
@@ -40,7 +40,7 @@ Register* IRManager::getFreshReg(){
 Register* IRManager::getGlobalFreshReg(){
     // TODO: add "t" after %
     
-    Register* ret = new Register(global_register_index, "@.g_reg" + to_string(global_register_index));
+    Register* ret = new Register(global_register_index, "@g_reg" + to_string(global_register_index));
     global_register_index++;
     return ret;
 }
@@ -48,14 +48,14 @@ Register* IRManager::getGlobalFreshReg(){
 int IRManager::emitToBuffer(string command){
     
     int emit_result = codeBuffer.emit(" " + command + " ");
-    cout << "command is: " << command << endl;
+    //cout << "command is: " << command << endl;
     return emit_result;
 }
 
 void IRManager::emitGlobalToBuffer(string command){
     
     codeBuffer.emitGlobal(command);
-    cout << "global command is: " << command << endl;
+    //cout << "global command is: " << command << endl;
 }
 
 void IRManager::endProgram(){
@@ -377,8 +377,8 @@ void IRManager::enterLoop(){
 }
 
 void IRManager::definePrintAndPrinti() {
-    emitGlobalToBuffer("@.str_specifier = internal constant [4 x i8] c\"%s\\0A\\00\"");
-    emitGlobalToBuffer("@.int_specifier = internal constant [4 x i8] c\"%d\\0A\\00\"");
+    emitGlobalToBuffer("@.str_specifier = constant [4 x i8] c\"%s\\0A\\00\"");
+    emitGlobalToBuffer("@.int_specifier = constant [4 x i8] c\"%d\\0A\\00\"");
     
     emitGlobalToBuffer("declare void @exit(i32) ");
     emitGlobalToBuffer("declare i32 @printf(i8*, ...)");
@@ -405,9 +405,9 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
     }
 
     //TODO: check how to add the parameters correctly!!
-    cout << "NOT SURE HOW TO ADD VARIABLES TO FUNCTION!!!" << endl;
+    //cout << "NOT SURE HOW TO ADD VARIABLES TO FUNCTION!!!" << endl;
 
-    emitToBuffer("define " + llvm_function_type + "@" + id_node->name + "(" + params_list + ") { ");	
+    emitToBuffer("define " + llvm_function_type + " @" + id_node->name + "(" + params_list + ") { ");	
     
     Register* fresh_reg = getFreshReg();
 
