@@ -80,18 +80,9 @@ string IRManager::fromI8RegisterToI32Register(string type, string original_regis
 
 
 void IRManager::loadID(string type, string reg, string id_name) {
-    if(type =="int"){
-        emitToBuffer("%" + reg + " = load i32, i32* " + "%p" + id_name);
-    }
-    else if(type=="byte"){
-        emitToBuffer("%" + reg + " = load i1, i1* " + "%p" + id_name);
-    }
-    else if(type=="bool"){
-        emitToBuffer("%" + reg + " = load i8, i8* " + "%p" + id_name);
-    }
-    else {
-        cout<<"%%% WHAT TYPE IS THAT"<< endl;
-    }
+    
+    emitToBuffer("%" + reg + " = load i32, i32* " + "%p" + id_name);
+    
 }
 
 
