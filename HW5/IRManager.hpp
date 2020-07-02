@@ -12,10 +12,11 @@ class VarNode;
 class ExpNode;
 class LabelNode;
 class RelopNode;
-class StatementNode;
+class BrNode;
 class IdNode;
 class ExpList;
 class FuncNode;
+class StatementNode;
 
 
 class Register {
@@ -97,11 +98,14 @@ public:
     void createFalseListAndTrueList(ExpNode* bool_node, string bool_sign);
     void expPassListNotRule(ExpNode* old_node, ExpNode* new_node);
     void expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* exp2, RelopNode* compare_sign);
-    void patchIf( ExpNode* if_cond_exp , LabelNode* marker, StatementNode* statement, StatementNode* result_state );
-    void patchIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st, 
-                           StatementNode* if_statement, StatementNode* go_to_else, 
-                           LabelNode* marker_else_st, StatementNode* else_statement, StatementNode* result_state );
-    void goToNext( StatementNode* returned );
+    
+    void patchIf( ExpNode* if_cond_exp , LabelNode* marker, BrNode* br_node );
+    void patchIfElse( ExpNode* if_cond_exp, 
+                      LabelNode* marker_if_true, 
+                      BrNode* go_to_end_from_if, 
+                      LabelNode* marker_else, 
+                      BrNode* go_to_end_from_else );
+    int goToNext( );
 
     void patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker, LabelNode* after_exp_marker, 
     ExpNode* exp_node, StatementNode* returned_statment);

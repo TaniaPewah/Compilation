@@ -243,11 +243,21 @@ class LabelNode: public Node {
     }
 };
 
+class BrNode: public Node {
+    public:
+    int br_location;
+
+    BrNode( int location): Node(NA), br_location(location){
+    }
+};
+
 class StatementNode: public Node {
+
     public:
     int next_list_id;
 
     StatementNode(): Node(NA), next_list_id(-1){
+
     }
 };
 

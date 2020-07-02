@@ -105,12 +105,13 @@ FormalDecl : Type ID {
 	};
 Statements : Statement {
 				printProductionRule(12); 
-				$$ = ruleStatements((StatementNode*)$1);
+				cout<< "here" << endl;
+				//$$ = ruleStatements((StatementNode*)$1);
 				}
 
 		   | Statements JMA Statement {
-			   printProductionRule(13);
-			   	$$ = rulePatchStatements((StatementNode*)$1, (LabelNode*)$2, (StatementNode*)$3);
+			   	printProductionRule(13);
+			   	//$$ = rulePatchStatements((StatementNode*)$1, (LabelNode*)$2, (StatementNode*)$3);
 				
 				}
 		   ;
@@ -143,38 +144,37 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  }
 		  | Call SC { 
 			  printProductionRule(18);
-			  $$ = ruleCallStatment((ExpNode*)$1); 
+			  ruleCallStatment((ExpNode*)$1); 
 		  }
 		  | RETURN SC { 
 			  printProductionRule(19);
-			  $$ = ruleReturnVoid($1);
+			  ruleReturnVoid($1);
 			  }
 		  | RETURN Exp SC { 
 			  printProductionRule(20);
-			  $$ = ruleReturnNonVoid($1, (ExpNode*)$2);
+			  ruleReturnNonVoid($1, (ExpNode*)$2);
 			  }
-		  | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE NJ %prec NO_ELSE { 	
+		  | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE BM %prec NO_ELSE { 	
 			  printProductionRule(21); 
-			  $$ = ruleIfNoElse( (ExpNode*)$3, (LabelNode*)$5, (StatementNode*)$7 );
+			  ruleIfNoElse( (ExpNode*)$3, (LabelNode*)$5, (BrNode*)$9 );
 			}
 
-          | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE NJ ELSE JMA NEWSCOPECREATION Statement {
+          | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE BM ELSE JMA NEWSCOPECREATION Statement BM {
 			   printProductionRule(22); 
-			   $$ = ruleIfElse( (ExpNode*)$3, (LabelNode*)$5, (StatementNode*)$7, 
-			   						  (StatementNode*)$9,  (LabelNode*)$11, (StatementNode*)$13); 
+			   ruleIfElse( (ExpNode*)$3, (LabelNode*)$5, (BrNode*)$9, (LabelNode*)$11, (BrNode*)$14); 
 			   symbolTable.closeScope();
 			  }
 
 		  |   WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement %prec NO_ELSE { 
 			  	printProductionRule(23); 
 
-				$$ = ruleWhileNoElse((StatementNode*)$8, (LabelNode*)$2, (LabelNode*)$7, (ExpNode*)$5 );
+				ruleWhileNoElse((StatementNode*)$8, (LabelNode*)$2, (LabelNode*)$7, (ExpNode*)$5 );
 				symbolTable.closeScope();
 			  }
 
-		  |  WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement ELSE NJ JMA NEWSCOPECREATION Statement { 
+		  |  WHILE JMA LPAREN ENTERLOOP Exp RPAREN JMA Statement ELSE BM JMA NEWSCOPECREATION Statement { 
 				printProductionRule(24);  
-				$$ = ruleWhileElse((LabelNode*)$2, (ExpNode*)$5, (LabelNode*)$7, (StatementNode*)$8, (StatementNode*)$9, 
+				ruleWhileElse((LabelNode*)$2, (ExpNode*)$5, (LabelNode*)$7, (StatementNode*)$8, (StatementNode*)$9, 
 										(LabelNode*)$11, (StatementNode*)$13);
 				symbolTable.closeScope();
 			  }
@@ -231,7 +231,7 @@ JMA : %empty {
 	}
 	;
 
-NJ : %empty {
+BM : %empty {
 	$$ = ruleNextJump();
 };
 

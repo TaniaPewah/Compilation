@@ -402,38 +402,37 @@ ExpNode* ruleRelop(ExpNode* exp1, RelopNode* compare_sign, ExpNode* exp2){
 }
 
 
-StatementNode* ruleIfNoElse( ExpNode* if_cond_exp , LabelNode* marker, StatementNode* statement ){
+void ruleIfNoElse( ExpNode* if_cond_exp , LabelNode* marker, BrNode* br_node ){
     if(if_cond_exp->type != "bool"){
        output::errorMismatch(if_cond_exp->lineno);
        exit(0); 
     }
 
-    StatementNode* result =  new StatementNode();
-    regManager->patchIf(if_cond_exp, marker, statement, result);
-
-    return result;
+    regManager->patchIf(if_cond_exp, marker, br_node);
 }
 
-StatementNode* ruleIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st, 
-                           StatementNode* if_statement, StatementNode* go_to_else, 
-                           LabelNode* marker_else_st, StatementNode* else_statement ){
+void ruleIfElse( ExpNode* if_cond_exp, 
+                           LabelNode* marker_if_true, 
+                           BrNode* go_to_end_from_if, 
+                           LabelNode* marker_else, 
+                           BrNode* go_to_end_from_else ){
     if(if_cond_exp->type != "bool"){
        output::errorMismatch(if_cond_exp->lineno);
        exit(0); 
     }
 
-    StatementNode* result =  new StatementNode();
-    regManager->patchIfElse(if_cond_exp, marker_if_st, if_statement, go_to_else, 
-                            marker_else_st, else_statement,result);
+    regManager->patchIfElse(if_cond_exp, marker_if_true, go_to_end_from_if, 
+                            marker_else, go_to_end_from_else );
 
-    return result;
 }
 
 StatementNode* ruleStatements(StatementNode* statements_node){
 
+    cout << "ruleStatements enter" << endl;
     StatementNode* result =  new StatementNode();
-
+    cout << "ruleStatements middle statements_node->next_list_id: " << statements_node->next_list_id << endl;
     result->next_list_id = statements_node->next_list_id;
+    cout << "ruleStatements" << endl;
     return result;
 }
 
@@ -464,9 +463,8 @@ LabelNode* ruleBranchLabel(){
     return new LabelNode();
 }
 
-StatementNode* ruleNextJump(){
-    StatementNode* returned = new StatementNode();
-    regManager->goToNext(returned);
+BrNode* ruleNextJump(){
+    BrNode* returned = new BrNode(regManager->goToNext());
     return returned;
 }
 
@@ -495,6 +493,7 @@ StatementNode* ruleWhileElse ( LabelNode* cond_marker, ExpNode* exp_cond, LabelN
 StatementNode* rulePatchStatements(StatementNode* statments_node, LabelNode* before_statement_marker, 
                                    StatementNode* statment_node){
 
+    cout << "rulePatchStatements" << endl;
     StatementNode* returned = new StatementNode();
     cout << "tring to merge 2 statments next -> rulePatchStatements" << endl;
     regManager->patchStatements(statments_node, before_statement_marker, statment_node, returned);
