@@ -107,8 +107,8 @@ public:
                       BrNode* go_to_end_from_else );
     int goToNext( );
 
-    void patchWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker, LabelNode* after_exp_marker, 
-    ExpNode* exp_node, StatementNode* returned_statment);
+    void patchWhileNoElse( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
+                     ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp );
     
     void patchWhileElse ( LabelNode* cond_marker, 
                           ExpNode* exp_cond, 

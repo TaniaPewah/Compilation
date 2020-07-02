@@ -468,15 +468,13 @@ BrNode* ruleNextJump(){
     return returned;
 }
 
-StatementNode* ruleWhileNoElse( StatementNode* statment_node, LabelNode* before_exp_marker,
-                     LabelNode* after_exp_marker, ExpNode* exp_node ){
+void ruleWhileNoElse( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
+                     ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp ){
 
     StatementNode* returned = new StatementNode();
 
     exitWhile();
-    regManager->patchWhileNoElse(statment_node, before_exp_marker, after_exp_marker, exp_node, returned);
-
-    return returned;
+    regManager->patchWhileNoElse(go_to_before_exp, before_exp_marker,  exp_node, after_exp_marker, go_to_check_exp );
 }
 
 StatementNode* ruleWhileElse ( LabelNode* cond_marker, ExpNode* exp_cond, LabelNode* while_block_marker, 

@@ -298,27 +298,28 @@ void IRManager::patchIfElse(ExpNode* if_cond_exp,
 }
 
 
-void IRManager::patchWhileNoElse( StatementNode* statment_node, LabelNode* cond_marker,LabelNode* while_block_marker,
- ExpNode* exp_node , StatementNode* returned_statment){
+void IRManager::patchWhileNoElse( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
+                      ExpNode* exp_node, LabelNode* after_exp_marker, BrNode* go_to_check_exp ){
 
-    codeBuffer.bpatch(list_of_labels[statment_node->next_list_id], cond_marker->label);
-    list_of_labels.erase(statment_node->next_list_id);
+    string end_while_label = codeBuffer.genLabel();
 
-    codeBuffer.bpatch(list_of_labels[exp_node->true_list_id], while_block_marker->label);
+    // if exp == true
+    codeBuffer.bpatch(list_of_labels[exp_node->true_list_id], after_exp_marker->label);
     list_of_labels.erase(exp_node->true_list_id);
 
-    returned_statment->next_list_id = exp_node->false_list_id;
+    codeBuffer.bpatch(list_of_labels[exp_node->false_list_id], end_while_label);
+    list_of_labels.erase(exp_node->false_list_id);
 
-    emitToBuffer("br label " + cond_marker->label);
-
-    string end_label = codeBuffer.genLabel();
+    // check exp condition
+    codeBuffer.bpatch(codeBuffer.makelist({go_to_before_exp->br_location,FIRST}), before_exp_marker->label);
+    codeBuffer.bpatch(codeBuffer.makelist({go_to_check_exp->br_location,FIRST}), before_exp_marker->label);
 
     // break branches should go to loop_end_label
-	codeBuffer.bpatch(break_list[loop_counter], end_label);
+	codeBuffer.bpatch(break_list[break_list.size() - 1], end_while_label);
 	break_list.pop_back();
 
 	// continue branches should go to cond_label
-	CodeBuffer::instance().bpatch(continue_list[loop_counter], cond_marker->label);
+	codeBuffer.bpatch(continue_list[continue_list.size() -1], before_exp_marker->label);
 	continue_list.pop_back();
 
     return;
