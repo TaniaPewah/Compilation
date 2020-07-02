@@ -68,16 +68,22 @@ void ruleBreakCheck(Node* break_sign){
 }
 
 
-void ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
+StatementNode* ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
 
     string func_type = symbolTable.getFuncType(return_sign->lineno, current_func);
     if((func_type != return_value->type) && !(return_value->type == "byte" && func_type == "int")){
         output::errorMismatch(return_sign->lineno);
         exit(0);
     }
+
+    regManager->returnFromNonVoidFunction(func_type, return_value);
+
+    //TODO: check if should add statment->nexr
+    StatementNode* statment = new StatementNode();
+    return statment;
 }
 
-void ruleReturnVoid(Node* return_sign){
+StatementNode* ruleReturnVoid(Node* return_sign){
 
     // check what is the return type of the current function
     string func_type = symbolTable.getFuncType(return_sign->lineno, current_func);
@@ -85,6 +91,12 @@ void ruleReturnVoid(Node* return_sign){
         output::errorMismatch(return_sign->lineno);
         exit(0);
     }
+
+    regManager->emitToBuffer(" ret void ");
+
+    //TODO: check if should add statment->nexr
+    StatementNode* statment = new StatementNode();
+    return statment;
 }
 
 void addPrintAndPrinti(){
@@ -175,7 +187,7 @@ FuncNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> p
     }
     current_func = name;
 
-    regManager->defineNewFunction(id_node, type, &params);
+    regManager->defineNewFunction(id_node, type, params);
 
     delete(id_node);
     return current_node;
@@ -331,10 +343,17 @@ ExpNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
     return returned_value; 
 }
 
-TypeNode* ruleCallEmptyFunc(IdNode* id_node) {
+ExpNode* ruleCallEmptyFunc(IdNode* id_node) {
      // search ID in symboltable, and get it's type
     string returned_type = symbolTable.getFuncType(id_node->lineno, id_node->name);
-    return (new TypeNode(id_node->lineno, returned_type )); 
+
+    FuncNode* func = (FuncNode*)(symbolTable.findSymbolInStack(id_node->name)->node);
+
+    ExpNode* returned_value = new ExpNode(id_node->lineno, returned_type);
+
+    regManager->handleCallFunction(func, NULL, returned_value);
+
+    return returned_value; 
 }
 
 
@@ -447,12 +466,6 @@ ExpNode* ruleIDToExp (IdNode* id_node){
     return exp_node;
 }
 
-ExpNode* ruleCallToExp ( TypeNode* callNode ){
-    ExpNode* expNode = new ExpNode(callNode->lineno, callNode->type_name);
-    delete(callNode);
-    return expNode;
-}
-
 void endProgram(){
 
     regManager->endProgram();
@@ -499,5 +512,15 @@ StatementNode* rulePatchStatements(StatementNode* statments_node, LabelNode* bef
     regManager->patchStatements(statments_node, before_statement_marker, statment_node, returned);
     return returned;                                   
 }
+
+StatementNode* ruleCallStatment(ExpNode* function_returned_value){
+    StatementNode* returned_statment = new StatementNode();
+
+    cout<<"NOT SURE IF WE SHOULD ADD STATMENTNODE->NEXT" << endl;
+
+    if(function_returned_value->type == "bool"){
+        regManager->callToFunctionBackPatch(function_returned_value);
+    }
+} 
 
 #endif //PARSER_ADAPTER_HPP

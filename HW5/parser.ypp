@@ -61,12 +61,15 @@ Funcs :  %empty { printProductionRule(2);
 	  ;
 
 FuncDecl : RetType ID LPAREN Formals RPAREN {
-
+			cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! in here1 << ((TypeNode*)$1)->type_name << !!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
+			cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! in here2!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
+			cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! in here3 !!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			ruleFuncDeclEndFunc();
+			cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! in here4 !!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 		}
 		;
 
@@ -142,15 +145,17 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  ruleIdAssign((IdNode*)$1 , (ExpNode*)$3);
 			  
 			  }
-		  | Call SC { printProductionRule(18); 
+		  | Call SC { 
+			  printProductionRule(18);
+			  $$ = ruleCallStatment((ExpNode*)$1); 
 		  }
 		  | RETURN SC { 
 			  printProductionRule(19);
-			  ruleReturnVoid($1);
+			  $$ = ruleReturnVoid($1);
 			  }
 		  | RETURN Exp SC { 
 			  printProductionRule(20);
-			  ruleReturnNonVoid($1, (ExpNode*)$2);
+			  $$ = ruleReturnNonVoid($1, (ExpNode*)$2);
 			  }
 		  | IF LPAREN Exp RPAREN JMA NEWSCOPECREATION Statement ENDSCOPE NJ %prec NO_ELSE { 	
 			  printProductionRule(21); 
@@ -260,7 +265,7 @@ Exp : LPAREN Exp RPAREN {
 	| Call {
 		//TODO: final level
 		printProductionRule(37); 
-		$$ = ruleCallToExp((TypeNode*)$1);
+		$$ = $1;
 		}
 	| NUM { 
 		printProductionRule(38); 

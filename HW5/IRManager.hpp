@@ -121,11 +121,13 @@ public:
     void enterLoop();
     void handleContinue();
     void definePrintAndPrinti();
-    void defineNewFunction(IdNode* id_node, string type, vector<VarNode*>* params);
+    void defineNewFunction(IdNode* id_node, string type, vector<VarNode*> params);
 
     void startBoolJump(ExpNode* exp_node);
     void handleCallFunction(FuncNode* func_node, ExpList* params_list, ExpNode* returned_value);
+    void callToFunctionBackPatch(ExpNode* function_returned_value);
 
+    void returnFromNonVoidFunction(string func_type, ExpNode* return_value);
 };
 
 #endif //IR_MANAGER_HPP

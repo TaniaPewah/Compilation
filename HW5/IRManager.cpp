@@ -48,7 +48,7 @@ Register* IRManager::getGlobalFreshReg(){
 
 int IRManager::emitToBuffer(string command){
     
-    int emit_result = codeBuffer.emit(command);
+    int emit_result = codeBuffer.emit(" " + command + " ");
     cout << "command is: " << command << endl;
     return emit_result;
 }
@@ -413,7 +413,7 @@ void IRManager::definePrintAndPrinti() {
     emitToBuffer("define void @print(i8*) { call i32 (i8*, ...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0), i8* %0) ret void }");
 }
 
-void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>* params){
+void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*> params){
     string llvm_function_type = "";
     if(type == "void"){
         llvm_function_type = "void";
@@ -422,11 +422,13 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
     }
     
     string params_list = "";
-    if(params->size() > 0){
+    if(params.size() > 0){
         params_list += "i32";
-    }
-    for(int i = 0; i < params->size() - 1; i++){
-        params_list += ", i32";
+    
+        for(int i = 0; i < params.size() - 1; i++){
+            cout<< "param num " << i << endl;
+            params_list += ", i32";
+        }
     }
 
     //TODO: check how to add the parameters correctly!!
@@ -465,7 +467,7 @@ string _addFunctionSingleVar(ExpNode* current_node){
          " x i8], [" + ((StringNode*)current_node)->size + " x i8]* @" + current_node->llvm_reg + ", i32 0, i32 0)";
     }
     else{
-        return "i32 %" + current_node->llvm_reg;
+        return "i32 " + current_node->llvm_reg;
     }
 }
 
@@ -482,7 +484,7 @@ void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, Ex
     }
 
     string call_func_variables = "";
-    if(params_list->params.size() > 0){
+    if(params_list != NULL && params_list->params.size() > 0){
         call_func_variables = _addFunctionSingleVar(params_list->params[0]);
         for(int i = 1; i < params_list->params.size(); i++){
             call_func_variables += ", " + _addFunctionSingleVar(params_list->params[i]);
@@ -495,7 +497,7 @@ void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, Ex
     if(func_node->type == "bool"){
         Register* fresh_reg = getFreshReg();
 
-        emitToBuffer(fresh_reg->getName() + " = icmp eq i32 " + returned_value->llvm_reg + ", 1";
+        emitToBuffer(fresh_reg->getName() + " = icmp eq i32 " + returned_value->llvm_reg + ", 1");
 
        	int branch_location = emitToBuffer( "br i1 " + fresh_reg->getName() + ", label @, label @");
 		
@@ -507,6 +509,34 @@ void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, Ex
 		returned_value->false_list_id = label_list_key_gen;
 		label_list_key_gen++;
     }
+}
+
+void IRManager::callToFunctionBackPatch(ExpNode* function_returned_value){
+
+    string end_lable = codeBuffer.genLabel();
+    codeBuffer.bpatch(list_of_labels[function_returned_value->true_list_id], end_lable);
+    codeBuffer.bpatch(list_of_labels[function_returned_value->false_list_id], end_lable);
+    list_of_labels.erase(function_returned_value->true_list_id);
+    list_of_labels.erase(function_returned_value->false_list_id);
+
+}
+
+void IRManager::returnFromNonVoidFunction(string func_type, ExpNode* return_value){
+
+    if(func_type == "bool"){
+        string true_lable = codeBuffer.genLabel();
+        codeBuffer.bpatch(list_of_labels[return_value->true_list_id], true_lable);
+        list_of_labels.erase(return_value->true_list_id);
+        emitToBuffer("ret i32 1");
+
+        string false_lable = codeBuffer.genLabel();
+        codeBuffer.bpatch(list_of_labels[return_value->false_list_id], false_lable);
+        list_of_labels.erase(return_value->false_list_id);
+        emitToBuffer("ret i32 0");
+    }else{
+        emitToBuffer("ret i32" + return_value->llvm_reg);
+    }
+
 }
 
                         
