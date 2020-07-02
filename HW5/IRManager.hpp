@@ -125,6 +125,7 @@ public:
     void returnFromNonVoidFunction(string func_type, ExpNode* return_value);
     void newFuncScope ();
     void bpatchBool(VarNode* variable, ExpNode* exp_node);
+    void getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node);
 };
 
 #endif //IR_MANAGER_HPP

@@ -550,4 +550,24 @@ void IRManager::newFuncScope (){
     register_index = 0;
 }
 
+void IRManager::getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node){
+    loadID(var->type, exp_node->llvm_reg, var->llvm_reg);
+
+    if(var->type == "bool"){
+        Register* fresh_reg = getFreshReg();
+        emitToBuffer("%" + fresh_reg->getName() +  " = icmp eq i32 % " + exp_node->llvm_reg);
+
+        int branch_location = emitToBuffer("br i1 %" + fresh_reg->getName() + ", label @, label @");
+
+        vector<pair<int,BranchLabelIndex>> for_true_list = codeBuffer.makelist({branch_location, FIRST});
+        list_of_labels[label_list_key_gen] = for_true_list;
+        label_list_key_gen++;
+
+         vector<pair<int,BranchLabelIndex>> for_false_list = codeBuffer.makelist({branch_location, SECOND});
+        list_of_labels[label_list_key_gen] = for_false_list;
+        label_list_key_gen++;
+    }
+
+}
+
                         
