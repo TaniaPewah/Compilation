@@ -219,7 +219,7 @@ void IRManager::orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel
 
 void IRManager::createFalseListAndTrueList(ExpNode* bool_node, string bool_sign){
         
-    int br_command_location = emitToBuffer("br label @@");
+    int br_command_location = emitToBuffer("br label @");
 	vector<pair<int,BranchLabelIndex>> false_list;
     vector<pair<int,BranchLabelIndex>> true_list;
 
