@@ -213,22 +213,26 @@ void ruleVarDecl( string type_name, IdNode* id_node) {
 
 }
 
-void ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_node) {
+VarNode* createVarNode(IdNode* id_node, string var_type){
     string name = id_node->name;
     VarNode* current_node = NULL;
 
+
+    current_node = new VarNode(id_node->lineno, name, var_type, true); 
+    symbolTable.addSymbolVar( current_node );
+
+    delete(id_node);
+    return current_node;
+}
+
+void ruleVarDeclAssign(IdNode* id_node, VarNode* var_node, ExpNode* exp_node,  string var_type) {
+   
     if((var_type != exp_node->type) && !(var_type == "int" && exp_node->type == "byte")){
         output::errorMismatch(id_node->lineno);
         exit(0);
 
     } 
-
-    current_node = new VarNode(id_node->lineno, name, var_type, true); 
-    symbolTable.addSymbolVar( current_node );
-
-    regManager->assignExpNodeToVar(current_node, exp_node);
-
-    delete(id_node);
+    regManager->assignExpNodeToVar(var_node, exp_node);
 }
 
 

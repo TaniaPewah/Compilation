@@ -555,7 +555,7 @@ void IRManager::getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node){
 
     if(var->type == "bool"){
         Register* fresh_reg = getFreshReg();
-        emitToBuffer("%" + fresh_reg->getName() +  " = icmp eq i32 % " + exp_node->llvm_reg);
+        emitToBuffer("%" + fresh_reg->getName() +  " = icmp eq i32 %" + exp_node->llvm_reg);
 
         int branch_location = emitToBuffer("br i1 %" + fresh_reg->getName() + ", label @, label @");
 
