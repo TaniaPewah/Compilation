@@ -148,7 +148,7 @@ ExpNode* ruleNotExp(ExpNode* node) {
     }
 
     ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
-    regManager->emitToBuffer(new_exp_node->llvm_reg + " = add i1 1, " + node->llvm_reg);
+    regManager->emitToBuffer("%" + new_exp_node->llvm_reg + " = add i1 1, %" + node->llvm_reg);
     
     regManager->expPassListNotRule(node, new_exp_node);
 
@@ -260,14 +260,14 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
             //one is int, and the other one byte
             string command;
             if(exp_a->type == "byte") {
-                command = expNode->llvm_reg + " = zext i8 " + exp_a->llvm_reg + " to i32";
+                command = "%" + expNode->llvm_reg + " = zext i8 %" + exp_a->llvm_reg + " to i32";
             }
             else{
-                command = expNode->llvm_reg + " = zext i8 " + exp_b->llvm_reg + " to i32";
+                command = "%" + expNode->llvm_reg + " = zext i8 %" + exp_b->llvm_reg + " to i32";
             }
             regManager->emitToBuffer(command);
         }
-        string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
+        string to_emit = "%" + expNode->llvm_reg + " = " + binop->binop + " i32 %" + exp_a->llvm_reg + ", %" + exp_b->llvm_reg;
         regManager->emitToBuffer(to_emit);
 
         if(binop->binop == "sdiv"){
@@ -279,7 +279,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
     // Both are byte
     ExpNode* expNode = new ExpNode(binop->lineno, "byte");
-    string to_emit = expNode->llvm_reg + " = " + binop->binop + " i8 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
+    string to_emit = "%" + expNode->llvm_reg + " = " + binop->binop + " i8 %" + exp_a->llvm_reg + ", %" + exp_b->llvm_reg;
 
     regManager->emitToBuffer(to_emit);
     return expNode;
@@ -291,7 +291,7 @@ ExpNode* ruleExpNum(NumNode* num_node){
 
     //TODO: Add constructor, to get existing reister
     ExpNode* expNode = new ExpNode(num_node->lineno, num_node->type_name);
-    string command = expNode->llvm_reg + " = add i32 0, " + to_string(num_node->value); 
+    string command = "%" + expNode->llvm_reg + " = add i32 0, " + to_string(num_node->value); 
     regManager->emitToBuffer(command);
     return (expNode);
 }
@@ -303,7 +303,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
     }
     //TODO: Add constructor, to get existing reister
     ExpNode* expNode = new ExpNode(num->lineno, "byte");
-    string command = expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
+    string command = "%" + expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
 
     regManager->emitToBuffer(command);
     return (expNode);
@@ -312,7 +312,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
 
 ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
     
-    regManager->emitToBuffer(bool_node->llvm_reg + " = add i1 0, " + bool_sign);
+    regManager->emitToBuffer("%" + bool_node->llvm_reg + " = add i1 0, " + bool_sign);
 
     regManager->createFalseListAndTrueList(bool_node, bool_sign);
     

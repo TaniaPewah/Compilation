@@ -7,24 +7,24 @@ int IRManager::addPointerToRegisterInStack(string llvm_reg){
         // adds a variable to the stack, and creates a register that is a pointer to that location.
         // this register will always be a pointer to the stack
 
-        emitToBuffer(llvm_reg + " = getelementptr inbounds [50 x i32], [50 x i32]* %stack, i32 0, i32 " + to_string(stack_offset_pointer));
+        emitToBuffer("%p" + llvm_reg + " = getelementptr inbounds [50 x i32], [50 x i32]* %stack, i32 0, i32 " + to_string(stack_offset_pointer));
         stack_offset_pointer++;
-        emitToBuffer("store i32 0, i32* " + llvm_reg);
+        emitToBuffer("store i32 0, i32* %p" + llvm_reg);
         return stack_offset_pointer - 1;
     }
 
 void IRManager::assignExpNodeToVar(string variable_reg, string exp_node_reg, string exp_node_type){
     // the variable is a register which points to a location in the string. we just neet to update the value in this location.
     if(exp_node_type == "int"){
-        emitToBuffer("store i32 " + exp_node_reg + ", i32* " + variable_reg);
+        emitToBuffer("store i32 %" + exp_node_reg + ", i32* %p" + variable_reg);
     }else if(exp_node_type == "byte"){
         Register* fresh_register = getFreshReg();
-        emitToBuffer(fresh_register->getName() + " = zext i8 " + exp_node_reg + " to i32");
-        emitToBuffer("store i32 " + fresh_register->getName() + ", i32* " + variable_reg);
+        emitToBuffer("%" + fresh_register->getName() + " = zext i8 %" + exp_node_reg + " to i32");
+        emitToBuffer("store i32 %" + fresh_register->getName() + ", i32* %p" + variable_reg);
     }else{
         Register* fresh_register = getFreshReg();
-        emitToBuffer(fresh_register->getName() + " = zext i1 " + exp_node_reg + " to i32");
-        emitToBuffer("store i32 " + fresh_register->getName() + ", i32* " + variable_reg);
+        emitToBuffer("%" + fresh_register->getName() + " = zext i1 %" + exp_node_reg + " to i32");
+        emitToBuffer("store i32 %" + fresh_register->getName() + ", i32* %p" + variable_reg);
     }
     return;
 }
@@ -32,7 +32,7 @@ void IRManager::assignExpNodeToVar(string variable_reg, string exp_node_reg, str
 Register* IRManager::getFreshReg(){
     // TODO: add "t" after %
     
-    Register* ret = new Register(register_index , "%reg" + to_string(register_index));
+    Register* ret = new Register(register_index , "reg" + to_string(register_index));
    register_index++;
     return ret;
 }
@@ -71,7 +71,7 @@ string IRManager::fromI8RegisterToI32Register(string type, string original_regis
 
     if(type == "byte"){
         Register* exp_i32 = getFreshReg();
-        emitToBuffer(exp_i32->getName() + " = zext i8 " + original_register + " to i32");
+        emitToBuffer("%" + exp_i32->getName() + " = zext i8 %" + original_register + " to i32");
         return exp_i32->getName();
     }
     
@@ -81,13 +81,13 @@ string IRManager::fromI8RegisterToI32Register(string type, string original_regis
 
 void IRManager::loadID(string type, string reg, string id_name) {
     if(type =="int"){
-        emitToBuffer(reg + " = load i32, i32* " + id_name);
+        emitToBuffer("%" + reg + " = load i32, i32* " + "%p" + id_name);
     }
     else if(type=="byte"){
-        emitToBuffer(reg + " = load i1, i1* " + id_name);
+        emitToBuffer("%" + reg + " = load i1, i1* " + "%p" + id_name);
     }
     else if(type=="bool"){
-        emitToBuffer(reg + " = load i8, i8* " + id_name);
+        emitToBuffer("%" + reg + " = load i8, i8* " + "%p" + id_name);
     }
     else {
         cout<<"%%% WHAT TYPE IS THAT"<< endl;
@@ -111,14 +111,14 @@ BackpatchInfo IRManager::handlerDivZero(string exp_b_type, string exp_b_reg) {
     Register* zero_devision = getFreshReg();
 
     if(exp_b_type == "byte"){
-        emitToBuffer(zero_devision->getName() + " = icmp eq i8 " + exp_b_reg + ", 0");
+        emitToBuffer("%" + zero_devision->getName() + " = icmp eq i8 %" + exp_b_reg + ", 0");
     }
     else{
-        emitToBuffer(zero_devision->getName() + " = icmp eq i32 " + exp_b_reg + ", 0");
+        emitToBuffer("%" + zero_devision->getName() + " = icmp eq i32 %" + exp_b_reg + ", 0");
     }
 
     BackpatchInfo patching_info;
-    patching_info.branch_location = emitToBuffer("br i1 " + zero_devision->getName() + ", label @, label @");
+    patching_info.branch_location = emitToBuffer("br i1 %" + zero_devision->getName() + ", label @, label @");
     
 
     patching_info.label_true = codeBuffer.genLabel();
@@ -236,10 +236,10 @@ void IRManager::expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* ex
     string exp1_i32_register = fromI8RegisterToI32Register(exp1->type, exp1->llvm_reg);
     string exp2_i32_register = fromI8RegisterToI32Register(exp2->type, exp2->llvm_reg);
     
-    emitToBuffer(compare->llvm_reg + " = icmp " + compare_sign->relop_sign + " i32 " + 
+    emitToBuffer("%" + compare->llvm_reg + " = icmp %" + compare_sign->relop_sign + " i32 " + 
     exp1_i32_register + ", " + exp2_i32_register);
 
-    int branch_location = emitToBuffer("br i1 " + compare->llvm_reg + ", label @, label @");
+    int branch_location = emitToBuffer("br i1 %" + compare->llvm_reg + ", label @, label @");
 	
 	// make a new truelist
 	vector<pair<int,BranchLabelIndex>> true_list = codeBuffer.makelist({branch_location,FIRST});
@@ -408,20 +408,14 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
     //cout << "NOT SURE HOW TO ADD VARIABLES TO FUNCTION!!!" << endl;
 
     emitToBuffer("define " + llvm_function_type + " @" + id_node->name + "(" + params_list + ") { ");	
-    
-    Register* fresh_reg = getFreshReg();
 
     for(int i = 0; i < params.size() ; i++){
-        // put param value inside temp reg
-        emitToBuffer("store i32 "+ params[i]->llvm_reg + ", i32 " + fresh_reg->getName() );
 
-        cout << "before alloca" << endl;
         // allocate empty space in stack and save on the param.llvm_reg
-        emitToBuffer ( params[i]->llvm_reg + " = alloca i32");
-        cout << "after alloca" << endl;
+        emitToBuffer ( "%p" + params[i]->llvm_reg + " = alloca i32");
 
         // copy the value back to function stack and params[i]->llvm_reg points to it
-        emitToBuffer("store i32 "+fresh_reg->getName() + ", i32* " + params[i]->llvm_reg );
+        emitToBuffer("store i32 %"+ params[i]->llvm_reg + ", i32* %p" + params[i]->llvm_reg );
     }
 
     emitToBuffer("%stack = alloca [50 x i32]");
@@ -447,13 +441,13 @@ void IRManager::startBoolJump(ExpNode* exp_node){
     codeBuffer.bpatch(codeBuffer.makelist({true_branch_location, FIRST}), end_lable);
     codeBuffer.bpatch(codeBuffer.makelist({false_branch_location, FIRST}), end_lable);
 
-    emitToBuffer(exp_node->llvm_reg + " = phi i32 [1, %" + true_lable + "], [0, %" + false_lable + "]");
+    emitToBuffer("%" + exp_node->llvm_reg + " = phi i32 [1, %" + true_lable + "], [0, %" + false_lable + "]");
 }
 
 string _addFunctionSingleVar(ExpNode* current_node){
     if(current_node->type == "string"){
         return "i8* getelementptr inbounds ([" + ((StringNode*)current_node)->size + \
-         " x i8], [" + ((StringNode*)current_node)->size + " x i8]* @" + current_node->llvm_reg + ", i32 0, i32 0)";
+         " x i8], [" + ((StringNode*)current_node)->size + " x i8]* " + current_node->llvm_reg + ", i32 0, i32 0)";
     }
     else{
         return "i32 " + current_node->llvm_reg;
@@ -472,6 +466,8 @@ void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, Ex
     }
 
     string call_func_variables = "";
+
+    
     if(params_list != NULL && params_list->params.size() > 0){
         call_func_variables = _addFunctionSingleVar(params_list->params[0]);
         for(int i = 1; i < params_list->params.size(); i++){
@@ -485,9 +481,9 @@ void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, Ex
     if(func_node->type == "bool"){
         Register* fresh_reg = getFreshReg();
 
-        emitToBuffer(fresh_reg->getName() + " = icmp eq i32 " + returned_value->llvm_reg + ", 1");
+        emitToBuffer("%" + fresh_reg->getName() + " = icmp eq i32 %" + returned_value->llvm_reg + ", 1");
 
-       	int branch_location = emitToBuffer( "br i1 " + fresh_reg->getName() + ", label @, label @");
+       	int branch_location = emitToBuffer( "br i1 %" + fresh_reg->getName() + ", label @, label @");
 		
 		list_of_labels[label_list_key_gen] = codeBuffer.makelist({branch_location,FIRST});
 		returned_value->true_list_id = label_list_key_gen;
