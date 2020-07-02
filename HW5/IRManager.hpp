@@ -110,14 +110,9 @@ public:
     void patchWhileNoElse( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
                      ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp );
     
-    void patchWhileElse ( LabelNode* cond_marker, 
-                          ExpNode* exp_cond, 
-                          LabelNode* while_block_marker, 
-                          StatementNode* while_state_block, 
-                          StatementNode* go_to_cond, 
-						  LabelNode* else_block_marker, 
-                          StatementNode* else_state_block, 
-                          StatementNode* returned);
+    void patchWhileElse ( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
+                     ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp, 
+                     LabelNode* else_marker, BrNode* end_else);
 
     void patchStatements( StatementNode* statments_node, LabelNode* before_statement_marker, 
                                    StatementNode* statment_node, StatementNode* returned);

@@ -477,15 +477,13 @@ void ruleWhileNoElse( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
     regManager->patchWhileNoElse(go_to_before_exp, before_exp_marker,  exp_node, after_exp_marker, go_to_check_exp );
 }
 
-StatementNode* ruleWhileElse ( LabelNode* cond_marker, ExpNode* exp_cond, LabelNode* while_block_marker, 
-                                StatementNode* while_state_block, StatementNode* go_to_cond, 
-										LabelNode* else_block_marker, StatementNode* else_state_block){
+void ruleWhileElse ( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
+                     ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp,
+                    LabelNode* else_marker, BrNode* end_else){
 
-    StatementNode * returned = new StatementNode();
-    regManager->patchWhileElse(cond_marker, exp_cond, while_block_marker, while_state_block, go_to_cond,
-                                  else_block_marker, else_state_block, returned);
-
-    return returned;                                       
+    
+    regManager->patchWhileElse(go_to_before_exp, before_exp_marker,  exp_node, after_exp_marker, go_to_check_exp,
+                                 else_marker, end_else);                                   
 }
 
 StatementNode* rulePatchStatements(StatementNode* statments_node, LabelNode* before_statement_marker, 
