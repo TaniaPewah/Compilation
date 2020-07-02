@@ -155,8 +155,13 @@ ExpNode* ruleNotExp(ExpNode* node) {
     return new_exp_node;
 }
 
-void ruleFuncDeclEndFunc(){
-    regManager->emitToBuffer("}");
+void ruleFuncDeclEndFunc(TypeNode* type_node){
+    if(type_node->type_name == "void"){
+        regManager->emitToBuffer("ret void }");
+    }else{
+        regManager->emitToBuffer("ret i32 }");
+    }
+   
     current_func = "";
     symbolTable.closeScope();
 }

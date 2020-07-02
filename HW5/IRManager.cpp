@@ -463,11 +463,10 @@ string _addFunctionSingleVar(ExpNode* current_node){
 void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, ExpNode* returned_value){
 
     //TODO: check this call function- not sure if sending variables value currectly
-    cout << "I'M NOT SURE ABOUT THIS CALL FUNCTION!!!" << endl;
 
     string call_start = "";
     if(func_node->type == "void"){
-        call_start = "call void @" + func_node->name;
+        call_start = "call void @";
     }else{
         call_start = returned_value->llvm_reg + " = call i32 @";
     }

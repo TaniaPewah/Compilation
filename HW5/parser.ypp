@@ -65,7 +65,7 @@ FuncDecl : RetType ID { ruleNewFunc((IdNode*)$2, ((TypeNode*)$1)->type_name);} L
 			//printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
-			ruleFuncDeclEndFunc();
+			ruleFuncDeclEndFunc((TypeNode*)$1);
 		}
 		;
 
