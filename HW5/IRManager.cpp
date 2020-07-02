@@ -409,6 +409,8 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
 
     emitToBuffer("define " + llvm_function_type + " @" + id_node->name + "(" + params_list + ") { ");	
 
+    emitToBuffer("	; ======================= input arguments definition =======================");
+
     for(int i = 0; i < params.size() ; i++){
 
         // allocate empty space in stack and save on the param.llvm_reg
@@ -418,7 +420,11 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
         emitToBuffer("store i32 %"+ params[i]->llvm_reg + ", i32* %p" + params[i]->llvm_reg );
     }
 
+    emitToBuffer("	; =========================== stack definition =============================");
+
     emitToBuffer("%stack = alloca [50 x i32]");
+
+    emitToBuffer("	; ============================= function body ==============================");
     
 }
 
