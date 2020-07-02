@@ -61,7 +61,7 @@ Funcs :  %empty { printProductionRule(2);
 	  ;
 
 FuncDecl : RetType ID { ruleNewFunc((IdNode*)$2, ((TypeNode*)$1)->type_name);} LPAREN Formals RPAREN {
-			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
+			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$5)->params)->functionParams );
 			printProductionRule(4);
 
 		} LBRACE Statements RBRACE {

@@ -48,14 +48,14 @@ Register* IRManager::getGlobalFreshReg(){
 int IRManager::emitToBuffer(string command){
     
     int emit_result = codeBuffer.emit(" " + command + " ");
-    // cout << "command is: " << command << endl;
+    cout << "command is: " << command << endl;
     return emit_result;
 }
 
 void IRManager::emitGlobalToBuffer(string command){
     
     codeBuffer.emitGlobal(command);
-    // cout << "global command is: " << command << endl;
+    cout << "global command is: " << command << endl;
 }
 
 void IRManager::endProgram(){
@@ -404,8 +404,6 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
         }
     }
 
-    
-
     //TODO: check how to add the parameters correctly!!
     cout << "NOT SURE HOW TO ADD VARIABLES TO FUNCTION!!!" << endl;
 
@@ -416,8 +414,12 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
     for(int i = 0; i < params.size() ; i++){
         // put param value inside temp reg
         emitToBuffer("store i32 "+ params[i]->llvm_reg + ", i32 " + fresh_reg->getName() );
+
+        cout << "before alloca" << endl;
         // allocate empty space in stack and save on the param.llvm_reg
         emitToBuffer ( params[i]->llvm_reg + " = alloca i32");
+        cout << "after alloca" << endl;
+
         // copy the value back to function stack and params[i]->llvm_reg points to it
         emitToBuffer("store i32 "+fresh_reg->getName() + ", i32* " + params[i]->llvm_reg );
     }
