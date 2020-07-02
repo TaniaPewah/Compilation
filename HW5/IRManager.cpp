@@ -13,20 +13,46 @@ int IRManager::addPointerToRegisterInStack(string llvm_reg){
         return stack_offset_pointer - 1;
     }
 
-void IRManager::assignExpNodeToVar(string variable_reg, string exp_node_reg, string exp_node_type){
+void IRManager::assignExpNodeToVar(VarNode* variable, ExpNode* exp_node){
+
+
+
     // the variable is a register which points to a location in the string. we just neet to update the value in this location.
-    if(exp_node_type == "int"){
-        emitToBuffer("store i32 %" + exp_node_reg + ", i32* %p" + variable_reg);
-    }else if(exp_node_type == "byte"){
+    if(exp_node->type == "int"){
+        emitToBuffer("store i32 %" + exp_node->llvm_reg + ", i32* %p" + variable->llvm_reg);
+    }else if(exp_node->type == "byte"){
         Register* fresh_register = getFreshReg();
-        emitToBuffer("%" + fresh_register->getName() + " = zext i8 %" + exp_node_reg + " to i32");
-        emitToBuffer("store i32 %" + fresh_register->getName() + ", i32* %p" + variable_reg);
-    }else{
-        Register* fresh_register = getFreshReg();
-        emitToBuffer("%" + fresh_register->getName() + " = zext i1 %" + exp_node_reg + " to i32");
-        emitToBuffer("store i32 %" + fresh_register->getName() + ", i32* %p" + variable_reg);
+        emitToBuffer("%" + fresh_register->getName() + " = zext i8 %" + exp_node->llvm_reg + " to i32");
+        emitToBuffer("store i32 %" + fresh_register->getName() + ", i32* %p" + variable->llvm_reg);
+    }else if(exp_node->type == "bool"){
+        bpatchBool(variable, exp_node);
     }
     return;
+}
+
+void IRManager::bpatchBool(VarNode* variable, ExpNode* exp_node){
+    
+    string true_marker = codeBuffer.genLabel();
+    codeBuffer.bpatch(list_of_labels[exp_node->true_list_id], true_marker);
+    list_of_labels.erase(exp_node->true_list_id);
+
+    emitToBuffer("store i32 1, i32* %p" + variable->llvm_reg);
+
+    int br_true_loc = emitToBuffer("	br label @");
+
+    string false_marker = codeBuffer.genLabel();
+    codeBuffer.bpatch(list_of_labels[exp_node->false_list_id], false_marker);
+    list_of_labels.erase(exp_node->false_list_id);
+    
+    emitToBuffer("store i32 0, i32* %p" + variable->llvm_reg);
+
+    int br_false_loc = emitToBuffer("	br label @");
+
+    string finish_label = codeBuffer.genLabel();
+
+    codeBuffer.bpatch(codeBuffer.makelist({br_true_loc,FIRST}), finish_label);
+    codeBuffer.bpatch(codeBuffer.makelist({br_false_loc,FIRST}), finish_label);
+   
 }
 
 Register* IRManager::getFreshReg(){
@@ -193,7 +219,7 @@ void IRManager::orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel
 
 void IRManager::createFalseListAndTrueList(ExpNode* bool_node, string bool_sign){
         
-    int br_command_location = emitToBuffer("br label @");
+    int br_command_location = emitToBuffer("br label @@");
 	vector<pair<int,BranchLabelIndex>> false_list;
     vector<pair<int,BranchLabelIndex>> true_list;
 

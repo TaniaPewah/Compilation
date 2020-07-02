@@ -78,7 +78,7 @@ public:
     }
 
     int addPointerToRegisterInStack(string llvm_reg);
-    void assignExpNodeToVar(string variable_reg, string exp_node_reg, string exp_node_type);
+    void assignExpNodeToVar(VarNode* variable, ExpNode* exp_node);
     Register* getFreshReg();
     Register* getGlobalFreshReg();
     int emitToBuffer(string command);
@@ -124,6 +124,7 @@ public:
 
     void returnFromNonVoidFunction(string func_type, ExpNode* return_value);
     void newFuncScope ();
+    void bpatchBool(VarNode* variable, ExpNode* exp_node);
 };
 
 #endif //IR_MANAGER_HPP
