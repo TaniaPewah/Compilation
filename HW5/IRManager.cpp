@@ -555,16 +555,18 @@ void IRManager::getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node){
 
     if(var->type == "bool"){
         Register* fresh_reg = getFreshReg();
-        emitToBuffer("%" + fresh_reg->getName() +  " = icmp eq i32 %" + exp_node->llvm_reg);
+        emitToBuffer("%" + fresh_reg->getName() +  " = icmp eq i32 %" + exp_node->llvm_reg + ", 1");
 
         int branch_location = emitToBuffer("br i1 %" + fresh_reg->getName() + ", label @, label @");
 
         vector<pair<int,BranchLabelIndex>> for_true_list = codeBuffer.makelist({branch_location, FIRST});
         list_of_labels[label_list_key_gen] = for_true_list;
+        exp_node->true_list_id = label_list_key_gen;
         label_list_key_gen++;
 
          vector<pair<int,BranchLabelIndex>> for_false_list = codeBuffer.makelist({branch_location, SECOND});
         list_of_labels[label_list_key_gen] = for_false_list;
+        exp_node->false_list_id = label_list_key_gen;
         label_list_key_gen++;
     }
 
