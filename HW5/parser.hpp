@@ -251,15 +251,6 @@ class BrNode: public Node {
     }
 };
 
-class StatementNode: public Node {
-
-    public:
-    int next_list_id;
-
-    StatementNode(): Node(NA), next_list_id(-1){
-
-    }
-};
 
 
 

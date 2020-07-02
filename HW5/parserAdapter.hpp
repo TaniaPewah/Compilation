@@ -68,7 +68,7 @@ void ruleBreakCheck(Node* break_sign){
 }
 
 
-StatementNode* ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
+void ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
 
     string func_type = symbolTable.getFuncType(return_sign->lineno, current_func);
     if((func_type != return_value->type) && !(return_value->type == "byte" && func_type == "int")){
@@ -78,12 +78,9 @@ StatementNode* ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
 
     regManager->returnFromNonVoidFunction(func_type, return_value);
 
-    //TODO: check if should add statment->nexr
-    StatementNode* statment = new StatementNode();
-    return statment;
 }
 
-StatementNode* ruleReturnVoid(Node* return_sign){
+void ruleReturnVoid(Node* return_sign){
 
     // check what is the return type of the current function
     string func_type = symbolTable.getFuncType(return_sign->lineno, current_func);
@@ -94,9 +91,6 @@ StatementNode* ruleReturnVoid(Node* return_sign){
 
     regManager->emitToBuffer(" ret void ");
 
-    //TODO: check if should add statment->nexr
-    StatementNode* statment = new StatementNode();
-    return statment;
 }
 
 void addPrintAndPrinti(){
@@ -167,14 +161,21 @@ void ruleFuncDeclEndFunc(){
     symbolTable.closeScope();
 }
 
-FuncNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> params) {
-
-    string name = id_node->name;
+void ruleNewFunc( IdNode* func_id, string ret_type ){
+    
+    string name = func_id->name;
 
     if( symbolTable.ifExists(name) ){
-        output::errorDef(id_node->lineno, name);
+        output::errorDef(func_id->lineno, name);
         exit(0);
     }
+    
+	regManager->newFuncScope();
+}
+
+FuncNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
+
+    string name = id_node->name;
 
     reverse(params.begin(), params.end());
 
@@ -193,7 +194,7 @@ FuncNode* ruleFuncDeclStartFunc(IdNode* id_node, string type, vector<VarNode*> p
 
 }
 
-StatementNode* ruleVarDecl( string type_name, IdNode* id_node) {
+void ruleVarDecl( string type_name, IdNode* id_node) {
     string name = id_node->name;
 
     if( symbolTable.ifExists(name) ){
@@ -204,11 +205,10 @@ StatementNode* ruleVarDecl( string type_name, IdNode* id_node) {
 	symbolTable.addSymbolVar( current_node );
 
     delete(id_node);
-    StatementNode* returned = new StatementNode();
-    return returned;
+
 }
 
-StatementNode* ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_node) {
+void ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_node) {
     string name = id_node->name;
     VarNode* current_node = NULL;
 
@@ -224,8 +224,6 @@ StatementNode* ruleVarDeclAssign(IdNode* id_node, string var_type, ExpNode* exp_
     regManager->assignExpNodeToVar(current_node->llvm_reg, exp_node->llvm_reg, exp_node->type);
 
     delete(id_node);
-    StatementNode* returned = new StatementNode();
-    return returned;
 }
 
 
@@ -426,15 +424,6 @@ void ruleIfElse( ExpNode* if_cond_exp,
 
 }
 
-StatementNode* ruleStatements(StatementNode* statements_node){
-
-    cout << "ruleStatements enter" << endl;
-    StatementNode* result =  new StatementNode();
-    cout << "ruleStatements middle statements_node->next_list_id: " << statements_node->next_list_id << endl;
-    result->next_list_id = statements_node->next_list_id;
-    cout << "ruleStatements" << endl;
-    return result;
-}
 
 void checkMain(){
     if (!symbolTable.hasMain()) {
@@ -471,8 +460,6 @@ BrNode* ruleNextJump(){
 void ruleWhileNoElse( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
                      ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp ){
 
-    StatementNode* returned = new StatementNode();
-
     exitWhile();
     regManager->patchWhileNoElse(go_to_before_exp, before_exp_marker,  exp_node, after_exp_marker, go_to_check_exp );
 }
@@ -486,22 +473,8 @@ void ruleWhileElse ( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
                                  else_marker, end_else);                                   
 }
 
-StatementNode* rulePatchStatements(StatementNode* statments_node, LabelNode* before_statement_marker, 
-                                   StatementNode* statment_node){
 
-    cout << "rulePatchStatements" << endl;
-    StatementNode* returned = new StatementNode();
-    cout << "tring to merge 2 statments next -> rulePatchStatements" << endl;
-    regManager->patchStatements(statments_node, before_statement_marker, statment_node, returned);
-    cout << "tring to merge 2 statments next -> rulePatchStatements -> SUCSESS" << endl;
-    return returned;                                   
-}
-
-StatementNode* ruleCallStatment(ExpNode* function_returned_value){
-    StatementNode* returned_statment = new StatementNode();
-
-    //TODO: Mabey change STATMENTNODE->next
-
+void ruleCallStatment(ExpNode* function_returned_value){
     if(function_returned_value->type == "bool"){
         regManager->callToFunctionBackPatch(function_returned_value);
     }

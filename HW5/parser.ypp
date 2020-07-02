@@ -60,8 +60,8 @@ Funcs :  %empty { printProductionRule(2);
 		  }
 	  ;
 
-FuncDecl : RetType ID LPAREN Formals RPAREN {
-			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
+FuncDecl : RetType ID { ruleNewFunc((IdNode*)$2, ((TypeNode*)$1)->type_name);} LPAREN Formals RPAREN {
+			$$ = ruleFuncDecl((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
 			printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
@@ -105,14 +105,10 @@ FormalDecl : Type ID {
 	};
 Statements : Statement {
 				printProductionRule(12); 
-				cout<< "here" << endl;
-				//$$ = ruleStatements((StatementNode*)$1);
 				}
 
-		   | Statements JMA Statement {
+		   | Statements Statement {
 			   	printProductionRule(13);
-			   	//$$ = rulePatchStatements((StatementNode*)$1, (LabelNode*)$2, (StatementNode*)$3);
-				
 				}
 		   ;
 
@@ -123,14 +119,14 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 		  | Type ID SC { 
 			  	// DONE
 			    printProductionRule(15); 
-				$$ = ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
+				ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
 				
 				}
 
 		  | Type ID ASSIGN Exp SC { 
 			  	// DONE
 				printProductionRule(16); 
-				$$ = ruleVarDeclAssign( (IdNode*)$2, 
+				ruleVarDeclAssign( (IdNode*)$2, 
 										((TypeNode*)$1)->type_name, 
 										((ExpNode*)$4));
 				

@@ -16,8 +16,6 @@ class BrNode;
 class IdNode;
 class ExpList;
 class FuncNode;
-class StatementNode;
-
 
 class Register {
 	int num;
@@ -114,8 +112,6 @@ public:
                      ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp, 
                      LabelNode* else_marker, BrNode* end_else);
 
-    void patchStatements( StatementNode* statments_node, LabelNode* before_statement_marker, 
-                                   StatementNode* statment_node, StatementNode* returned);
     void handleBreak();
     void enterLoop();
     void handleContinue();
@@ -127,6 +123,7 @@ public:
     void callToFunctionBackPatch(ExpNode* function_returned_value);
 
     void returnFromNonVoidFunction(string func_type, ExpNode* return_value);
+    void newFuncScope ();
 };
 
 #endif //IR_MANAGER_HPP

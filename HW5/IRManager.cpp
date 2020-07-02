@@ -370,14 +370,6 @@ int IRManager::goToNext(){
     return emitToBuffer("br label @");
 }
 
-void IRManager::patchStatements( StatementNode* statments_node, LabelNode* before_statement_marker, 
-                                   StatementNode* statment_node, StatementNode* returned){
-    codeBuffer.bpatch(list_of_labels[statments_node->next_list_id], before_statement_marker->label);
-    // erase the bpached list
-    list_of_labels.erase(statments_node->next_list_id);
-    returned->next_list_id = statment_node->next_list_id;
-}
-
 void IRManager::enterLoop(){
     loop_counter++;
     break_list.push_back(vector<pair<int,BranchLabelIndex>>());
@@ -412,10 +404,24 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
         }
     }
 
+    
+
     //TODO: check how to add the parameters correctly!!
     cout << "NOT SURE HOW TO ADD VARIABLES TO FUNCTION!!!" << endl;
 
-    emitToBuffer("define " + llvm_function_type + "@" + id_node->name + "(" + params_list + ") { ");
+    emitToBuffer("define " + llvm_function_type + "@" + id_node->name + "(" + params_list + ") { ");	
+    
+    Register* fresh_reg = getFreshReg();
+
+    for(int i = 0; i < params.size() ; i++){
+        // put param value inside temp reg
+        emitToBuffer("store i32 "+ params[i]->llvm_reg + ", i32 " + fresh_reg->getName() );
+        // allocate empty space in stack and save on the param.llvm_reg
+        emitToBuffer ( params[i]->llvm_reg + " = alloca i32");
+        // copy the value back to function stack and params[i]->llvm_reg points to it
+        emitToBuffer("store i32 "+fresh_reg->getName() + ", i32* " + params[i]->llvm_reg );
+    }
+
     emitToBuffer("%stack = alloca [50 x i32]");
     
 }
@@ -518,6 +524,10 @@ void IRManager::returnFromNonVoidFunction(string func_type, ExpNode* return_valu
         emitToBuffer("ret i32" + return_value->llvm_reg);
     }
 
+}
+
+void IRManager::newFuncScope (){
+    register_index = 0;
 }
 
                         
