@@ -6,8 +6,7 @@ IRManager* IRManager::instance = 0;
 int IRManager::addPointerToRegisterInStack(string llvm_reg){
         // adds a variable to the stack, and creates a register that is a pointer to that location.
         // this register will always be a pointer to the stack
-        cout << "REMEMBER TO INITIATE %stack LATER!!!" <<endl;
-        //TODO: initiate %stack. refer: line 104, parser_hw5.hpp
+
         emitToBuffer(llvm_reg + " = getelementptr [50 x i32], [50 x i32]* %stack, i32 0, i32 " + to_string(stack_offset_pointer));
         stack_offset_pointer++;
         emitToBuffer("store i32 0, i32* " + llvm_reg);
@@ -49,14 +48,14 @@ Register* IRManager::getGlobalFreshReg(){
 int IRManager::emitToBuffer(string command){
     
     int emit_result = codeBuffer.emit(" " + command + " ");
-    cout << "command is: " << command << endl;
+    // cout << "command is: " << command << endl;
     return emit_result;
 }
 
 void IRManager::emitGlobalToBuffer(string command){
     
     codeBuffer.emitGlobal(command);
-    cout << "global command is: " << command << endl;
+    // cout << "global command is: " << command << endl;
 }
 
 void IRManager::endProgram(){
@@ -154,8 +153,6 @@ void IRManager::andPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MAlabe
     // if node_a false go to FalseList label
     // if node_b false go to FalseList label
 
-    cout<< "merging AND false lists" << endl;
-
     // merge false lists of node_a node_b
     list_of_labels[label_list_key_gen] = codeBuffer.merge(list_of_labels[node_a->false_list_id], 
                                                             list_of_labels[node_b->false_list_id]);
@@ -183,9 +180,6 @@ void IRManager::orPatching( ExpNode* node_a, ExpNode* node_b, LabelNode* MOlabel
     // erase the bpached list
     list_of_labels.erase(node_a->false_list_id);
 
-    cout << "merging OR true lists:" << endl;
-    cout <<" node_a truelist: " << node_a->true_list_id << endl;
-    cout <<" node_b truelist: " << node_b->true_list_id << endl;
 
     // if node_a true go to TrueList label
     // if node_b true go to TrueList label
@@ -229,8 +223,6 @@ void IRManager::createFalseListAndTrueList(ExpNode* bool_node, string bool_sign)
     list_of_labels[label_list_key_gen] = false_list;
     bool_node->false_list_id = label_list_key_gen;
     label_list_key_gen++;
-
-    cout <<" node_a truelist: " << bool_node->true_list_id << endl;
 	
 }
 
@@ -267,7 +259,7 @@ void IRManager::expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* ex
 void IRManager::patchIf( ExpNode* if_cond_exp , LabelNode* marker, 
                         StatementNode* statement, StatementNode* result_state ){
 
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::patchIf"<< endl;
+    // cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::patchIf"<< endl;
     // if if_cond_exp true go to marker label
     codeBuffer.bpatch(list_of_labels[if_cond_exp->true_list_id], marker->label);
     // erase the bpached list
@@ -288,7 +280,7 @@ void IRManager::patchIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st,
                            StatementNode* if_statement, StatementNode* go_to_else, 
                            LabelNode* marker_else_st, StatementNode* else_statement, StatementNode* result_state ){
     
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::patchIfElse"<< endl;
+    // cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::patchIfElse"<< endl;
     // if if_cond_exp true go to marker label
     codeBuffer.bpatch(list_of_labels[if_cond_exp->true_list_id], marker_if_st->label);
     // erase the bpached list
@@ -380,7 +372,7 @@ void IRManager::handleContinue(){
 }
 
 void IRManager::goToNext( StatementNode* returned ){
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::goToNext"<< endl;
+    // cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IRManager::goToNext"<< endl;
     int branch_location = emitToBuffer("br label @");
     vector<pair<int,BranchLabelIndex>> next_list = codeBuffer.makelist({branch_location, FIRST});
 	list_of_labels[label_list_key_gen] = next_list;
@@ -426,7 +418,6 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
         params_list += "i32";
     
         for(int i = 0; i < params.size() - 1; i++){
-            cout<< "param num " << i << endl;
             params_list += ", i32";
         }
     }
@@ -434,7 +425,7 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
     //TODO: check how to add the parameters correctly!!
     cout << "NOT SURE HOW TO ADD VARIABLES TO FUNCTION!!!" << endl;
 
-    emitToBuffer("define " + llvm_function_type + "@" + id_node->name + "(" + params_list + " { ");
+    emitToBuffer("define " + llvm_function_type + "@" + id_node->name + "(" + params_list + ") { ");
     emitToBuffer("%stack = alloca [50 x i32]");
     
 }
@@ -473,7 +464,7 @@ string _addFunctionSingleVar(ExpNode* current_node){
 
 void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, ExpNode* returned_value){
 
-    //TODO: check this call function
+    //TODO: check this call function- not sure if sending variables value currectly
     cout << "I'M NOT SURE ABOUT THIS CALL FUNCTION!!!" << endl;
 
     string call_start = "";
@@ -491,7 +482,7 @@ void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, Ex
         }
     }
 
-    emitToBuffer(call_start + "(" + call_func_variables + ")");
+    emitToBuffer(call_start + func_node->name + "(" + call_func_variables + ")");
 
     // Check if the function is bool- and patc
     if(func_node->type == "bool"){

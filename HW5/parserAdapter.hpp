@@ -133,7 +133,6 @@ ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
 }
 
 ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b,  LabelNode* label){
-    cout << "handling ruleOrExp function" << endl;
     if(node_a->type != "bool" || node_b->type != "bool") {
         output::errorMismatch(node_a->lineno);
         exit(0);
@@ -263,7 +262,6 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
             else{
                 command = expNode->llvm_reg + " = zext i8 " + exp_b->llvm_reg + " to i32";
             }
-            cout << "command binup is: " << command << endl;
             regManager->emitToBuffer(command);
         }
         string to_emit = expNode->llvm_reg + " = " + binop->binop + " i32 " + exp_a->llvm_reg + ", " + exp_b->llvm_reg;
@@ -310,12 +308,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
 
 
 ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
-    if(bool_sign == "1"){
-        cout << "now handling true with register " << bool_node->llvm_reg << endl;
-    }
-    else{
-        cout << "now handling false with register " << bool_node->llvm_reg << endl;
-    }
+    
     regManager->emitToBuffer(bool_node->llvm_reg + " = add i1 0, " + bool_sign);
 
     regManager->createFalseListAndTrueList(bool_node, bool_sign);
@@ -367,13 +360,13 @@ FormalsList* ruleAddFormals( FormalsList* params_list ,VarNode* param_to_add){
     return params_list;
 }
 
-ExpList* ruleAddExp(ExpList* exp_list, ExpNode* exp){
+ExpList* ruleAddExp(ExpList* exp_list, ExpNode* exp_node_to_add){
 
-    if(exp->type == "bool") {
-        regManager->startBoolJump(exp);
+    if(exp_node_to_add->type == "bool") {
+        regManager->startBoolJump(exp_node_to_add);
     }
 
-    exp_list->addParam(exp);
+    exp_list->addParam(exp_node_to_add);
     return exp_list;
 }
 
@@ -415,8 +408,6 @@ StatementNode* ruleIfNoElse( ExpNode* if_cond_exp , LabelNode* marker, Statement
        exit(0); 
     }
 
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ruleIfNoElse"<< endl;
-
     StatementNode* result =  new StatementNode();
     regManager->patchIf(if_cond_exp, marker, statement, result);
 
@@ -430,8 +421,6 @@ StatementNode* ruleIfElse( ExpNode* if_cond_exp , LabelNode* marker_if_st,
        output::errorMismatch(if_cond_exp->lineno);
        exit(0); 
     }
-
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ruleIfNoElse"<< endl;
 
     StatementNode* result =  new StatementNode();
     regManager->patchIfElse(if_cond_exp, marker_if_st, if_statement, go_to_else, 
@@ -472,7 +461,6 @@ void endProgram(){
 }
 
 LabelNode* ruleBranchLabel(){
-    cout << "in OR marker" << endl;
     return new LabelNode();
 }
 
@@ -508,15 +496,16 @@ StatementNode* rulePatchStatements(StatementNode* statments_node, LabelNode* bef
                                    StatementNode* statment_node){
 
     StatementNode* returned = new StatementNode();
-
+    cout << "tring to merge 2 statments next -> rulePatchStatements" << endl;
     regManager->patchStatements(statments_node, before_statement_marker, statment_node, returned);
+    cout << "tring to merge 2 statments next -> rulePatchStatements -> SUCSESS" << endl;
     return returned;                                   
 }
 
 StatementNode* ruleCallStatment(ExpNode* function_returned_value){
     StatementNode* returned_statment = new StatementNode();
 
-    cout<<"NOT SURE IF WE SHOULD ADD STATMENTNODE->NEXT" << endl;
+    //TODO: Mabey change STATMENTNODE->next
 
     if(function_returned_value->type == "bool"){
         regManager->callToFunctionBackPatch(function_returned_value);

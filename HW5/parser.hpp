@@ -36,14 +36,12 @@ class Node{
     string getFreshReg(){
         IRManager* regManager = IRManager::getInstance();
         Register* regID = regManager->getFreshReg();
-        cout <<" new reg created name : " << regID->getName() << endl;
         return regID->getName();
     }
 
     string getGlobalFreshReg(){
         IRManager* regManager = IRManager::getInstance();
         Register* regID = regManager->getGlobalFreshReg();
-        cout <<" new global reg created name : " << regID->getName() << endl;
         return regID->getName();
     }
 };
@@ -90,7 +88,6 @@ class ExpNode: public Node{
     };
     
     ExpNode(int lineno, string type, string llvm_reg) : Node(lineno), type(type), llvm_reg(llvm_reg), true_list_id(-1), false_list_id(-1) {
-        cout << "created new exp node, with givven register " << llvm_reg << endl;
     }
 };
 

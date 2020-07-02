@@ -61,15 +61,11 @@ Funcs :  %empty { printProductionRule(2);
 	  ;
 
 FuncDecl : RetType ID LPAREN Formals RPAREN {
-			cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! in here1 << ((TypeNode*)$1)->type_name << !!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			$$ = ruleFuncDeclStartFunc((IdNode*)$2, ((TypeNode*)$1)->type_name, ((FormalsList*)((Formals*)$4)->params)->functionParams );
-			cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! in here2!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			printProductionRule(4);
 
 		} LBRACE Statements RBRACE {
-			cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! in here3 !!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			ruleFuncDeclEndFunc();
-			cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! in here4 !!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 		}
 		;
 
@@ -201,26 +197,22 @@ ENTERLOOP : %empty {
 Call : ID LPAREN {
 	 ruleAllowString((IdNode*)$1);} ExpList RPAREN { 
 		printProductionRule(27); 
-		cout << "call ID LPAREN ~~~~~~~~~~" << endl;
 		$$ = ruleCallFunc((IdNode*)$1, (ExpList*)$4);
 		}
 	
 	 | ID LPAREN RPAREN { 
 		printProductionRule(28); 
-		 cout << "call ID LPAREN RPAREN ~~~~~~~~~~" << endl;
 		$$ = ruleCallEmptyFunc((IdNode*)$1 );
 	 	}
 	 ;
 
 ExpList : Exp { 
 		printProductionRule(29); 
-		cout << "ExpList : Exp new list ~~~~~~~~~~" << endl;
 		$$ = new ExpList();
 		$$ = ruleAddExp( (ExpList*)$$, (ExpNode*)$1); 
 		}
 		| Exp COMMA ExpList { 
 			printProductionRule(30); 
-			cout << "ExpList : Exp add to list ~~~~~~~~~~" << endl;
 			$$ = ruleAddExp((ExpList*)$3, (ExpNode*)$1);
 			}
 		;
@@ -245,17 +237,14 @@ NJ : %empty {
 
 Exp : LPAREN Exp RPAREN { 
 		printProductionRule(34); 
-		cout << "LPAREN Exp RPAREN **********************" << endl;
 		$$ = (ExpNode*)$2;
 		}
 	| Exp ADDITIVE Exp {
 		printProductionRule(35); 
-		cout << "Exp ADDITIVE Exp **********************" << endl; 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
 		}
 	| Exp MUL Exp {
 		printProductionRule(35); 
-		cout << "Exp MUL Exp **********************" << endl; 
 		$$ = ruleExpBinopExp((ExpNode*)$1, (BinopNode*)$2, (ExpNode*)$3);
 		}
 	| ID { 
@@ -293,23 +282,19 @@ Exp : LPAREN Exp RPAREN {
 		}
 	| Exp AND JMA Exp {
 		printProductionRule(44); 
-		cout << "Exp AND Exp **********************" << endl; 
 		$$ = ruleAndExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
 		}
 	| Exp OR JMA Exp {
 		printProductionRule(45); 
-		cout << "Exp OR Exp **********************" << endl; 
 		$$ = ruleOrExp((ExpNode*)$1, (ExpNode*)$4, (LabelNode*)$3);
 		}
 	| Exp RELOPLEFT Exp {
 		printProductionRule(46); 
-		cout << "Exp RELOPLEFT Exp **********************" << endl;
 		// check both Exp are numerical
 		$$ = ruleRelop((ExpNode*)$1, (RelopNode*)$2, (ExpNode*)$3);	
 		}
     | Exp RELOPNOTASS Exp {
 		printProductionRule(46); 
-		cout << "Exp RELOPNOTASS Exp **********************" << endl; 
 		$$ = ruleRelop((ExpNode*)$1, (RelopNode*)$2, (ExpNode*)$3);
 		}
 	;
