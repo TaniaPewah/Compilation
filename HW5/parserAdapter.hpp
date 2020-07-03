@@ -157,9 +157,9 @@ ExpNode* ruleNotExp(ExpNode* node) {
 
 void ruleFuncDeclEndFunc(TypeNode* type_node){
     if(type_node->type_name == "void"){
-        regManager->emitToBuffer("ret void ");
+        regManager->emitToBuffer("ret void }");
     }else{
-        regManager->emitToBuffer("ret i32 ");
+        regManager->emitToBuffer("ret i32 0 }");
     }
    
     current_func = "";
@@ -253,7 +253,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
     if(type == "byte"){
         string new_reg_name = regManager->getFreshReg()->getName();
-        regManager->emitToBuffer( "%" + new_reg_name + " = and i32 %t" + expNode->llvm_reg + ", 255");
+        regManager->emitToBuffer( "%" + new_reg_name + " = and i32 %" + expNode->llvm_reg + ", 255");
         expNode->llvm_reg = new_reg_name;
     
     }
