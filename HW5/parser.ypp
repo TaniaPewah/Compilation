@@ -127,7 +127,6 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 			  	// DONE
 				//printProductionRule(16); 
 				ruleVarDeclAssign( (IdNode*)$2, (VarNode*)$3, (ExpNode*)$5,  ((TypeNode*)$1)->type_name);
-				
 				}
 
 		  | ID ASSIGN Exp SC { 
