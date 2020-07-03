@@ -10,7 +10,7 @@ bool call_print = false;
 IRManager* regManager = IRManager::getInstance();
 
 VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
-    VarNode* new_var = new VarNode(type->lineno, id->name, type->type_name, false);
+    VarNode* new_var = new VarNode(type->lineno, id->name, type->type_name);
     new_var->llvm_reg = regManager->getFreshVarReg();
     delete(type);
     delete(id);
@@ -97,12 +97,12 @@ void ruleReturnVoid(Node* return_sign){
 void addPrintAndPrinti(){
 
     vector<VarNode*> vector_for_print_func;
-    vector_for_print_func.push_back(new VarNode(NA, "", "string", false));
+    vector_for_print_func.push_back(new VarNode(NA, "", "string"));
     FuncNode* print_function = new FuncNode(NA, "print", "void", vector_for_print_func);
     symbolTable.addSymbolFunc(print_function);
 
     vector<VarNode*> vector_for_printi_func;
-    vector_for_printi_func.push_back(new VarNode(NA, "", "int", false));
+    vector_for_printi_func.push_back(new VarNode(NA, "", "int"));
     FuncNode* printi_function = new FuncNode(NA, "printi", "void", vector_for_printi_func);
     symbolTable.addSymbolFunc(printi_function);
 
@@ -149,7 +149,6 @@ ExpNode* ruleNotExp(ExpNode* node) {
     }
 
     ExpNode* new_exp_node = new ExpNode(node->lineno, "bool");
-    regManager->emitToBuffer("%" + new_exp_node->llvm_reg + " = add i1 1, %" + node->llvm_reg);
     
     regManager->expPassListNotRule(node, new_exp_node);
 
@@ -249,6 +248,7 @@ void ruleInit(){
 ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     // Check exp_a & exp_b are num types. If not- raise exeption. Else, do binop and return higher num type
 
+    // VarNode* var_a = getVarNode(exp_a-)
 
     if((exp_a->type != "int" && exp_a->type != "byte") || (exp_b->type != "int" && exp_b->type != "byte")){
 
@@ -263,6 +263,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
     if(exp_a->type == "int" || exp_b->type == "int") {  
         ExpNode* expNode = new ExpNode(binop->lineno, "int");
+        expNode->getFreshReg();
 
         if(exp_a->type !=  exp_b->type) {
             //one is int, and the other one byte
@@ -275,6 +276,7 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
             }
             regManager->emitToBuffer(command);
         }
+        regManager->emitToBuffer(";if multipale define-> check binop");
         string to_emit = "%" + expNode->llvm_reg + " = " + binop->binop + " i32 %" + exp_a->llvm_reg + ", %" + exp_b->llvm_reg;
         regManager->emitToBuffer(to_emit);
 
@@ -290,6 +292,8 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     string to_emit = "%" + expNode->llvm_reg + " = " + binop->binop + " i8 %" + exp_a->llvm_reg + ", %" + exp_b->llvm_reg;
 
     regManager->emitToBuffer(to_emit);
+
+    regManager->emitToBuffer( expNode->llvm_reg + " = and i32 %t" + expNode->llvm_reg + ", 255");
     return expNode;
       
 }
@@ -299,6 +303,8 @@ ExpNode* ruleExpNum(NumNode* num_node){
 
     //TODO: Add constructor, to get existing reister
     ExpNode* expNode = new ExpNode(num_node->lineno, num_node->type_name);
+    expNode->llvm_reg = regManager->getFreshReg()->getName();
+
     string command = "%" + expNode->llvm_reg + " = add i32 0, " + to_string(num_node->value); 
     regManager->emitToBuffer(command);
     return (expNode);
@@ -311,6 +317,8 @@ ExpNode* ruleExpNumB(NumNode* num) {
     }
     //TODO: Add constructor, to get existing reister
     ExpNode* expNode = new ExpNode(num->lineno, "byte");
+    expNode->llvm_reg = regManager->getFreshReg()->getName();
+
     string command = "%" + expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
 
     regManager->emitToBuffer(command);
@@ -349,6 +357,7 @@ ExpNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
 ExpNode* ruleCallEmptyFunc(IdNode* id_node) {
      // search ID in symboltable, and get it's type
+     //TODO: Add check for empty called function!!
     string returned_type = symbolTable.getFuncType(id_node->lineno, id_node->name);
 
     FuncNode* func = (FuncNode*)(symbolTable.findSymbolInStack(id_node->name)->node);
@@ -475,14 +484,25 @@ void ruleWhileNoElse( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
                      ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp ){
 
     exitWhile();
+
+    if(exp_node->type != "bool") {
+        output::errorMismatch(exp_node->lineno);
+        exit(0);
+    }
     regManager->patchWhileNoElse(go_to_before_exp, before_exp_marker,  exp_node, after_exp_marker, go_to_check_exp );
 }
 
 void ruleWhileElse ( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
                      ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp,
                     LabelNode* else_marker, BrNode* end_else){
-
     
+    if(exp_node->type != "bool") {
+        output::errorMismatch(exp_node->lineno);
+        exit(0);
+    }
+    
+    exitWhile();
+     
     regManager->patchWhileElse(go_to_before_exp, before_exp_marker,  exp_node, after_exp_marker, go_to_check_exp,
                                  else_marker, end_else);                                   
 }

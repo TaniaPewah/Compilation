@@ -108,8 +108,8 @@ class VarNode: public IdNode{
     public:
     string type;
     int stack_offset;
-    bool alocate_memory;
-    VarNode( int lineno, string name, string type , bool alocate_memory) : IdNode(lineno, name), type(type) , alocate_memory(alocate_memory){
+
+    VarNode( int lineno, string name, string type) : IdNode(lineno, name), type(type){
         IRManager* regManager = IRManager::getInstance();
         // if(!alocate_memory){
         //     llvm_reg = to_string(regManager->stack_offset_pointer);
@@ -126,7 +126,7 @@ class FuncNode: public VarNode{
     /* This class supports variable types, such as int, bool... */
     public:
     vector<VarNode*> params;
-    FuncNode( int lineno, string name, string type, vector<VarNode*> params ) : VarNode(lineno, name, type, false), params(params) {
+    FuncNode( int lineno, string name, string type, vector<VarNode*> params ) : VarNode(lineno, name, type), params(params) {
     };
 };
 
