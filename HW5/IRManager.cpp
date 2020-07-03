@@ -455,7 +455,7 @@ void IRManager::startBoolJump(ExpNode* exp_node){
 
     //if false
     string false_lable = codeBuffer.genLabel();
-    codeBuffer.bpatch(list_of_labels[exp_node->false_list_id], true_lable);
+    codeBuffer.bpatch(list_of_labels[exp_node->false_list_id], false_lable);
     list_of_labels.erase(exp_node->false_list_id);
     int false_branch_location = emitToBuffer("br label @");
 
