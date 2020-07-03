@@ -128,6 +128,10 @@ class FuncNode: public VarNode{
     vector<VarNode*> params;
     FuncNode( int lineno, string name, string type, vector<VarNode*> params ) : VarNode(lineno, name, type), params(params) {
     };
+
+    void setParams(vector<VarNode*> new_params){
+        this->params = new_params;
+    }
 };
 
 class ExpList: public Node{

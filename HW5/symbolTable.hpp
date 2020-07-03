@@ -70,20 +70,20 @@ public:
     }
 
     void endScope(){
-        //output::endScope();
-        //cout << "++++++ Trying to end scope: "<< func_name << "++++++" << endl;
+        // output::endScope();
+        //cout << "-------------------------scope ended: "<< func_name << "++++++" << endl;
       
         for ( auto entry : entries) {
  
             string id = entry->node->name;
 
             if(entry->is_var){
-                //output::printID( id, entry->offset, toUpper(entry->node->type));
+                // output::printID( id, entry->offset, toUpper(entry->node->type));
             }
             else{
                 vector<string> params_type = varNodeToVectString(((FuncNode*)(entry->node))->params);
                 string print_types = output::makeFunctionType(toUpper(entry->node->type), params_type);
-                //output::printID( id, entry->offset, print_types);
+                // output::printID( id, entry->offset, print_types);
             }
         }
     }
@@ -97,28 +97,28 @@ public:
     SymbolTable() {}
 
     void newScope(){
-         
 
         Scope* scopeToAdd;
         if (stack.empty()){
             scopeToAdd = new Scope(0);
-            //cout << "--First scope was created--" << endl;
+            // cout << "-------------------------First scope was created " << " size: " << stack.size() <<"--------------------" <<endl;
         }
         else{
             scopeToAdd = new Scope(stack.back()->offset);
-            //cout << "--New scope was created--" << endl;
+            // cout << "-----------------New scope was created--" << " size: " << stack.size() <<"--------------------" <<endl;
         }
         stack.push_back(scopeToAdd);
     }
     void closeScope(){
         stack.back()->endScope();
         stack.pop_back();
+        // cout<<"-----------------------scope ended "<< " size: " << stack.size() << "----------------------" <<endl;
     }
 
     void addSymbolVar( VarNode* symbolToAdd){
         if(!ifExists(symbolToAdd->name)){
             stack.back()->addSymbolVar( symbolToAdd);
-            //cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
+            // cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
         }
         else{
             output::errorDef(symbolToAdd->lineno, symbolToAdd->name);
@@ -130,7 +130,7 @@ public:
         
         if(!ifExists(symbolToAdd->name)){
             stack.back()->addSymbolVarForFunction( symbolToAdd, wanted_offset );
-            //cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
+            // cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
         }
         else{
             output::errorDef(symbolToAdd->lineno, symbolToAdd->name);
@@ -195,6 +195,16 @@ public:
        }
 
        return wanted_entry->node->type;
+    }
+
+    FuncNode* getFuncNode(int lineno, string id){
+        TableEntry* wanted_entry = findSymbolInStack(id);
+        if(!wanted_entry || wanted_entry->is_var) {
+            output::errorUndefFunc(lineno, id);
+            exit(0);
+       }
+
+       return (FuncNode*)(wanted_entry->node);
     }
 
     bool ifExists(string name){

@@ -32,10 +32,12 @@ void enterWhile(){
 
 void exitWhile(){
     regManager->loop_counter--;
+    symbolTable.closeScope();
 }
 
 
 ExpNode* ruleHandleString(StringNode* string_node){
+    // cout<<"called function not print"<<endl;
     if(!call_print){
         output::errorMismatch(string_node->lineno);
         exit(0);
@@ -73,6 +75,7 @@ void ruleReturnNonVoid(Node* return_sign, ExpNode* return_value) {
 
     string func_type = symbolTable.getFuncType(return_sign->lineno, current_func);
     if((func_type != return_value->type) && !(return_value->type == "byte" && func_type == "int")){
+        // cout<<"function not int byte or bool"<<endl;
         output::errorMismatch(return_sign->lineno);
         exit(0);
     }
@@ -85,6 +88,7 @@ void ruleReturnVoid(Node* return_sign){
 
     // check what is the return type of the current function
     string func_type = symbolTable.getFuncType(return_sign->lineno, current_func);
+    // cout<<"funvtion not void"<<endl;
     if(func_type != "void"){
         output::errorMismatch(return_sign->lineno);
         exit(0);
@@ -110,6 +114,7 @@ void addPrintAndPrinti(){
 
 ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
    
+   // cout<<"And with no bool" <<endl;
     if(node_a->type != "bool" || node_b->type != "bool") {
         output::errorMismatch(node_a->lineno);
         exit(0);
@@ -128,6 +133,7 @@ ExpNode* ruleAndExp(ExpNode* node_a, ExpNode* node_b, LabelNode* label ){
 }
 
 ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b,  LabelNode* label){
+    // cout<<"OR with no bool"<<endl;
     if(node_a->type != "bool" || node_b->type != "bool") {
         output::errorMismatch(node_a->lineno);
         exit(0);
@@ -143,6 +149,7 @@ ExpNode* ruleOrExp(ExpNode* node_a, ExpNode* node_b,  LabelNode* label){
 }
 
 ExpNode* ruleNotExp(ExpNode* node) {
+    // cout<<"not with no bool"<<endl;
     if(node->type != "bool") {
         output::errorMismatch(node->lineno);
         exit(0);
@@ -167,23 +174,25 @@ void ruleFuncDeclEndFunc(TypeNode* type_node){
 }
 
 void ruleNewFunc( IdNode* func_id, string ret_type ){
-    
+
+    vector<VarNode*> temp_params;
+    FuncNode* current_node = new FuncNode(func_id->lineno, func_id->name, ret_type, temp_params); 
+	symbolTable.addSymbolFunc( current_node );
+    symbolTable.newScope();
 	regManager->newFuncScope();
 }
 
 FuncNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
 
-    string name = id_node->name;
-
     reverse(params.begin(), params.end());
 
-	FuncNode* current_node = new FuncNode(id_node->lineno, name, type, params); 
-	symbolTable.addSymbolFunc( current_node );
-    symbolTable.newScope();
+    FuncNode* current_node = symbolTable.getFuncNode(id_node->lineno, id_node->name);
+    current_node->setParams(params);
+
     for( int i = 0 ; i < params.size(); i++){
         symbolTable.addSymbolVarForFunction(params[i], 0 - i - 1 );
     }
-    current_func = name;
+    current_func = id_node->name;
     
     // ruleNewFunc(id_node, type);
     regManager->defineNewFunction(id_node, type, params);
@@ -204,7 +213,7 @@ VarNode* createVarNode(IdNode* id_node, string var_type){
 
 void ruleVarDeclAssign(IdNode* id_node, VarNode* var_node, ExpNode* exp_node,  string var_type) {
    
-
+   // cout<<"Type ID = exp, but id type != exp type" <<endl;
     if((var_type != exp_node->type) && !(var_type == "int" && exp_node->type == "byte")){
         output::errorMismatch(id_node->lineno);
         exit(0);
@@ -225,8 +234,8 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
 
     // VarNode* var_a = getVarNode(exp_a-)
 
+    // cout<<"binop between two vars, with diffrent types"<<endl;
     if((exp_a->type != "int" && exp_a->type != "byte") || (exp_b->type != "int" && exp_b->type != "byte")){
-
         output::errorMismatch(exp_a->lineno);
         exit(0);
     }
@@ -300,7 +309,6 @@ ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
 
 ExpNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
 
-    call_print = false;
     // search ID in symboltable, and get it's type
     string returned_type = symbolTable.getFuncType(id_node->lineno, id_node->name);
 
@@ -357,8 +365,8 @@ void ruleIdAssign( IdNode* id_node, ExpNode* exp){
     VarNode* variable = symbolTable.getVarNode(id_node->lineno, id_node->name);
 
     string id_type = variable->type;
-
-    if( id_type != exp->type ){
+    // cout<<"ID = exp, but id type != exp type"<<endl;
+    if( id_type != exp->type && !(id_type == "int" && exp->type == "byte")){
         
         output::errorMismatch(id_node->lineno);
         exit(0);
@@ -370,6 +378,7 @@ void ruleIdAssign( IdNode* id_node, ExpNode* exp){
 
 ExpNode* ruleRelop(ExpNode* exp1, RelopNode* compare_sign, ExpNode* exp2){
 
+    // cout<<"var 1 relop var 2, but tow diffrent types"<<endl;
     if((exp1->type != "int" && exp1->type != "byte") || (exp2->type != "int" && exp2->type != "byte")){
 
         output::errorMismatch(exp1->lineno);
@@ -385,6 +394,7 @@ ExpNode* ruleRelop(ExpNode* exp1, RelopNode* compare_sign, ExpNode* exp2){
 
 
 void ruleIfNoElse( ExpNode* if_cond_exp , LabelNode* marker, BrNode* br_node ){
+    // cout<<"if no else condition type not bool"<<endl;
     if(if_cond_exp->type != "bool"){
        output::errorMismatch(if_cond_exp->lineno);
        exit(0); 
@@ -398,6 +408,7 @@ void ruleIfElse( ExpNode* if_cond_exp,
                            BrNode* go_to_end_from_if, 
                            LabelNode* marker_else, 
                            BrNode* go_to_end_from_else ){
+    // cout<<"if condition with else not bool"<<endl;
     if(if_cond_exp->type != "bool"){
        output::errorMismatch(if_cond_exp->lineno);
        exit(0); 
@@ -445,8 +456,7 @@ BrNode* ruleNextJump(){
 void ruleWhileNoElse( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
                      ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp ){
 
-    exitWhile();
-
+    // cout<<"While condition no else not bool"<<endl;
     if(exp_node->type != "bool") {
         output::errorMismatch(exp_node->lineno);
         exit(0);
@@ -458,12 +468,11 @@ void ruleWhileElse ( BrNode* go_to_before_exp, LabelNode* before_exp_marker,
                      ExpNode* exp_node,  LabelNode* after_exp_marker, BrNode* go_to_check_exp,
                     LabelNode* else_marker, BrNode* end_else){
     
+    // cout<<"While condition with else not bool"<<endl;
     if(exp_node->type != "bool") {
         output::errorMismatch(exp_node->lineno);
         exit(0);
     }
-    
-    exitWhile();
      
     regManager->patchWhileElse(go_to_before_exp, before_exp_marker,  exp_node, after_exp_marker, go_to_check_exp,
                                  else_marker, end_else);                                   
@@ -474,6 +483,7 @@ void ruleCallStatment(ExpNode* function_returned_value){
     if(function_returned_value->type == "bool"){
         regManager->callToFunctionBackPatch(function_returned_value);
     }
+    call_print = false;
 } 
 
 void debugWindow(string s){
