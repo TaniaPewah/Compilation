@@ -157,9 +157,9 @@ ExpNode* ruleNotExp(ExpNode* node) {
 
 void ruleFuncDeclEndFunc(TypeNode* type_node){
     if(type_node->type_name == "void"){
-        regManager->emitToBuffer("ret void }");
+        regManager->emitToBuffer("ret void ");
     }else{
-        regManager->emitToBuffer("ret i32 }");
+        regManager->emitToBuffer("ret i32 ");
     }
    
     current_func = "";
@@ -236,41 +236,30 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
         patching_info = regManager->handlerDivZero(exp_b->type, exp_b->llvm_reg);
     }
 
-    if(exp_a->type == "int" || exp_b->type == "int") {  
-        ExpNode* expNode = new ExpNode(binop->lineno, "int");
-        expNode->getFreshReg();
+    string type = (exp_a->type == "int" || exp_b->type == "int") ? "int" : "byte";
+    
+    ExpNode* expNode = new ExpNode(binop->lineno, type);
+    expNode->llvm_reg =  regManager->getFreshReg()->getName();
 
-        if(exp_a->type !=  exp_b->type) {
-            //one is int, and the other one byte
-            string command;
-            if(exp_a->type == "byte") {
-                command = "%" + expNode->llvm_reg + " = zext i8 %" + exp_a->llvm_reg + " to i32";
-            }
-            else{
-                command = "%" + expNode->llvm_reg + " = zext i8 %" + exp_b->llvm_reg + " to i32";
-            }
-            regManager->emitToBuffer(command);
-        }
-        regManager->emitToBuffer(";if multipale define-> check binop");
-        string to_emit = "%" + expNode->llvm_reg + " = " + binop->binop + " i32 %" + exp_a->llvm_reg + ", %" + exp_b->llvm_reg;
-        regManager->emitToBuffer(to_emit);
-
-        if(binop->binop == "sdiv"){
-            regManager->handlePatching(patching_info);
-        }
-        
-        return expNode;
-    }
-
-    // Both are byte
-    ExpNode* expNode = new ExpNode(binop->lineno, "byte");
-    string to_emit = "%" + expNode->llvm_reg + " = " + binop->binop + " i8 %" + exp_a->llvm_reg + ", %" + exp_b->llvm_reg;
-
+    regManager->emitToBuffer(";if multipale define-> check binop");
+    string to_emit = "%" + expNode->llvm_reg + " = " + binop->binop + " i32 %" + exp_a->llvm_reg + ", %" + exp_b->llvm_reg;
     regManager->emitToBuffer(to_emit);
 
-    regManager->emitToBuffer( expNode->llvm_reg + " = and i32 %t" + expNode->llvm_reg + ", 255");
+    if(binop->binop == "sdiv"){
+        regManager->handlePatching(patching_info);
+    }
+
+    
+
+    if(type == "byte"){
+        string new_reg_name = regManager->getFreshReg()->getName();
+        regManager->emitToBuffer( "%" + new_reg_name + " = and i32 %t" + expNode->llvm_reg + ", 255");
+        expNode->llvm_reg = new_reg_name;
+    
+    }
+    
     return expNode;
-      
+    
 }
 
 
@@ -294,7 +283,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
     ExpNode* expNode = new ExpNode(num->lineno, "byte");
     expNode->llvm_reg = regManager->getFreshReg()->getName();
 
-    string command = "%" + expNode->llvm_reg + " = add i8 0, " + to_string(num->value); 
+    string command = "%" + expNode->llvm_reg + " = add i32 0, " + to_string(num->value); 
 
     regManager->emitToBuffer(command);
     return (expNode);
@@ -302,8 +291,6 @@ ExpNode* ruleExpNumB(NumNode* num) {
 
 
 ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
-    
-    // regManager->emitToBuffer("%" + bool_node->llvm_reg + " = add i1 0, " + bool_sign);
 
     regManager->createFalseListAndTrueList(bool_node, bool_sign);
     
