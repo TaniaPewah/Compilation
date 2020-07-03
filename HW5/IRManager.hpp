@@ -127,6 +127,7 @@ public:
     void bpatchBool(VarNode* variable, ExpNode* exp_node);
     void getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node);
     string getFreshVarReg();
+    VarNode* createNewVar(IdNode* id_node, string var_type);
 };
 
 #endif //IR_MANAGER_HPP

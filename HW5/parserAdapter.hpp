@@ -168,13 +168,6 @@ void ruleFuncDeclEndFunc(TypeNode* type_node){
 
 void ruleNewFunc( IdNode* func_id, string ret_type ){
     
-    // string name = func_id->name;
-
-    // if( symbolTable.ifExists(name) ){
-    //     output::errorDef(func_id->lineno, name);
-    //     exit(0);
-    // }
-    
 	regManager->newFuncScope();
 }
 
@@ -200,28 +193,9 @@ FuncNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
 
 }
 
-void ruleVarDecl( string type_name, IdNode* id_node) {
-    string name = id_node->name;
-
-    if( symbolTable.ifExists(name) ){
-        output::errorDef(id_node->lineno, name);
-        exit(0);
-    }
-	VarNode* current_node = new VarNode(id_node->lineno, name, type_name, true); 
-    current_node->llvm_reg = regManager->getFreshVarReg();
-	symbolTable.addSymbolVar( current_node );
-
-    delete(id_node);
-
-}
-
 VarNode* createVarNode(IdNode* id_node, string var_type){
-    string name = id_node->name;
-    VarNode* current_node = NULL;
-
-
-    current_node = new VarNode(id_node->lineno, name, var_type, true); 
-    current_node->llvm_reg = regManager->getFreshVarReg();
+    VarNode* current_node =  regManager->createNewVar(id_node, var_type);
+   
     symbolTable.addSymbolVar( current_node );
 
     delete(id_node);
@@ -230,6 +204,7 @@ VarNode* createVarNode(IdNode* id_node, string var_type){
 
 void ruleVarDeclAssign(IdNode* id_node, VarNode* var_node, ExpNode* exp_node,  string var_type) {
    
+
     if((var_type != exp_node->type) && !(var_type == "int" && exp_node->type == "byte")){
         output::errorMismatch(id_node->lineno);
         exit(0);

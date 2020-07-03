@@ -119,7 +119,7 @@ Statement : LBRACE NEWSCOPECREATION Statements RBRACE {
 		  | Type ID SC { 
 			  	// DONE
 			    //printProductionRule(15); 
-				ruleVarDecl(((TypeNode*)$1)->type_name, (IdNode*)$2);
+				createVarNode((IdNode*)$2, ((TypeNode*)$1)->type_name); 
 				
 				}
 

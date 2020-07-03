@@ -15,8 +15,6 @@ int IRManager::addPointerToRegisterInStack(string llvm_reg){
 
 void IRManager::assignExpNodeToVar(VarNode* variable, ExpNode* exp_node){
 
-
-
     // the variable is a register which points to a location in the string. we just neet to update the value in this location.
     if(exp_node->type == "int"){
         emitToBuffer("store i32 %" + exp_node->llvm_reg + ", i32* %p" + variable->llvm_reg);
@@ -544,7 +542,7 @@ void IRManager::returnFromNonVoidFunction(string func_type, ExpNode* return_valu
         list_of_labels.erase(return_value->false_list_id);
         emitToBuffer("ret i32 0");
     }else{
-        emitToBuffer("ret i32" + return_value->llvm_reg);
+        emitToBuffer("ret i32 %t" + return_value->llvm_reg);
     }
 
 }
@@ -578,6 +576,16 @@ void IRManager::getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node){
 string  IRManager::getFreshVarReg(){
     stack_offset_pointer++;
     return to_string(stack_offset_pointer - 1);
+}
+
+VarNode* IRManager::createNewVar(IdNode* id_node, string var_type){
+
+    VarNode* current_node = new VarNode(id_node->lineno, id_node->name, var_type); 
+    current_node->llvm_reg = getFreshVarReg();
+    emitToBuffer( "	%p" + current_node->llvm_reg + " = getelementptr inbounds [50 x i32], [50 x i32]* %stack, i32 0, i32 " + current_node->llvm_reg);
+   
+    emitToBuffer( "	store i32 0, i32* %p" + current_node->llvm_reg);
+    return current_node;
 }
 
                         
