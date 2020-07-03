@@ -434,7 +434,7 @@ ExpNode* ruleIDToExp (IdNode* id_node){
     string type = var->type;
     int line = id_node->lineno;
 
-    ExpNode* exp_node = new ExpNode(line, type, var->llvm_reg);
+    ExpNode* exp_node = new ExpNode(line, type, regManager->getFreshReg()->getName());
 
     regManager->getExpNodeValueAndBranch(var, exp_node);
 

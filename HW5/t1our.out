@@ -18,9 +18,9 @@ declare i32 @printf(i8*, ...)
  	; =========================== stack definition ============================= 
  %stack = alloca [50 x i32] 
  	; ============================= function body ============================== 
- %0 = load i32, i32* %p0 
- %reg9 = icmp eq i32 %0, 1 
- br i1 %reg9, label %label_12, label %label_15 
+ %reg9 = load i32, i32* %p0 
+ %reg10 = icmp eq i32 %reg9, 1 
+ br i1 %reg10, label %label_12, label %label_15 
 label_12:
  call void @print(i8* getelementptr inbounds ([12 x i8], [12 x i8]* @g_reg0, i32 0, i32 0)) 
  br label %label_18 
@@ -40,16 +40,16 @@ label_26:
 label_28:
  br label %label_30 
 label_30:
- %reg17 = phi i32 [1, %label_26], [0, %label_28] 
- call void @printByValue(i32 reg17) 
+ %reg18 = phi i32 [1, %label_26], [0, %label_28] 
+ call void @printByValue(i32 %reg18) 
  br label %label_34 
 label_34:
  br label %label_38 
 label_36:
  br label %label_38 
 label_38:
- %reg20 = phi i32 [1, %label_34], [0, %label_36] 
- call void @printByValue(i32 reg20) 
+ %reg21 = phi i32 [1, %label_34], [0, %label_36] 
+ call void @printByValue(i32 %reg21) 
  br label %label_42 
 label_42:
  call void @print(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @g_reg2, i32 0, i32 0)) 

@@ -473,7 +473,7 @@ string _addFunctionSingleVar(ExpNode* current_node){
          " x i8], [" + ((StringNode*)current_node)->size + " x i8]* " + current_node->llvm_reg + ", i32 0, i32 0)";
     }
     else{
-        return "i32 " + current_node->llvm_reg;
+        return "i32 %" + current_node->llvm_reg;
     }
 }
 
