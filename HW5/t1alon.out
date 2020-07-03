@@ -1,0 +1,78 @@
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+@.str_zero_div  = constant [23 x i8] c"Error division by zero\00"
+@.str_0 = constant [12 x i8] c"val is true\00"
+@.str_1 = constant [13 x i8] c"val is false\00"
+@.str_2 = constant [5 x i8] c"true\00"
+@.str_3 = constant [5 x i8] c"true\00"
+
+declare i32 @printf(i8*, ...)                                                   
+declare void @exit(i32)                                                         
+
+define void @printi(i32) {                                                      
+	call i32 (i8*, ...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0), i32 %0)
+	ret void                                                                       
+}                                                                               
+
+define void @print(i8*) {                                                       
+	call i32 (i8*, ...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0), i8* %0)
+	ret void                                                                       
+}                                                                               
+
+define void @printByValue(i32) {                                                
+	; ======================= input arguments definition =======================   
+	%t0 = alloca i32                                                               ; define a space in the stack for input boolean variable val and save to register %t0 a pointer to it
+	store i32 %0, i32* %t0                                                         ; store the input boolean variable val in it's assigned space in stack
+	; ============================ stack definition ============================   
+	%stack = alloca [50 x i32]                                                     ; define a space in the stack for maximum 50 variables
+	; ============================= function body ==============================   
+	%t1 = load i32, i32* %t0                                                       ; load the value of variable val and save it into register %t1
+	%t2 = icmp eq i32 %t1, 1                                                       ; check the value of variable val, which is being held inside %t2
+	br i1 %t2, label %label_24, label %label_27                                                    ; branch for each possible case of val's value
+label_24:
+	call void @print(i8* getelementptr inbounds ([12 x i8], [12 x i8]* @.str_0, i32 0, i32 0))
+	br label %label_30                                                                     
+label_27:
+	call void @print(i8* getelementptr inbounds ([13 x i8], [13 x i8]* @.str_1, i32 0, i32 0))
+	br label %label_30                                                                     
+label_30:
+	ret void                                                                       
+}                                                                               
+
+define void @main() {                                                           
+	; ============================ stack definition ============================   
+	%stack = alloca [50 x i32]                                                     ; define a space in the stack for maximum 50 variables
+	; ============================= function body ==============================   
+	br label %label_39                                                                     ; always TRUE expr
+label_39:
+	br label %label_43                                                                     ; jump to phi from TRUE prespective
+label_41:
+	br label %label_43                                                                     ; jump to phi from FALSE prespective
+label_43:
+	%t0 = phi i32 [1, %label_39], [0, %label_41]                                   ; according to the source label, put 1 or 0 in register %t0
+	call void @printByValue(i32 %t0)                                               
+	br label %label_49                                                                     ; always FALSE expr
+label_47:
+	br label %label_51                                                                     ; jump to phi from TRUE prespective
+label_49:
+	br label %label_51                                                                     ; jump to phi from FALSE prespective
+label_51:
+	%t1 = phi i32 [1, %label_47], [0, %label_49]                                   ; according to the source label, put 1 or 0 in register %t1
+	call void @printByValue(i32 %t1)                                               
+	br label %label_55                                                                     ; always TRUE expr
+label_55:
+	call void @print(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str_2, i32 0, i32 0))
+	br label %label_58                                                                     
+label_58:
+	br label %label_60                                                                     ; always FALSE expr
+label_60:
+	br label %label_67                                                                     ; always FALSE expr
+label_62:
+	br label %label_64                                                                     ; always TRUE expr
+label_64:
+	call void @print(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str_3, i32 0, i32 0))
+	br label %label_67                                                                     
+label_67:
+	ret void                                                                       
+}                                                                               
+

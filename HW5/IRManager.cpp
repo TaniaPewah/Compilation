@@ -56,10 +56,10 @@ void IRManager::bpatchBool(VarNode* variable, ExpNode* exp_node){
 }
 
 Register* IRManager::getFreshReg(){
-    // TODO: add "t" after %
-    
-    Register* ret = new Register(register_index , "reg" + to_string(register_index));
-   register_index++;
+   
+    Register* ret = new Register(register_index , to_string(register_index));
+    //cout <<"cout >>>> freshReg: %" << register_index << endl;
+    register_index++;
     return ret;
 }
 
@@ -430,8 +430,9 @@ void IRManager::defineNewFunction(IdNode* id_node, string type, vector<VarNode*>
 
     for(int i = 0; i < params.size() ; i++){
 
+
         // allocate empty space in stack and save on the param.llvm_reg
-        emitToBuffer ( "%p" + params[i]->llvm_reg + " = alloca i32");
+        emitToBuffer ( "%p" + params[i]->llvm_reg + " = alloca i32 ; " + params[i]->name );
 
         // copy the value back to function stack and params[i]->llvm_reg points to it
         emitToBuffer("store i32 %"+ params[i]->llvm_reg + ", i32* %p" + params[i]->llvm_reg );

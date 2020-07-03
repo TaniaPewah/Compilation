@@ -1,0 +1,73 @@
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+declare void @exit(i32) 
+declare i32 @printf(i8*, ...)
+@g_reg0 = constant [12 x i8] c"val is true\00"
+@g_reg1 = constant [13 x i8] c"val is false\00"
+@g_reg2 = constant [5 x i8] c"true\00"
+@g_reg3 = constant [5 x i8] c"true\00"
+
+ 
+; -----------------------  Program ------------------------ 
+ define void @printi(i32) { call i32 (i8*, ...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0), i32 %0) ret void} 
+ define void @print(i8*) { call i32 (i8*, ...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0), i8* %0) ret void } 
+ define void @printByValue(i32) {  
+ 	; ======================= input arguments definition ======================= 
+ %p1 = alloca i32 ; val 
+ store i32 %1, i32* %p1 
+ 	; =========================== stack definition ============================= 
+ %stack = alloca [50 x i32] 
+ 	; ============================= function body ============================== 
+ %4 = load i32, i32* %p1 
+ %5 = icmp eq i32 %4, 1 
+ br i1 %5, label %label_12, label %label_15 
+label_12:
+ call void @print(i8* getelementptr inbounds ([12 x i8], [12 x i8]* @g_reg0, i32 0, i32 0)) 
+ br label %label_18 
+label_15:
+ call void @print(i8* getelementptr inbounds ([13 x i8], [13 x i8]* @g_reg1, i32 0, i32 0)) 
+ br label %label_18 
+label_18:
+ ret void } 
+ define void @main() {  
+ 	; ======================= input arguments definition ======================= 
+ 	; =========================== stack definition ============================= 
+ %stack = alloca [50 x i32] 
+ 	; ============================= function body ============================== 
+ %2 = add i1 0, 1 
+ br label %label_27 
+label_27:
+ br label %label_31 
+label_29:
+ br label %label_31 
+label_31:
+ %2 = phi i32 [1, %label_27], [0, %label_29] 
+ call void @printByValue(i32 2) 
+ %5 = add i1 0, 0 
+ br label %label_36 
+label_36:
+ br label %label_40 
+label_38:
+ br label %label_40 
+label_40:
+ %5 = phi i32 [1, %label_36], [0, %label_38] 
+ call void @printByValue(i32 5) 
+ %7 = add i1 0, 1 
+ br label %label_45 
+label_45:
+ call void @print(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @g_reg2, i32 0, i32 0)) 
+ br label %label_48 
+label_48:
+ %10 = add i1 0, 0 
+ br label %label_51 
+label_51:
+ %11 = add i1 0, 0 
+ br label %label_60 
+label_54:
+ %12 = add i1 0, 1 
+ br label %label_57 
+label_57:
+ call void @print(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @g_reg3, i32 0, i32 0)) 
+ br label %label_60 
+label_60:
+ ret void } 
