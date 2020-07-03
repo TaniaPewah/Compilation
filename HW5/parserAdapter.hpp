@@ -11,6 +11,7 @@ IRManager* regManager = IRManager::getInstance();
 
 VarNode* ruleFormalDecl(TypeNode* type, IdNode* id){
     VarNode* new_var = new VarNode(type->lineno, id->name, type->type_name, false);
+    new_var->llvm_reg = regManager->getFreshVarReg();
     delete(type);
     delete(id);
     return new_var;
@@ -168,12 +169,12 @@ void ruleFuncDeclEndFunc(TypeNode* type_node){
 
 void ruleNewFunc( IdNode* func_id, string ret_type ){
     
-    string name = func_id->name;
+    // string name = func_id->name;
 
-    if( symbolTable.ifExists(name) ){
-        output::errorDef(func_id->lineno, name);
-        exit(0);
-    }
+    // if( symbolTable.ifExists(name) ){
+    //     output::errorDef(func_id->lineno, name);
+    //     exit(0);
+    // }
     
 	regManager->newFuncScope();
 }
@@ -191,7 +192,8 @@ FuncNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
         symbolTable.addSymbolVarForFunction(params[i], 0 - i - 1 );
     }
     current_func = name;
-
+    
+    // ruleNewFunc(id_node, type);
     regManager->defineNewFunction(id_node, type, params);
 
     delete(id_node);
@@ -207,6 +209,7 @@ void ruleVarDecl( string type_name, IdNode* id_node) {
         exit(0);
     }
 	VarNode* current_node = new VarNode(id_node->lineno, name, type_name, true); 
+    current_node->llvm_reg = regManager->getFreshVarReg();
 	symbolTable.addSymbolVar( current_node );
 
     delete(id_node);
@@ -219,6 +222,7 @@ VarNode* createVarNode(IdNode* id_node, string var_type){
 
 
     current_node = new VarNode(id_node->lineno, name, var_type, true); 
+    current_node->llvm_reg = regManager->getFreshVarReg();
     symbolTable.addSymbolVar( current_node );
 
     delete(id_node);
@@ -316,7 +320,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
 
 ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
     
-    regManager->emitToBuffer("%" + bool_node->llvm_reg + " = add i1 0, " + bool_sign);
+    // regManager->emitToBuffer("%" + bool_node->llvm_reg + " = add i1 0, " + bool_sign);
 
     regManager->createFalseListAndTrueList(bool_node, bool_sign);
     
@@ -446,7 +450,7 @@ ExpNode* ruleIDToExp (IdNode* id_node){
     string type = var->type;
     int line = id_node->lineno;
 
-    ExpNode* exp_node = new ExpNode(line, type);
+    ExpNode* exp_node = new ExpNode(line, type, var->llvm_reg);
 
     regManager->getExpNodeValueAndBranch(var, exp_node);
 
@@ -489,5 +493,9 @@ void ruleCallStatment(ExpNode* function_returned_value){
         regManager->callToFunctionBackPatch(function_returned_value);
     }
 } 
+
+void debugWindow(string s){
+    regManager->emitToBuffer(";" + s);
+}
 
 #endif //PARSER_ADAPTER_HPP

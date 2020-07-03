@@ -57,8 +57,9 @@ void IRManager::bpatchBool(VarNode* variable, ExpNode* exp_node){
 
 Register* IRManager::getFreshReg(){
    
-    Register* ret = new Register(register_index , to_string(register_index));
+    Register* ret = new Register(register_index , "reg" + to_string(register_index));
     //cout <<"cout >>>> freshReg: %" << register_index << endl;
+    //emitToBuffer(";node fresh reg num: "+ ret->getName());
     register_index++;
     return ret;
 }
@@ -548,7 +549,7 @@ void IRManager::returnFromNonVoidFunction(string func_type, ExpNode* return_valu
 }
 
 void IRManager::newFuncScope (){
-    register_index = 0;
+    stack_offset_pointer = 0;
 }
 
 void IRManager::getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node){
@@ -571,6 +572,11 @@ void IRManager::getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node){
         label_list_key_gen++;
     }
 
+}
+
+string  IRManager::getFreshVarReg(){
+    stack_offset_pointer++;
+    return to_string(stack_offset_pointer - 1);
 }
 
                         

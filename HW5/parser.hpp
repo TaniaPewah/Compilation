@@ -69,9 +69,7 @@ class NumNode: public TypeNode{
     public:
     string llvm_reg;
     int value;
-    NumNode( int lineno, int value, string type ) : TypeNode(lineno, type), value(value) {
-        llvm_reg = getFreshReg();
-    };
+    NumNode( int lineno, int value, string type ) : TypeNode(lineno, type), value(value) ,llvm_reg("") {};
 };
 
 
@@ -83,11 +81,11 @@ class ExpNode: public Node{
     int true_list_id;
     int false_list_id;
 
-    ExpNode( int lineno, string type ) : Node(lineno), type(type), true_list_id(-1), false_list_id(-1)  {
-        llvm_reg = getFreshReg();
-    };
+    ExpNode( int lineno, string type ) : Node(lineno), type(type), true_list_id(-1), 
+                                         false_list_id(-1), llvm_reg("")  {};
     
-    ExpNode(int lineno, string type, string llvm_reg) : Node(lineno), type(type), llvm_reg(llvm_reg), true_list_id(-1), false_list_id(-1) {
+    ExpNode(int lineno, string type, string llvm_reg) : Node(lineno), type(type), 
+                    llvm_reg(llvm_reg), true_list_id(-1), false_list_id(-1) {
     }
 };
 
@@ -112,13 +110,15 @@ class VarNode: public IdNode{
     int stack_offset;
     bool alocate_memory;
     VarNode( int lineno, string name, string type , bool alocate_memory) : IdNode(lineno, name), type(type) , alocate_memory(alocate_memory){
-        if(!alocate_memory){
-            stack_offset = -1;
-        }
-        else{
-            IRManager* regManager = IRManager::getInstance();
-            stack_offset = regManager->addPointerToRegisterInStack(llvm_reg);
-        }    
+        IRManager* regManager = IRManager::getInstance();
+        // if(!alocate_memory){
+        //     llvm_reg = to_string(regManager->stack_offset_pointer);
+        //     stack_offset = regManager->stack_offset_pointer++;
+        // }
+        // else{
+        //     this->llvm_reg = to_string(regManager->stack_offset_pointer);
+        //     stack_offset = regManager->addPointerToRegisterInStack(llvm_reg);
+        // }    
     };
 };
 

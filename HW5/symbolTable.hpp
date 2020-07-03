@@ -127,6 +127,7 @@ public:
     }
 
     void addSymbolVarForFunction( VarNode* symbolToAdd , int wanted_offset) {
+        
         if(!ifExists(symbolToAdd->name)){
             stack.back()->addSymbolVarForFunction( symbolToAdd, wanted_offset );
             //cout << "~~~~~~~~~~~~~~~~~~~~~ added var to symbol table " << symbolToAdd->name << endl;
@@ -138,6 +139,7 @@ public:
     }
     
     void addSymbolFunc( FuncNode* func_to_add ){
+       
         if(!ifExists(func_to_add->name)){
             stack.front()->addSymbolFunc( func_to_add );
             

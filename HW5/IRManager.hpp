@@ -126,6 +126,7 @@ public:
     void newFuncScope ();
     void bpatchBool(VarNode* variable, ExpNode* exp_node);
     void getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node);
+    string getFreshVarReg();
 };
 
 #endif //IR_MANAGER_HPP
