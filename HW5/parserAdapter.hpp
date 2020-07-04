@@ -186,6 +186,12 @@ FuncNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
 
     reverse(params.begin(), params.end());
 
+    // if (id_node->name == "main"){
+    //     if (params.size() != 0){
+    //         output::errorMainMissing();
+    //     }
+    // }
+
     FuncNode* current_node = symbolTable.getFuncNode(id_node->lineno, id_node->name);
     current_node->setParams(params);
 
@@ -307,6 +313,7 @@ ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
 
 
 ExpNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
+    reverse(params_list->params.begin(), params_list->params.end());
 
     // search ID in symboltable, and get it's type
     string returned_type = symbolTable.getFuncType(id_node->lineno, id_node->name);
