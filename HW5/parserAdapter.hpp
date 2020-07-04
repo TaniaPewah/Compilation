@@ -313,7 +313,7 @@ ExpNode* ruleBool(ExpNode* bool_node, string bool_sign){
 
 
 ExpNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
-    reverse(params_list->params.begin(), params_list->params.end());
+    
 
     // search ID in symboltable, and get it's type
     string returned_type = symbolTable.getFuncType(id_node->lineno, id_node->name);
@@ -324,6 +324,7 @@ ExpNode* ruleCallFunc(IdNode* id_node, ExpList* params_list) {
     // check whether the Exp list types are correct for this func else raise exception
     params_list->compareParams(func, func->params);
 
+    reverse(params_list->params.begin(), params_list->params.end());
     ExpNode* returned_value = new ExpNode(id_node->lineno, returned_type);
 
     regManager->handleCallFunction(func, params_list, returned_value);
