@@ -1,0 +1,19 @@
+//test
+void myFun() {
+	if(true) print("cool");
+}
+
+void main()
+{
+	while(true) {
+		if(false){
+			print("not happening");
+		} else {
+			print("sure");
+			myFun();
+			break;
+		}
+	} else {
+		print("won't get here");
+	}
+}

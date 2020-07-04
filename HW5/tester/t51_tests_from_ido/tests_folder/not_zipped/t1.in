@@ -1,0 +1,27 @@
+bool f(int x, bool y, byte z){
+    print("in f");
+    return (5!=3);
+}
+
+int g(){
+    print("g");
+    return 3;
+}
+
+bool h(){
+    print("h");
+    return false;
+}
+
+byte z(){
+    print("z");
+    return 6b;
+}
+
+void main()
+{
+    f(g(), h(), z());
+    int s=9;
+    return;
+   
+}

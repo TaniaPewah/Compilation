@@ -1,0 +1,15 @@
+// already defined as function
+void c(byte x) {
+    print("c");
+}
+
+void foo(bool m) {
+    print("foo");
+    return;
+}
+
+void main() {
+    c(7b);
+    foo(true);
+    return;
+}

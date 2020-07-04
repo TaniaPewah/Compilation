@@ -1,0 +1,9 @@
+// already defined as function
+int foo(int a, int c) {
+    return a+c;
+}
+
+void main() {
+    byte f;
+    printi(foo(foo(foo(1,2), foo(3,4)), foo(foo(5,6), foo(7,8))));
+}

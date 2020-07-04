@@ -1,0 +1,13 @@
+//assign void
+void testIn1(bool bin, byte in){
+    if (bin) {
+        printi(in);
+    } else {
+        printi(0b-in);
+    }
+    return;
+}
+
+void main() {
+    testIn1(true,6b);
+}

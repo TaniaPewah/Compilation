@@ -1,0 +1,80 @@
+//whiles
+bool cond() { return false; }
+
+
+
+void f1() {
+    while (cond())
+        print("not good");
+    else
+        print("still good");
+}
+
+void f2() {
+    bool x = true;
+    while (x) {
+        int y;
+        if (not x)
+            y = 6;
+        else
+            break;
+    }
+    print("f2 good");
+}
+
+void f3(bool c) {
+    while (c)
+        while (c or not c){
+            c = false;
+            break;
+        }
+    print("f3 good");
+}
+
+void f4() {
+    int x;
+    while(x < 3){
+        x = 4;
+        printi(x);
+        bool p;
+        if(x == 6)
+            bool z;
+        else
+            bool z;
+        continue;
+        x = 0;
+    }
+}
+
+void f5() {
+    int x;
+    while(x < 3){
+        x = 4;
+        printi(x);
+        bool p;
+        if(x == 6)
+            bool z;
+        else
+            bool z;
+        continue;
+        x = 0;
+    } else {
+		bool z;
+        printi(5);
+	}
+}
+
+void main() {
+    while (6 < 7) {
+        print("ok");
+        break;
+        print("ohoh");
+    }
+    
+    int z;
+    f1();
+    f2();
+    f3(true);
+    f4();
+    f5();
+}

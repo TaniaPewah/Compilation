@@ -1,0 +1,9 @@
+bool printfoo() { printi(1); return true; }
+
+void main() {
+    if(true or printfoo()){
+        print("true");
+    } else {
+        print("false");
+    }
+}

@@ -1,0 +1,38 @@
+//test conversions
+void printbool(bool a){
+    if (a){
+        print("true");
+    } else {
+        print("false");
+    }
+}
+void main() {
+    int int1 = 8;
+    printi(int1);
+    byte byte1 = 9 b;
+    bool bool1 = true;
+    printbool(bool1);
+    bool bool2 = false;
+    printbool(bool2);
+
+    int1 = 6b;
+    printi(int1);
+    int1 = byte1;
+    printi(int1);
+
+    bool1 = 6 < 7;
+    printbool(bool1);
+    bool2 = 80 b >= 12;
+    printbool(bool2);
+    bool1 = 12 b != 13 b;
+    printbool(bool1);
+    bool2 = 1 == 2b;
+    printbool(bool2);
+
+    bool bool3 = bool1 and bool2;
+    printbool(bool3);
+    bool3 = bool1 or bool2;
+    printbool(bool3);
+    bool3 = bool1 or not bool2;
+    printbool(bool3);
+}

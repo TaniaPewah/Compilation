@@ -1,0 +1,7 @@
+// some comment
+int func() { int a; return 0;}
+
+void main()
+{
+    int t;
+}

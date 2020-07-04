@@ -1,0 +1,23 @@
+//else far from while
+
+void main()
+{
+    int x = 4;
+    byte y = 100 b;
+	int z = 2;
+	while(true){
+		int a;
+		if (a > 1){
+			break;
+		}
+		a = a+1;
+		z = z+1;
+		printi(z);
+		if (z > 10){
+			break;
+		}
+	}else {
+		int a;
+		printi(69);
+	}
+}

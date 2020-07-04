@@ -1,0 +1,51 @@
+void f1(bool bo1, int i1, byte b1){
+    if(bo1){
+        printi(i1+b1);
+    }
+}
+
+void f2(bool bo1, byte b1, int i1){
+    if(bo1){
+        printi(i1+b1);
+    }
+}
+
+void f3(byte b1, bool bo1, int i1){
+    if(bo1){
+        printi(i1+b1);
+    }
+}
+
+void f4(int i1, bool bo1, byte b1){
+    if(bo1){
+        printi(i1+b1);
+    }
+}
+
+void f5(int i1, byte b1, bool bo1){
+    if(bo1){
+        printi(i1+b1);
+    }
+}
+
+void f6(byte b1, int i1, bool bo1){
+    if(bo1){
+        printi(i1+b1);
+    }
+}
+
+void main()
+{
+    f1(true, 1, 1b);
+    f1(false, 1, 1b);
+    f2(true, 1b, 1);
+    f2(false, 1b, 1);
+    f3(1b, false, 1);
+    f3(1b, true, 1);
+    f4(1, false, 1b);
+    f4(1, true, 1b);
+    f5(1, 1b, false);
+    f5(1, 1b, true);
+    f6(1b, 1, false);
+    f6(1b, 1, true);
+}

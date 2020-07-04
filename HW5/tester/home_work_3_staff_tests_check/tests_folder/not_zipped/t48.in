@@ -1,0 +1,24 @@
+bool uselessFunc(int x, int y)
+{
+    return x < y;
+}
+
+int return6()
+{
+    int i = 0;
+    while (true) {
+        if (i == 6) break;
+        i = i+1;
+    }
+    else printi(i);
+    return 6;
+}
+
+void main() {
+    bool c = false;
+    if (not c) {
+        int x = return6();
+        printi(x);
+    }
+    else { return; }
+}

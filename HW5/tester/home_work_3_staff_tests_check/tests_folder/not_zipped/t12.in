@@ -1,0 +1,9 @@
+//fail assign return
+byte returnInt() {
+    return 7b;
+}
+
+void main() {
+    byte b1 = returnInt();
+    printi(b1);
+}

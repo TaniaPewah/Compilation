@@ -1,0 +1,13 @@
+//fail param num
+void test(bool bin, byte in){
+    if (bin) {
+        printi(in);
+    } else {
+        printi(0b-in);
+    }
+    return;
+}
+
+void main() {
+    test(true,2 b);
+}

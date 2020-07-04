@@ -87,7 +87,6 @@ public:
     string fromI8RegisterToI32Register(string type, string original_register);
     void loadID(string type, string reg, string id_name);
 
-    void defineDivZeroError();
     void zeroError();
     BackpatchInfo handlerDivZero(string exp_b_type, string exp_b_reg);
     void handlePatching(BackpatchInfo patching_info);

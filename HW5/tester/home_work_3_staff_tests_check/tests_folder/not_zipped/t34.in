@@ -1,0 +1,114 @@
+void main() {
+    print("testing var init");
+    int a;
+    byte c;
+    bool d;
+    printi(a);
+    printi(c);
+    if(d){
+        print("true");
+    } else {
+        print("false");
+    }
+
+    print("testing var write and read");
+    a = 7;
+    printi(a);
+    c = 7b;
+    printi(c);
+    d = true;
+    if(d){
+        print("true");
+    } else {
+        print("false");
+    }
+
+    print("testing signed int");
+    a = (0-7);
+    printi(a);
+    a = a+8;
+    printi(a);
+    a = a-2;
+    printi(a);
+    a = a*9;
+    printi(a);
+    a = 1*(0-a);
+    printi(a);
+    a = a/(0-3);
+    printi(a);
+
+    print("testing unsigned byte");
+    printi(6b - 7b);
+    printi(6b * (0b-7b));
+    printi(9b/(0b-3b));
+
+    print("testing comparison between types");
+    if(9b > 7){
+        print("true");
+    } else {
+        print("false");
+    }
+    if(9 > 7b){
+        print("true");
+    } else {
+        print("false");
+    }
+    if(9 == 9b){
+        print("true");
+    } else {
+        print("false");
+    }
+
+    if(9b < 7){
+        print("true");
+    } else {
+        print("false");
+    }
+    if(9 < 7b){
+        print("true");
+    } else {
+        print("false");
+    }
+    if(9 != 9b){
+        print("true");
+    } else {
+        print("false");
+    }
+
+    if(9b >= 9){
+        print("true");
+    } else {
+        print("false");
+    }
+    if(9b < 9){
+        print("true");
+    } else {
+        print("false");
+    }
+    if(9b >= 9){
+        print("true");
+    } else {
+        print("false");
+    }
+
+    if(7 < 7b){
+        print("true");
+    } else {
+        print("false");
+    }
+    if(7 <= 7b){
+        print("true");
+    } else {
+        print("false");
+    }
+    if(7 >= 7b){
+        print("true");
+    } else {
+        print("false");
+    }
+
+    print("testing division by 0");
+    int x1 = 7;
+    int x2 = x1 - x1;
+    printi(x1/x2);
+}

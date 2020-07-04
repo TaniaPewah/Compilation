@@ -1,0 +1,13 @@
+int foo(bool x) {
+    if (x) {
+        bool y;
+        return 0;
+    }
+    else
+        return 5;
+    return 0-1;
+}
+
+void main() {
+    printi(foo(false));
+}

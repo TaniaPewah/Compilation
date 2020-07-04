@@ -1,0 +1,4 @@
+//incorrect main
+void main() {
+	int c;
+}

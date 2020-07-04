@@ -1,0 +1,9 @@
+//use string as expr
+void callee() {
+    byte variable = 48b;
+    printi(variable);
+}
+
+void main() {
+    callee();
+}

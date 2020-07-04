@@ -1,0 +1,33 @@
+void main(){
+int x = 1;
+	while(x > 0){
+		printi(0);
+		while(x != 0 ){
+			printi(1);
+			x=0;
+			break;
+		}else{
+			while(x == 0){
+			
+				printi(3);
+				printi(4);
+				x=1;
+			}
+			else{
+				while(x==1){
+					printi(6);
+					break;
+				}
+				else{
+				printi(7);
+				}
+			printi(8);
+			}
+			printi(5);
+		}
+		break;
+	}else{
+		printi(2);
+	}
+}
+

@@ -1,0 +1,8 @@
+1. copy your .h/.hpp/.cpp parser.ypp scanner.lex files into src folder.
+2. run python script "python files_to_submittion.py" on csComp, make sure your in the right directory.
+3. if a test fails then the program will output all you need to know, if not you can do your own testing in 
+src and the script can handle it.
+4. if all tests pass you can find the submission zip file in the folder "submission_folder" that will be created.
+
+notes:
+2 tests have been added since 6/27/2020

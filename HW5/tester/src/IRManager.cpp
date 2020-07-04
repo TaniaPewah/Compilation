@@ -19,7 +19,7 @@ void IRManager::assignExpNodeToVar(VarNode* variable, ExpNode* exp_node){
     if(exp_node->type == "bool"){
         bpatchBool(variable, exp_node);
     } else{
-        emitToBuffer("store i32 %p" + exp_node->llvm_reg + ", i32* %p" + variable->llvm_reg);
+        emitToBuffer("store i32 %" + exp_node->llvm_reg + ", i32* %p" + variable->llvm_reg);
     }
     return;
 }
@@ -89,18 +89,18 @@ void IRManager::endProgram(){
 
 void IRManager::loadID(string type, string reg, string id_name) {
     
-    emitToBuffer("%p" + reg + " = load i32, i32* " + "%p" + id_name);
+    emitToBuffer("%" + reg + " = load i32, i32* " + "%p" + id_name);
     
-}
-
-void IRManager::defineDivZeroError(){
-    emitGlobalToBuffer("@.zero_error  = constant [23 x i8] c\"Error division by zero\\00\"");
 }
 
 
 void IRManager::zeroError(){
     
-   
+    emitGlobalToBuffer("@.zero_error  = constant [23 x i8] c\"Error division by zero\\00\"");
+
+    emitToBuffer("call void @print(i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.zero_error, i32 0, i32 0))");
+    emitToBuffer("call void @exit(i32 0)");
+    emitToBuffer("SHOULD NOT BE PRINTED");
 
 }
 
@@ -110,18 +110,15 @@ BackpatchInfo IRManager::handlerDivZero(string exp_b_type, string exp_b_reg) {
     Register* zero_devision = getFreshReg();
 
     
-    emitToBuffer("%p" + zero_devision->getName() + " = icmp eq i32 %p" + exp_b_reg + ", 0");
+    emitToBuffer("%" + zero_devision->getName() + " = icmp eq i32 %" + exp_b_reg + ", 0");
     
 
     BackpatchInfo patching_info;
-    patching_info.branch_location = emitToBuffer("br i1 %p" + zero_devision->getName() + ", label @, label @");
+    patching_info.branch_location = emitToBuffer("br i1 %" + zero_devision->getName() + ", label @, label @");
     
 
     patching_info.label_true = codeBuffer.genLabel();
-   
-    emitToBuffer("call void @print(i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.zero_error, i32 0, i32 0))");
-    emitToBuffer("call void @exit(i32 0)");
-    emitToBuffer("unreachable");
+    zeroError();
     
     patching_info.label_false = codeBuffer.genLabel();
 
@@ -231,8 +228,8 @@ void IRManager::expRelopExpCreateBr(ExpNode* compare, ExpNode* exp1, ExpNode* ex
 
     Register* reg = getFreshReg();
     
-    emitToBuffer("%" + reg->getName() + " = icmp " + compare_sign->relop_sign + " i32 %p" + 
-     exp1->llvm_reg + ", %p" + exp2->llvm_reg);
+    emitToBuffer("%" + reg->getName() + " = icmp " + compare_sign->relop_sign + " i32 %" + 
+     exp1->llvm_reg + ", %" + exp2->llvm_reg);
 
     int branch_location = emitToBuffer("br i1 %" + reg->getName() + ", label @, label @");
 	
@@ -445,7 +442,7 @@ void IRManager::startBoolJump(ExpNode* exp_node){
     codeBuffer.bpatch(codeBuffer.makelist({true_branch_location, FIRST}), end_lable);
     codeBuffer.bpatch(codeBuffer.makelist({false_branch_location, FIRST}), end_lable);
 
-    emitToBuffer("%p" + exp_node->llvm_reg + " = phi i32 [1, %" + true_lable + "], [0, %" + false_lable + "]");
+    emitToBuffer("%" + exp_node->llvm_reg + " = phi i32 [1, %" + true_lable + "], [0, %" + false_lable + "]");
 }
 
 string _addFunctionSingleVar(ExpNode* current_node){
@@ -454,7 +451,7 @@ string _addFunctionSingleVar(ExpNode* current_node){
          " x i8], [" + ((StringNode*)current_node)->size + " x i8]* " + current_node->llvm_reg + ", i32 0, i32 0)";
     }
     else{
-        return "i32 %p" + current_node->llvm_reg;
+        return "i32 %" + current_node->llvm_reg;
     }
 }
 
@@ -486,7 +483,7 @@ void IRManager::handleCallFunction(FuncNode* func_node, ExpList* params_list, Ex
     if(func_node->type == "bool"){
         Register* fresh_reg = getFreshReg();
 
-        emitToBuffer("%" + fresh_reg->getName() + " = icmp eq i32 %p" + returned_value->llvm_reg + ", 1");
+        emitToBuffer("%" + fresh_reg->getName() + " = icmp eq i32 %" + returned_value->llvm_reg + ", 1");
 
        	int branch_location = emitToBuffer( "br i1 %" + fresh_reg->getName() + ", label @, label @");
 		
@@ -523,7 +520,7 @@ void IRManager::returnFromNonVoidFunction(string func_type, ExpNode* return_valu
         list_of_labels.erase(return_value->false_list_id);
         emitToBuffer("ret i32 0");
     }else{
-        emitToBuffer("ret i32 %p" + return_value->llvm_reg);
+        emitToBuffer("ret i32 %" + return_value->llvm_reg);
     }
 
 }
@@ -537,7 +534,7 @@ void IRManager::getExpNodeValueAndBranch(VarNode* var, ExpNode* exp_node){
 
     if(var->type == "bool"){
         Register* fresh_reg = getFreshReg();
-        emitToBuffer("%" + fresh_reg->getName() +  " = icmp eq i32 %p" + exp_node->llvm_reg + ", 1");
+        emitToBuffer("%" + fresh_reg->getName() +  " = icmp eq i32 %" + exp_node->llvm_reg + ", 1");
 
         int branch_location = emitToBuffer("br i1 %" + fresh_reg->getName() + ", label @, label @");
 

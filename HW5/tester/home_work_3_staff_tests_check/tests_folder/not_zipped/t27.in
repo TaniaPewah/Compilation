@@ -1,0 +1,12 @@
+// already defined
+void f1(byte x) {
+    int y = 5;
+    printi(x);
+}
+
+void main() {
+    byte x = 7b;
+    f1(8b);
+    return;
+}
+

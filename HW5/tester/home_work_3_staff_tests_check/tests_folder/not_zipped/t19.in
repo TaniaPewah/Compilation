@@ -1,0 +1,24 @@
+bool f(byte x) {
+    byte i = 1b;
+	while (i < 255b) {
+	    if(2 * i == x) {
+	        return true;
+	    }
+	    else
+	        return false;
+	}
+	return false;
+}
+
+byte g() {
+    return 42 b;
+}
+
+void main() {
+	if (f(g())){
+		print("even");
+	} else {
+		print("uneven");
+	}
+    return ;
+}

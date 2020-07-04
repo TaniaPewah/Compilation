@@ -225,9 +225,7 @@ void ruleVarDeclAssign(IdNode* id_node, VarNode* var_node, ExpNode* exp_node,  s
 
 void ruleInit(){
     addPrintAndPrinti();
-    regManager->defineDivZeroError();
     regManager->definePrintAndPrinti();
-    
 }
 
 
@@ -253,17 +251,20 @@ ExpNode* ruleExpBinopExp(ExpNode* exp_a,  BinopNode* binop, ExpNode* exp_b) {
     expNode->llvm_reg =  regManager->getFreshReg()->getName();
 
     regManager->emitToBuffer(";if multipale define-> check binop");
-    string to_emit = "%p" + expNode->llvm_reg + " = " + binop->binop + " i32 %p" + exp_a->llvm_reg + ", %p" + exp_b->llvm_reg;
-    regManager->emitToBuffer(to_emit );
+    string to_emit = "%" + expNode->llvm_reg + " = " + binop->binop + " i32 %" + exp_a->llvm_reg + ", %" + exp_b->llvm_reg;
+    regManager->emitToBuffer(to_emit);
 
     if(binop->binop == "sdiv"){
         regManager->handlePatching(patching_info);
     }
 
+    
+
     if(type == "byte"){
         string new_reg_name = regManager->getFreshReg()->getName();
-        regManager->emitToBuffer( "%p" + new_reg_name + " = and i32 %p" + expNode->llvm_reg + ", 255");
+        regManager->emitToBuffer( "%" + new_reg_name + " = and i32 %" + expNode->llvm_reg + ", 255");
         expNode->llvm_reg = new_reg_name;
+    
     }
     
     return expNode;
@@ -277,7 +278,7 @@ ExpNode* ruleExpNum(NumNode* num_node){
     ExpNode* expNode = new ExpNode(num_node->lineno, num_node->type_name);
     expNode->llvm_reg = regManager->getFreshReg()->getName();
 
-    string command = "%p" + expNode->llvm_reg + " = add i32 0, " + to_string(num_node->value); 
+    string command = "%" + expNode->llvm_reg + " = add i32 0, " + to_string(num_node->value); 
     regManager->emitToBuffer(command);
     return (expNode);
 }
@@ -291,7 +292,7 @@ ExpNode* ruleExpNumB(NumNode* num) {
     ExpNode* expNode = new ExpNode(num->lineno, "byte");
     expNode->llvm_reg = regManager->getFreshReg()->getName();
 
-    string command = "%p" + expNode->llvm_reg + " = add i32 0, " + to_string(num->value); 
+    string command = "%" + expNode->llvm_reg + " = add i32 0, " + to_string(num->value); 
 
     regManager->emitToBuffer(command);
     return (expNode);
