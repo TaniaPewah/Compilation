@@ -186,11 +186,13 @@ FuncNode* ruleFuncDecl(IdNode* id_node, string type, vector<VarNode*> params) {
 
     reverse(params.begin(), params.end());
 
-    // if (id_node->name == "main"){
-    //     if (params.size() != 0){
-    //         output::errorMainMissing();
-    //     }
-    // }
+     
+    if (id_node->name == "main" && 
+        type == "void" && 
+        params.size() == 0) {
+        
+        symbolTable.has_main = true;
+    }  
 
     FuncNode* current_node = symbolTable.getFuncNode(id_node->lineno, id_node->name);
     current_node->setParams(params);

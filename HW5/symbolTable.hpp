@@ -142,13 +142,7 @@ public:
        
         if(!ifExists(func_to_add->name)){
             stack.front()->addSymbolFunc( func_to_add );
-            
-            if (func_to_add->name == "main" && 
-                func_to_add->type == "void" && 
-                func_to_add->params.size() == 0) {
-
-                this->has_main = true;
-            }  
+           
             //cout << "~~~~~~~~~~~~~~~~~~~~~ added func to symbol table " << func_to_add->name << endl;
         }
         else{
